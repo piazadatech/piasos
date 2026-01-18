@@ -1,0 +1,1764 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Piabitech - CAD v11 (Híbrido)</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #0d1b3a; --secondary: #1e3c72; --accent: #b21f1f;
+            --bg-dark: #09090b; --card-bg: #18181b; --border: #27272a;
+            --text-light: #e4e4e7; --text-muted: #a1a1aa;
+            --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6;
+            --nav-height: 60px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-light); height: 100vh; overflow: hidden; }
+
+        /* --- UTILITÁRIOS --- */
+        .hidden { display: none !important; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 13px; text-transform: uppercase; color: white; background: linear-gradient(135deg, var(--primary), var(--secondary)); }
+        .btn-sm { padding: 6px 12px; width: auto; font-size: 11px; }
+        .btn-danger { background: var(--accent); }
+        .btn-success { background: var(--success); }
+        .btn-info { background: var(--info); }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-muted); transition: 0.2s; }
+        .btn-outline:hover { border-color: var(--text-light); color: var(--text-light); }
+        
+        /* INPUTS COMPACTOS */
+        input, select, textarea { width: 100%; padding: 10px 10px 10px 30px; background-color: #27272a; border: 1px solid #3f3f46; border-radius: 6px; color: white; font-size: 14px; outline: none; }
+        label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 4px; font-weight: 700; text-transform: uppercase; }
+        .input-wrapper { position: relative; margin-bottom: 12px; }
+        .input-wrapper i.icon-left { position: absolute; left: 8px; top: 32px; color: var(--text-muted); font-size: 13px; }
+        
+        /* NAVBAR */
+        #app-wrapper { display: flex; flex-direction: column; height: 100%; }
+        .navbar { height: var(--nav-height); background: var(--card-bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); z-index: 50; }
+        .nav-brand { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 700; color: white; }
+        .nav-menu { display: flex; gap: 5px; height: 100%; }
+        .nav-item { display: flex; align-items: center; gap: 8px; padding: 0 15px; color: var(--text-muted); cursor: pointer; font-size: 13px; font-weight: 500; border-bottom: 3px solid transparent; transition: 0.2s; }
+        .nav-item.active { color: white; border-bottom-color: var(--secondary); background: rgba(255,255,255,0.02); }
+        .nav-user { display: flex; align-items: center; gap: 10px; }
+        .avatar { width: 30px; height: 30px; background: var(--secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; }
+        
+        @media (max-width: 768px) { .navbar { padding: 0 10px; } .nav-text, .nav-brand h2 { display: none; } .nav-item { padding: 0 12px; } }
+
+        /* CONTEÚDO PRINCIPAL */
+        .main-content { flex: 1; overflow-y: hidden; position: relative; display: flex; flex-direction: column; }
+        .scroll-content { flex: 1; overflow-y: auto; padding: 15px; } 
+        
+        .section-box { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .section-title { font-size: 13px; font-weight: 700; color: var(--secondary); margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; text-transform: uppercase; }
+        .atend-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 15px; }
+        @media (max-width: 800px) { .atend-grid { grid-template-columns: 1fr; } }
+
+        /* GRADE 3x3 */
+        .classif-group { margin-bottom: 15px; }
+        .classif-label { font-size: 10px; color: var(--accent); font-weight: 700; margin-bottom: 6px; display: block; padding-left: 2px; }
+        .check-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .option-box { position: relative; height: 100%; }
+        .option-box input { position: absolute; opacity: 0; width: 0; height: 0; }
+        .option-box label { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 4px; font-size: 10px; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; color: var(--text-muted); margin: 0; padding: 10px 5px; height: 100%; transition: 0.2s; }
+        .option-box input:checked + label { background: var(--secondary); color: white; border-color: var(--info); box-shadow: 0 0 10px rgba(30, 60, 114, 0.4); }
+
+        /* === MONITORAMENTO HÍBRIDO (CSS RESPONSIVO) === */
+        
+        /* 1. Versão Desktop (Tabelas Fixas) */
+        .desktop-monitor { display: flex; height: 100%; gap: 20px; padding: 20px; }
+        .monitor-col { flex: 1; display: flex; flex-direction: column; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+        .monitor-header { padding: 15px; font-weight: 700; font-size: 14px; text-transform: uppercase; background: #222; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+        .monitor-body { flex: 1; overflow-y: auto; }
+        
+        table.monitor-table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+        table.monitor-table th { background: rgba(0,0,0,0.3); padding: 12px; text-align: left; color: var(--text-muted); font-size: 11px; position: sticky; top: 0; }
+        table.monitor-table td { padding: 12px; border-bottom: 1px solid var(--border); cursor: pointer; }
+        table.monitor-table tr:hover { background: rgba(255,255,255,0.05); }
+
+        /* 2. Versão Mobile (Painéis Deslizantes) */
+        .mobile-monitor { display: none; width: 100%; height: 100%; overflow: hidden; background: #000; }
+        .sliding-panel { height: 100%; display: flex; flex-direction: column; transition: flex-basis 0.4s ease, width 0.4s ease; border-right: 1px solid var(--border); overflow: hidden; position: relative; }
+        .panel-expanded { flex-basis: 90%; } /* Ajuste mobile */
+        .panel-collapsed { flex-basis: 10%; background: #111; cursor: pointer; }
+        .panel-collapsed .monitor-body { display: none; }
+        .panel-collapsed .monitor-header { writing-mode: vertical-rl; text-orientation: mixed; height: 100%; justify-content: center; padding: 0; font-size: 14px; letter-spacing: 2px; }
+
+        /* MEDIA QUERIES (A Mágica) */
+        @media (max-width: 1023px) {
+            .desktop-monitor { display: none; }
+            .mobile-monitor { display: flex; }
+        }
+
+        /* Card Mobile */
+        .card-mobile { background: #222; border: 1px solid var(--border); border-left-width: 4px; padding: 15px; margin: 10px; border-radius: 6px; cursor: pointer; }
+        .card-tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #333; color: #ccc; margin-right: 5px; }
+
+        /* DRAWERS (Gavetas Laterais) */
+        .drawer { position: fixed; top: 0; width: 400px; height: 100%; background: #18181b; border: 1px solid #333; transition: transform 0.3s ease; z-index: 300; display: flex; flex-direction: column; }
+        .drawer-left { left: 0; border-right: 1px solid #333; transform: translateX(-100%); }
+        .drawer-right { right: 0; border-left: 1px solid #333; transform: translateX(100%); }
+        .drawer-left.open { transform: translateX(0) !important; }
+        .drawer-right.open { transform: translateX(0) !important; }
+        .drawer-header { padding: 15px; background: #222; border-bottom: 1px solid #333; flex-shrink: 0; }
+        .drawer-header h3 { margin: 0 0 8px 0; font-size: 16px; font-weight: 700; }
+        .drawer-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+        .drawer-body { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+        .drawer-section { background: #222; border: 1px solid #333; border-radius: 6px; padding: 12px; }
+        .drawer-section-title { font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; margin-bottom: 8px; }
+        .drawer-section-content { font-size: 12px; line-height: 1.5; }
+        .drawer-footer { padding: 12px; background: #222; border-top: 1px solid #333; display: flex; justify-content: space-between; flex-shrink: 0; }
+        .drawer-footer i { cursor: pointer; font-size: 16px; color: var(--secondary); transition: 0.2s; }
+        .drawer-footer i:hover { color: var(--info); transform: scale(1.1); }
+        .btn-copy { font-size: 11px; padding: 4px 8px; background: #333; border: 1px solid #555; border-radius: 4px; cursor: pointer; color: white; }
+        .btn-copy:hover { background: #444; }
+        .tag-anonimo { display: inline-block; font-size: 9px; padding: 2px 6px; background: #ff6b6b; color: white; border-radius: 3px; margin-left: 8px; }
+        .historico-area { background: #1a1a1a; border: 1px solid #333; border-radius: 4px; padding: 10px; max-height: 200px; overflow-y: auto; font-size: 11px; line-height: 1.4; color: #ccc; }
+        .historico-msg { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #333; }
+        .historico-msg:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .historico-hora { font-size: 10px; color: var(--text-muted); }
+        .lista-recursos { flex-shrink: 0; }
+        .recurso-item { background: #1a1a1a; border: 1px solid #333; border-left: 3px solid var(--success); border-radius: 4px; padding: 8px; margin-bottom: 6px; font-size: 11px; }
+        
+        /* --- DRAWER EXTRA (SELEÇÃO DE FROTA) --- */
+        .drawer-extra { position: fixed; top: 0; width: 320px; height: 100%; background: #121212; z-index: 250; transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); box-shadow: 0 0 20px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+        .drawer-extra.left-hidden { left: 50px; opacity: 0; pointer-events: none; }
+        .drawer-extra.left-visible { left: 400px; opacity: 1; pointer-events: auto; border-left: 1px solid #333; }
+        .drawer-extra.right-hidden { right: 50px; opacity: 0; pointer-events: none; }
+        .drawer-extra.right-visible { right: 400px; opacity: 1; pointer-events: auto; border-right: 1px solid #333; }
+        
+        .tooltip { position: relative; display: inline-block; }
+        .tooltip .tooltiptext { visibility: hidden; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 8px; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -60px; opacity: 0; transition: opacity 0.3s; font-size: 11px; width: 120px; white-space: normal; }
+        .tooltip .tooltiptext::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #333 transparent transparent transparent; }
+        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+
+        /* MODAL GERAL */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .modal-content { background: #121212; width: 95%; max-width: 600px; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; max-height: 90vh; box-shadow: 0 20px 50px black; }
+        .modal-header { padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #1a1a1a; border-radius: 12px 12px 0 0; }
+        .modal-body { padding: 20px; overflow-y: auto; }
+        .modal-footer { padding: 15px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; background: #1a1a1a; border-radius: 0 0 12px 12px; }
+
+        /* Viaturas */
+        .viatura-item { padding: 12px; border: 1px solid var(--border); margin-bottom: 8px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; background: #1a1a1a; }
+        .viatura-item:hover { background: var(--secondary); border-color: var(--info); }
+
+        #login-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--bg-dark); z-index: 100; }
+        .login-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 30px; width: 90%; max-width: 380px; }
+        .suggestions { position: absolute; background: #333; width: 100%; z-index: 10; max-height: 150px; overflow-y: auto; border: 1px solid var(--border); top: 55px; border-radius: 0 0 6px 6px; }
+        .sugg-item { padding: 10px; border-bottom: 1px solid #444; font-size: 12px; cursor: pointer; }
+        .sugg-item:hover { background: var(--secondary); }
+        .dynamic-list { margin-top: 10px; display: flex; flex-direction: column; gap: 5px; }
+        .list-entry { background: #222; padding: 8px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; border: 1px solid var(--border); }
+    </style>
+</head>
+<body>
+
+    <div id="login-wrapper">
+        <div class="login-card">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <i class="fas fa-shield-alt" style="font-size: 40px; color: white;"></i>
+                <h2 style="margin-top: 10px;">Piabi<span style="color: var(--accent);">tech</span></h2>
+            </div>
+            <form onsubmit="handleLogin(event)">
+                <div style="margin-bottom: 10px;"><label>CPF</label><input type="tel" id="loginUser" required placeholder="000.000.000-00"></div>
+                <div style="margin-bottom: 20px;"><label>Senha</label><input type="password" id="loginPass" required></div>
+                <button type="submit" class="btn">ENTRAR</button>
+                <button type="button" class="btn btn-outline" onclick="abrirModalCadastro()" style="margin-top: 10px;">SOLICITAR ACESSO</button>
+            </form>
+        </div>
+        <div id="modalCadastro" class="modal-overlay">
+            <div class="modal-content" style="max-width:420px;">
+                <div class="modal-header"><h3>Solicitar Acesso</h3><i class="fas fa-times" onclick="fecharModal('modalCadastro')" style="cursor:pointer"></i></div>
+                <div class="modal-body">
+                    <div style="margin-bottom:8px;"><label>Chave de Acesso (Opcional)</label><input type="text" id="cad_chave" placeholder="Se possuir uma chave"></div>
+                    <div style="margin-bottom:8px;"><label>Nome Completo</label><input type="text" id="cad_nome" required></div>
+                    <div style="margin-bottom:8px;"><label>Nome de Guerra</label><input type="text" id="cad_guerra" required></div>
+                    <div style="margin-bottom:8px;"><label>CPF</label><input type="text" id="cad_cpf" required placeholder="Somente números"></div>
+                    <div style="margin-bottom:8px;"><label>Senha</label><input type="password" id="cad_senha" required></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-sm btn-success" onclick="solicitarCadastro()">Solicitar</button><button type="button" class="btn btn-sm btn-outline" onclick="fecharModal('modalCadastro')">Cancelar</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-wrapper" class="hidden">
+        <div class="navbar">
+            <div class="nav-brand"><i class="fas fa-shield-alt"></i><h2>Piabi<span>tech</span></h2></div>
+            <div class="nav-menu">
+                <div class="nav-item active" id="nav-atendimento" onclick="navegar('atendimento')"><i class="fas fa-phone-alt"></i> <span class="nav-text">ATENDIMENTO</span></div>
+                <div class="nav-item" id="nav-triagem" onclick="navegar('triagem')"><i class="fas fa-list-alt"></i> <span class="nav-text">TRIAGEM</span></div>
+                <div class="nav-item" id="nav-monitoramento" onclick="navegar('monitoramento')"><i class="fas fa-broadcast-tower"></i> <span class="nav-text">MONITORAMENTO</span></div>
+                <div class="nav-item" id="nav-frota" onclick="navegar('frota')"><i class="fas fa-car"></i> <span class="nav-text">FROTA</span></div>
+                <div class="nav-item" id="nav-admin" onclick="navegar('admin')"><i class="fas fa-users-cog"></i> <span class="nav-text">ADMIN</span></div>
+            </div>
+            <div class="nav-user"><div class="avatar" id="userAvatar">U</div><i class="fas fa-sign-out-alt" onclick="logout()" style="color:var(--text-muted); cursor:pointer;"></i></div>
+        </div>
+
+        <div class="main-content">
+            
+            <div id="view-atendimento" class="scroll-content">
+                <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
+                    <h1 style="font-size: 18px;">Novo Atendimento</h1>
+                    <button class="btn btn-outline btn-sm" onclick="limparAtendimento()">LIMPAR</button>
+                </div>
+
+                <form onsubmit="return false;">
+                    <div class="atend-grid">
+                        <div>
+                            <div class="section-box">
+                                <div class="section-title"><i class="fas fa-user"></i> Solicitante</div>
+                                <div style="display: flex; gap: 10px;">
+                                    <div style="flex:1"><label>Telefone</label><div class="input-wrapper"><i class="fas fa-phone icon-left"></i><input type="tel" id="solTel"></div></div>
+                                    <div style="flex:2"><label>Nome</label><div class="input-wrapper"><i class="fas fa-user icon-left"></i><input type="text" id="solNome"></div></div>
+                                </div>
+                                <div class="option-box" style="height:auto;"><input type="checkbox" id="chkAnon" onchange="toggleAnonimo(this)"><label for="chkAnon" style="width:fit-content; background:transparent; border:none; padding:0; justify-content:flex-start;">Anônimo</label></div>
+                            </div>
+                            <div class="section-box">
+                                <div class="section-title"><i class="fas fa-map-marker-alt"></i> Local</div>
+                                <div style="display: flex; gap: 10px;">
+                                    <div style="width: 100px;"><label>CEP</label><div class="input-wrapper"><i class="fas fa-search icon-left"></i><input type="tel" id="endCep" onblur="buscarCep(this.value)"></div></div>
+                                    <div style="flex: 1;"><label>Cidade</label><div class="input-wrapper"><i class="fas fa-city icon-left"></i><input type="text" id="endCidade"></div></div>
+                                </div>
+                                <div style="position: relative;">
+                                    <label>Logradouro</label><div class="input-wrapper"><i class="fas fa-road icon-left"></i><input type="text" id="endLog" oninput="sugerirLogradouro(this.value)" autocomplete="off"></div>
+                                    <div id="sugestoesLog" class="suggestions hidden"></div>
+                                </div>
+                                <div style="display: flex; gap: 10px;">
+                                    <div style="width: 80px;"><label>Nº</label><div class="input-wrapper"><i class="fas fa-hashtag icon-left"></i><input type="text" id="endNum"></div></div>
+                                    <div style="flex: 1;"><label>Bairro</label><div class="input-wrapper"><i class="fas fa-map icon-left"></i><input type="text" id="endBairro"></div></div>
+                                </div>
+                                <div><label>Referência</label><div class="input-wrapper"><i class="fas fa-map-pin icon-left"></i><input type="text" id="endRef"></div></div>
+                            </div>
+                            <div class="section-box">
+                                <div class="section-title"><i class="fas fa-tags"></i> Classificação</div>
+                                <div class="classif-group"><span class="classif-label">PERIGO IMEDIATO (Múltiplo)</span>
+                                    <div class="check-grid">
+                                        <div class="option-box"><input type="checkbox" id="p1" class="tag-check" value="ARMA DE FOGO"><label for="p1">ARMA DE FOGO</label></div>
+                                        <div class="option-box"><input type="checkbox" id="p2" class="tag-check" value="ARMA BRANCA"><label for="p2">ARMA BRANCA</label></div>
+                                        <div class="option-box"><input type="checkbox" id="p3" class="tag-check" value="EXPLOSIVO"><label for="p3">EXPLOSIVO</label></div>
+                                    </div>
+                                </div>
+                                <div class="classif-group"><span class="classif-label">LOCALIZAÇÃO AUTOR</span>
+                                    <div class="check-grid">
+                                        <div class="option-box"><input type="radio" name="locAutor" id="la1" class="tag-radio" value="NO LOCAL"><label for="la1">NO LOCAL</label></div>
+                                        <div class="option-box"><input type="radio" name="locAutor" id="la2" class="tag-radio" value="SAIU DO LOCAL"><label for="la2">SAIU DO LOCAL</label></div>
+                                        <div class="option-box"><input type="radio" name="locAutor" id="la3" class="tag-radio" value="INDETERMINADO"><label for="la3">INDETERMINADO</label></div>
+                                    </div>
+                                </div>
+                                <div class="classif-group"><span class="classif-label">TEMPO DO ATO</span>
+                                    <div class="check-grid">
+                                        <div class="option-box"><input type="radio" name="tempoAto" id="ta1" class="tag-radio" value="ESTÁ PARA OCORRER"><label for="ta1">VAI OCORRER</label></div>
+                                        <div class="option-box"><input type="radio" name="tempoAto" id="ta2" class="tag-radio" value="EM ANDAMENTO"><label for="ta2">EM ANDAMENTO</label></div>
+                                        <div class="option-box"><input type="radio" name="tempoAto" id="ta3" class="tag-radio" value="ACONTECEU A ALGUM TEMPO"><label for="ta3">JÁ OCORREU</label></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="section-box">
+                                <div class="section-title"><i class="fas fa-file-alt"></i> Ocorrência</div>
+                                <div><label>Natureza</label><div class="input-wrapper"><i class="fas fa-exclamation-circle icon-left"></i><input type="text" id="ocNatureza" placeholder="ROUBO"></div></div>
+                                <div class="input-wrapper"><label>Descrição</label><textarea id="ocRelato" style="height: 100px; padding-left:10px; resize:none;"></textarea></div>
+                            </div>
+                            <div class="section-box">
+                                <div class="section-title"><i class="fas fa-car"></i> Veículos / Suspeitos</div>
+                                <div style="margin-bottom: 15px;"><label>Veículo</label><div style="display: flex; gap: 5px;"><input type="text" id="vPlaca" placeholder="PLACA" style="width: 100px; text-transform: uppercase;"><input type="text" id="vDesc" placeholder="Descrição"><button type="button" class="btn btn-sm" onclick="consultarPlaca()"><i class="fas fa-search"></i></button></div><div id="listaVeiculos" class="dynamic-list"></div></div>
+                                <div><label>Suspeito</label><div style="display: flex; gap: 5px;"><input type="text" id="sNome" placeholder="Características..."><button type="button" class="btn btn-sm" onclick="addSuspeito()"><i class="fas fa-plus"></i></button></div><div id="listaSuspeitos" class="dynamic-list"></div></div>
+                            </div>
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;"><button type="button" class="btn btn-info" id="btnTriagem" onclick="salvar('TRIAGEM')" style="flex: 1; min-width: 150px;">ENVIAR P/ TRIAGEM</button><button type="button" class="btn btn-danger" id="btnGerar" onclick="salvar('DESPACHO')" style="flex: 1; min-width: 150px;">GERAR OCORRÊNCIA</button><button type="button" class="btn btn-success" id="btnGerarComplementar" onclick="salvarComplementar()" style="flex: 1; min-width: 150px;">GERAR E COMPLEMENTAR</button></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div id="view-triagem" class="scroll-content hidden">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h2 style="font-size:18px;">Rascunhos (Triagem)</h2>
+                    <button class="btn btn-sm btn-outline" onclick="carregarTriagem()"><i class="fas fa-sync"></i></button>
+                </div>
+
+                <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; height: 100%; max-height: 70vh;">
+                    <div style="padding: 12px; border-bottom: 1px solid var(--border);">
+                        <input type="text" id="filtroTriagem" placeholder="🔍 Buscar por telefone, nome, cidade, bairro, natureza..." 
+                            style="width:100%; padding:10px; background:#222; border:1px solid var(--border); border-radius:6px; color:white; font-size:13px;"
+                            oninput="filtrarTriagem(this.value)">
+                    </div>
+                    <div style="flex: 1; overflow-y: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                            <thead style="position: sticky; top: 0;">
+                                <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border);">
+                                    <th style="padding: 12px; text-align: left; color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase;">Telefone</th>
+                                    <th style="padding: 12px; text-align: left; color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase;">Nome</th>
+                                    <th style="padding: 12px; text-align: left; color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase;">Cidade</th>
+                                    <th style="padding: 12px; text-align: left; color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase;">Bairro</th>
+                                    <th style="padding: 12px; text-align: left; color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase;">Natureza</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaTriagemBody">
+                                <tr><td colspan="5" style="padding: 20px; text-align: center; color: var(--text-muted);">Carregando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-frota" class="scroll-content hidden">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h2 style="font-size:18px;">Gerenciamento de Frota</h2>
+                    <button class="btn btn-sm btn-outline" onclick="carregarFrota()"><i class="fas fa-sync"></i></button>
+                </div>
+                <div id="listaFrota" style="display:flex; flex-direction:column; gap:10px;"></div>
+            </div>
+
+            <div id="view-monitoramento" class="hidden" style="height:100%; display:flex; flex-direction:column;">
+                
+                <div class="desktop-monitor">
+                    <div class="monitor-col" style="border-top: 3px solid var(--warning);">
+                        <div class="monitor-header">
+                            <span><i class="fas fa-clock"></i> Fila de Espera</span>
+                            <span id="deskCountW">0</span>
+                        </div>
+                        <div class="monitor-body">
+                            <table class="monitor-table">
+                                <thead><tr><th style="width:10%;">RISCO</th><th style="width:30%;">NATUREZA</th><th style="width:20%;">CIDADE</th><th style="width:20%;">BAIRRO</th><th style="width:20%;">HORA</th></tr></thead>
+                                <tbody id="tableWait"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="monitor-col" style="border-top: 3px solid var(--success);">
+                        <div class="monitor-header">
+                            <span><i class="fas fa-broadcast-tower"></i> Em Andamento</span>
+                            <span id="deskCountA">0</span>
+                        </div>
+                        <div class="monitor-body">
+                            <table class="monitor-table">
+                                <thead><tr><th style="width:15%;">VTR</th><th style="width:25%;">NATUREZA</th><th style="width:20%;">CIDADE</th><th style="width:20%;">BAIRRO</th><th style="width:20%;">STATUS</th></tr></thead>
+                                <tbody id="tableActive"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mobile-monitor">
+                    <div id="mob-panel-wait" class="sliding-panel panel-expanded" onclick="expandMob('wait')">
+                        <div class="monitor-header" style="background:#222; border-bottom:2px solid var(--warning);">
+                            <span><i class="fas fa-clock"></i> Fila</span>
+                        </div>
+                        <div class="monitor-body" id="mobWaitBody" style="background:rgba(0,0,0,0.3); padding:10px;"></div>
+                    </div>
+                    <div id="mob-panel-active" class="sliding-panel panel-collapsed" onclick="expandMob('active')">
+                        <div class="monitor-header" style="background:#222; border-bottom:2px solid var(--success);">
+                            <span><i class="fas fa-broadcast-tower"></i> Rádio</span>
+                        </div>
+                        <div class="monitor-body" id="mobActiveBody" style="background:rgba(0,0,0,0.3); padding:10px;"></div>
+                    </div>
+                </div>
+
+                <div style="padding:10px; background:#1a1a1a; border-top:1px solid var(--border); flex-shrink:0;">
+                    <input type="text" id="filtroMonitoramento" placeholder="🔍 Buscar por natureza, área, solicitante, viatura..." 
+                        style="width:100%; padding:10px; background:#222; border:1px solid var(--border); border-radius:6px; color:white; font-size:13px;"
+                        oninput="filtrarMonitoramento(this.value)">
+                </div>
+
+            </div>
+
+            <div id="view-admin" class="hidden" style="overflow-y:auto; padding:15px;">
+                <h2 style="font-size:18px; margin-bottom:12px;">Gestão</h2>
+
+                <!-- Admin internal nav + global actions -->
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px;">
+                    <div style="display:flex; gap:6px;">
+                        <button class="btn btn-sm btn-outline" onclick="adminSwitch('usuarios')" id="admin-tab-usuarios">Usuários</button>
+                        <button class="btn btn-sm btn-outline" onclick="adminSwitch('chaves')" id="admin-tab-chaves">Chaves Acesso</button>
+                        <button class="btn btn-sm btn-outline" onclick="adminSwitch('viaturas')" id="admin-tab-viaturas">Viaturas</button>
+                        <button class="btn btn-sm btn-outline" onclick="adminSwitch('naturezas')" id="admin-tab-naturezas">Naturezas</button>
+                        <button class="btn btn-sm btn-outline" onclick="adminSwitch('areas')" id="admin-tab-areas">Áreas</button>
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <select id="adminExportTable" style="padding:8px; background:#111; border:1px solid var(--border); color:var(--text-light); border-radius:6px;">
+                            <option value="tb_usuarios">tb_usuarios</option>
+                            <option value="tb_chaves_acesso">tb_chaves_acesso</option>
+                            <option value="tb_viaturas">tb_viaturas</option>
+                            <option value="tb_naturezas">tb_naturezas</option>
+                            <option value="tb_areas">tb_areas</option>
+                        </select>
+                        <button class="btn btn-sm" onclick="exportTable(document.getElementById('adminExportTable').value)">💾 BACKUP</button>
+                        <button class="btn btn-sm btn-outline" onclick="triggerImport()">📂 IMPORTAR</button>
+                        <input type="file" id="adminImportFile" accept="application/json" style="display:none" onchange="handleImportFile(event)">
+                    </div>
+                </div>
+
+                <!-- Modules -->
+                <div id="admin-modules">
+                    <!-- Usuarios -->
+                    <div id="admin-usuarios" class="section-box">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <div style="font-weight:700;">Gestão de Usuários</div>
+                            <div style="display:flex; gap:8px;"><button class="btn btn-sm btn-success" onclick="openNewUserModal()">Novo Usuário</button><button class="btn btn-sm btn-outline" onclick="carregarUsuarios()">Atualizar</button></div>
+                        </div>
+                        <div>
+                            <table style="width:100%; border-collapse:collapse; table-layout:fixed; font-size:13px;">
+                                <thead><tr style="border-bottom:1px solid var(--border);"><th style="padding:10px; text-align:left; width:25%;">Nome</th><th style="padding:10px; text-align:left; width:25%;">CPF</th><th style="padding:10px; text-align:left; width:20%;">Perfil</th><th style="padding:10px; text-align:left; width:15%;">Status</th><th style="padding:10px; text-align:left; width:15%;">Ações</th></tr></thead>
+                                <tbody id="adminTabelaUsuarios"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Chaves de Acesso -->
+                    <div id="admin-chaves" class="section-box hidden">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <div style="font-weight:700;">Chaves de Acesso</div>
+                            <div style="display:flex; gap:8px;"><button class="btn btn-sm btn-success" onclick="openNewKeyModal()">Nova Chave</button><button class="btn btn-sm btn-outline" onclick="carregarChaves()">Atualizar</button></div>
+                        </div>
+                        <div>
+                            <table style="width:100%; border-collapse:collapse; table-layout:fixed; font-size:13px;">
+                                <thead><tr style="border-bottom:1px solid var(--border);"><th style="padding:10px; text-align:left; width:30%;">Código</th><th style="padding:10px; text-align:left; width:20%;">Perfil</th><th style="padding:10px; text-align:left; width:20%;">Validade</th><th style="padding:10px; text-align:left; width:15%;">Expirou</th><th style="padding:10px; text-align:left; width:15%;">Ações</th></tr></thead>
+                                <tbody id="adminTabelaChaves"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Viaturas -->
+                    <div id="admin-viaturas" class="section-box hidden">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <div style="font-weight:700;">Gestão de Viaturas</div>
+                            <div style="display:flex; gap:8px;"><button class="btn btn-sm btn-success" onclick="openNewViaturaModal()">Nova Viatura</button><button class="btn btn-sm btn-outline" onclick="carregarViaturas()">Atualizar</button></div>
+                        </div>
+                        <div>
+                            <table style="width:100%; border-collapse:collapse; table-layout:fixed; font-size:13px;">
+                                <thead><tr style="border-bottom:1px solid var(--border);"><th style="padding:10px; text-align:left; width:20%;">Prefixo</th><th style="padding:10px; text-align:left; width:18%;">Tipo</th><th style="padding:10px; text-align:left; width:18%;">Placa</th><th style="padding:10px; text-align:left; width:18%;">Guarnição</th><th style="padding:10px; text-align:left; width:14%;">Status</th><th style="padding:10px; text-align:left; width:12%;">Ações</th></tr></thead>
+                                <tbody id="adminTabelaViaturas"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Naturezas (scaffold) -->
+                    <div id="admin-naturezas" class="section-box hidden">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;"><div style="font-weight:700;">Cadastro de Naturezas</div><div><button class="btn btn-sm btn-success" onclick="alert('Implementar: Nova Natureza')">Nova Natureza</button></div></div>
+                        <div id="adminNaturezasBody">(Interface de naturezas pendente — será implementada)</div>
+                    </div>
+
+                    <!-- Areas (scaffold) -->
+                    <div id="admin-areas" class="section-box hidden">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;"><div style="font-weight:700;">Cadastro de Áreas</div><div><button class="btn btn-sm btn-success" onclick="alert('Implementar: Nova Área')">Nova Área</button></div></div>
+                        <div id="adminAreasBody">(Interface de áreas pendente — será implementada)</div>
+                    </div>
+                </div>
+
+                <!-- Modals -->
+                <div id="modalNewUser" class="modal-overlay">
+                    <div class="modal-content" style="max-width:480px;">
+                        <div class="modal-header"><h3>Novo Usuário</h3><i class="fas fa-times" onclick="fecharModal('modalNewUser')" style="cursor:pointer"></i></div>
+                        <div class="modal-body">
+                            <div style="display:flex;gap:8px;"><div style="flex:1"><label>Nome</label><input id="nu_nome"></div><div style="width:140px"><label>CPF</label><input id="nu_cpf"></div></div>
+                            <div style="display:flex;gap:8px;margin-top:8px;"><div style="flex:1"><label>Perfil</label><select id="nu_perfil"><option>Atendente</option><option>Despachante</option><option>Admin</option></select></div><div style="width:140px"><label>Senha</label><input id="nu_senha" type="password"></div></div>
+                        </div>
+                        <div class="modal-footer"><button class="btn btn-sm" onclick="criarUsuario()">Criar</button><button class="btn btn-sm btn-outline" onclick="fecharModal('modalNewUser')">Cancelar</button></div>
+                    </div>
+                </div>
+
+                <div id="modalNewKey" class="modal-overlay">
+                    <div class="modal-content" style="max-width:420px;">
+                        <div class="modal-header"><h3>Nova Chave de Acesso</h3><i class="fas fa-times" onclick="fecharModal('modalNewKey')" style="cursor:pointer"></i></div>
+                        <div class="modal-body">
+                            <div style="margin-bottom:8px;"><label>Código</label><input id="nk_codigo" placeholder="TURMA-2026"></div>
+                            <div style="display:flex;gap:8px;"><div style="flex:1"><label>Validade</label><select id="nk_validade"><option value="3600">1 hora</option><option value="86400">24 horas</option><option value="604800">7 dias</option><option value="0">Permanente</option></select></div><div style="width:160px"><label>Perfil</label><select id="nk_perfil"><option>Atendente</option><option>Despachante</option><option>Admin</option></select></div></div>
+                        </div>
+                        <div class="modal-footer"><button class="btn btn-sm" onclick="criarChave()">Gerar</button><button class="btn btn-sm btn-outline" onclick="fecharModal('modalNewKey')">Cancelar</button></div>
+                    </div>
+                </div>
+
+                <div id="modalNovaViatura" class="modal-overlay">
+                    <div class="modal-content" style="max-width:420px;">
+                        <div class="modal-header"><h3>Nova Viatura</h3><i class="fas fa-times" onclick="fecharModal('modalNovaViatura')" style="cursor:pointer"></i></div>
+                        <div class="modal-body">
+                            <div style="margin-bottom:8px;"><label>Prefixo</label><input id="nv_prefixo" placeholder="Ex: VTR-001"></div>
+                            <div style="margin-bottom:8px;"><label>Tipo</label><select id="nv_tipo"><option>Rádio Patrulha</option><option>ROTAM</option><option>Motocicleta</option><option>Outra</option></select></div>
+                            <div style="margin-bottom:8px;"><label>Placa</label><input id="nv_placa" placeholder="AAA-1234" style="text-transform: uppercase;"></div>
+                            <div style="margin-bottom:8px;"><label>Telefone</label><input id="nv_telefone" type="tel" placeholder="11987654321"></div>
+                        </div>
+                        <div class="modal-footer"><button class="btn btn-sm" onclick="criarViatura()">Criar</button><button class="btn btn-sm btn-outline" onclick="fecharModal('modalNovaViatura')">Cancelar</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <div id="modalPlaca" class="modal-overlay"><div class="modal-content" style="max-width:350px;"><div class="modal-header"><h3>Veículo</h3><i class="fas fa-times" onclick="fecharModal('modalPlaca')" style="cursor:pointer;"></i></div><div class="modal-body" id="modalPlacaBody"><p>Consultando...</p></div><div class="modal-footer"><button class="btn btn-sm" onclick="confirmarVeiculo()">ADICIONAR</button></div></div></div>
+
+    <div id="modalFrotaEditar" class="modal-overlay">
+        <div class="modal-content" style="max-width:420px;">
+            <div class="modal-header"><h3>Editar Viatura</h3><i class="fas fa-times" onclick="fecharModal('modalFrotaEditar')" style="cursor:pointer"></i></div>
+            <div class="modal-body">
+                <div style="margin-bottom:8px;"><label>Guarnição</label><input id="me_guarnicao" placeholder="Ex: Guarnição A"></div>
+                <div style="margin-bottom:8px; display:flex; gap:8px;">
+                    <div style="flex:1;"><label>Telefone</label><input id="me_telefone" type="tel" placeholder="11987654321"></div>
+                    <div style="margin-top:22px;"><button type="button" class="btn btn-sm" onclick="abrirWhatsapp()" style="background:#25D366;" title="Abrir WhatsApp"><i class="fab fa-whatsapp"></i></button></div>
+                </div>
+            </div>
+            <div class="modal-footer"><button class="btn btn-sm btn-success" onclick="salvarEdicaoViatura()">Salvar</button><button class="btn btn-sm btn-outline" onclick="fecharModal('modalFrotaEditar')">Cancelar</button></div>
+        </div>
+    </div>
+    
+    <!-- MODAIS -->
+    <div id="modalViatura" class="modal-overlay">
+        <div class="modal-content" style="max-width:400px;">
+            <div class="modal-header"><h3>Selecione a Viatura</h3><i class="fas fa-times" onclick="fecharModal('modalViatura')" style="cursor:pointer;"></i></div>
+            <div class="modal-body" id="mdViaturaBody" style="max-height:300px; overflow-y:auto;"><p>Carregando...</p></div>
+        </div>
+    </div>
+
+    <!-- MODAL DE COMPLEMENTAÇÃO -->
+    <div id="modalComplementacao" class="modal-overlay">
+        <div class="modal-content" style="max-width:500px;">
+            <div class="modal-header">
+                <h3>Complementar Ocorrência</h3>
+                <i class="fas fa-times" onclick="fecharModal('modalComplementacao')" style="cursor:pointer;"></i>
+            </div>
+            <div class="modal-body">
+                <div class="section-box">
+                    <label>Complemento</label>
+                    <textarea id="comp_relato" style="height: 150px; padding-left:10px; resize:none;"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-success" onclick="salvarComplementacaoFinal()">Salvar Complementação</button>
+                <button type="button" class="btn btn-sm btn-outline" onclick="fecharModal('modalComplementacao')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DRAWERS MONITORAMENTO -->
+    <!-- MODAIS MONITORAMENTO -->
+    <div id="modalOcorrencia" class="modal-overlay">
+        <div class="modal-content" style="max-width:700px; max-height:85vh;">
+            <div class="modal-header">
+                <h3 id="mo-natureza" style="margin:0 0 8px 0; font-size:18px;">Ocorrência</h3>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="display:flex; gap:15px; font-size:11px; color:var(--text-muted);">
+                        <span id="mo-id">ID: --</span>
+                        <span id="mo-timer">00:00</span>
+                    </div>
+                    <i class="fas fa-times" onclick="fecharModal('modalOcorrencia')" style="cursor:pointer; font-size:18px; color:var(--text-muted);"></i>
+                </div>
+                <div id="mo-tags" style="display:flex; gap:4px; flex-wrap:wrap; margin-top:8px;"></div>
+            </div>
+            <div class="modal-body" style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
+                <div>
+                    <div class="drawer-section-title"><i class="fas fa-map-pin"></i> Local</div>
+                    <div id="mo-endereco" style="font-size:12px; line-height:1.4;">Endereço</div>
+                </div>
+                <div>
+                    <div class="drawer-section-title"><i class="fas fa-user"></i> Solicitante</div>
+                    <div id="mo-nome" style="font-size:12px;">Nome: --</div>
+                    <div id="mo-telefone" style="font-size:12px;">Tel: --</div>
+                </div>
+            </div>
+            <div style="margin-bottom:15px;">
+                <div class="drawer-section-title"><i class="fas fa-history"></i> Descrição</div>
+                <div id="mo-historico" class="historico-area" style="max-height:150px;">Nenhuma informação</div>
+            </div>
+            <div id="mo-recursos-container" style="margin-bottom:15px; display:none;">
+                <div class="drawer-section-title"><i class="fas fa-car"></i> Recursos</div>
+                <div id="mo-recursos" style="font-size:11px;">Nenhum recurso</div>
+            </div>
+            <div class="modal-footer" style="display:flex; gap:10px;">
+                <button class="btn btn-info" id="mo-btn-editar" onclick="editarEndereco()"><i class="fas fa-pen"></i> Editar Endereço</button>
+                <button class="btn btn-success" id="mo-btn-acao" onclick="abrirSelecaoFrotaModal(idOcorrenciaAberta, 'PRINCIPAL')">Despachar</button>
+                <button class="btn btn-danger" id="mo-btn-finalizar" onclick="finalizarOcorrenciaModal(idOcorrenciaAberta)"><i class="fas fa-flag"></i> Finalizar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalFinalizacao" class="modal-overlay">
+        <div class="modal-content" style="max-width:400px;">
+            <div class="modal-header">
+                <h3 style="margin:0;">Finalizar Ocorrência</h3>
+                <i class="fas fa-times" onclick="fecharModal('modalFinalizacao')" style="cursor:pointer; font-size:18px; color:var(--text-muted);"></i>
+            </div>
+            <div class="modal-body">
+                <div class="input-wrapper">
+                    <label>Nº BO / Protocolo</label>
+                    <input type="text" id="mf-bo" placeholder="Ex: 12345/2026">
+                </div>
+                <div class="input-wrapper">
+                    <label>Desfecho / Observações Finais</label>
+                    <textarea id="mf-observacoes" placeholder="Descreva o desfecho da ocorrência..." style="height:120px; resize:none;"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer" style="display:flex; gap:10px;">
+                <button class="btn btn-danger" onclick="fecharModal('modalFinalizacao')">Cancelar</button>
+                <button class="btn btn-success" onclick="confirmarFinalizacao()">Confirmar Finalização</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalSelecaoFrota" class="modal-overlay" style="z-index:210;">
+        <div class="modal-content" style="max-width:500px;">
+            <div class="modal-header">
+                <h3 style="margin:0;">Selecionar Viatura</h3>
+                <i class="fas fa-times" onclick="fecharModal('modalSelecaoFrota')" style="cursor:pointer; font-size:18px; color:var(--text-muted);"></i>
+            </div>
+            <div class="modal-body" style="max-height:400px; overflow-y:auto;">
+                <div id="msfLista" style="display:flex; flex-direction:column; gap:10px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const PROJECT_URL = 'https://rgenujwwhgcnpmqfswzi.supabase.co';
+        const API_KEY = 'sb_publishable_70vDCsbBzp_1YgPvWacPvQ_n_WfBqnf';
+        let usuarioAtual = null;
+        let idOcorrenciaSelecao = null;
+        let idOcorrenciaAberta = null;
+        let idParaFinalizar = null;
+        let tipoFuncaoSelecao = null;
+        let timerOcorrencia = null;
+        let veiculosArray = [], suspeitosArray = [], veiculoTemp = null, idEmEdicao = null, idSelecionadoDespacho = null, ocoAtual = null;
+
+        window.onload = function() {
+            const sessao = localStorage.getItem('piabi_user');
+            if(sessao) { usuarioAtual = JSON.parse(sessao); mostrarApp(); } 
+            else { document.getElementById('login-wrapper').style.display = 'flex'; }
+        }
+
+        async function api(tabela, query, method='GET', body=null) {
+            const opt = { method, headers: { 'apikey': API_KEY, 'Authorization': `Bearer ${API_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' } };
+            if(body) opt.body = JSON.stringify(body);
+            const res = await fetch(`${PROJECT_URL}/rest/v1/${tabela}?${query}`, opt);
+            if(!res.ok) {
+                const erro = await res.json().catch(()=>({message:res.statusText}));
+                throw new Error(erro.message || 'Erro na API');
+            }
+            // Retorna json se houver conteúdo, senão null (para DELETE)
+            if(res.status === 204) return null;
+            return await res.json();
+        }
+
+        function navegar(tela) {
+            ['atendimento', 'triagem', 'monitoramento', 'frota', 'admin'].forEach(t => {
+                const el = document.getElementById('view-'+t);
+                const nav = document.getElementById('nav-'+t);
+                if(el) el.classList.add('hidden');
+                if(nav) nav.classList.remove('active');
+            });
+            
+            const view = document.getElementById('view-'+tela);
+            if(view) view.classList.remove('hidden');
+            
+            const nav = document.getElementById('nav-'+tela);
+            if(nav) nav.classList.add('active');
+            
+            if(window.innerWidth <= 768) toggleMenu(false);
+            
+            // Carregamentos específicos
+            if(tela === 'triagem') carregarTriagem();
+            if(tela === 'monitoramento') { carregarMonitoramento(); expandMob('wait'); }
+            if(tela === 'frota') carregarFrota();
+            if(tela === 'admin') {
+                // Abre aba usuários por padrão se nenhuma estiver ativa
+                if(document.getElementById('admin-usuarios').classList.contains('hidden')) adminSwitch('usuarios');
+            }
+        }
+
+        function expandMob(side) {
+            if(side === 'wait') {
+                document.getElementById('mob-panel-wait').className = 'sliding-panel panel-expanded';
+                document.getElementById('mob-panel-active').className = 'sliding-panel panel-collapsed';
+            } else {
+                document.getElementById('mob-panel-wait').className = 'sliding-panel panel-collapsed';
+                document.getElementById('mob-panel-active').className = 'sliding-panel panel-expanded';
+            }
+        }
+
+        function toggleMenu(force) { const sb=document.querySelector('.sidebar'); const ov=document.querySelector('.mobile-overlay'); const open=force!==undefined?force:!sb.classList.contains('open'); if(open){sb.classList.add('open');ov.style.display='block';}else{sb.classList.remove('open');ov.style.display='none';} }
+        function mostrarApp() { document.getElementById('login-wrapper').style.display='none'; document.getElementById('app-wrapper').classList.remove('hidden'); document.getElementById('userAvatar').innerText=usuarioAtual.nome_guerra[0]; document.getElementById('mobileUserAvatar').innerText=usuarioAtual.nome_guerra[0]; navegar('atendimento'); }
+        function logout() { localStorage.removeItem('piabi_user'); window.location.reload(); }
+        
+        async function handleLogin(e) { 
+            e.preventDefault(); 
+            const u=document.getElementById('loginUser').value.replace(/\D/g,''); 
+            const p=document.getElementById('loginPass').value; 
+            try{ 
+                const d=await api('tb_usuarios', `cpf_login=eq.${u}&senha=eq.${p}&select=*`); 
+                if(!d.length) throw new Error('Dados inválidos');
+                if(d[0].status_conta!=='VALIDADO') throw new Error('Conta aguardando aprovação'); 
+                usuarioAtual=d[0]; 
+                localStorage.setItem('piabi_user', JSON.stringify(usuarioAtual)); 
+                mostrarApp(); 
+            } catch(e){ alert(e.message); } 
+        }
+
+        // --- FUNÇÕES PARA SOLICITAR ACESSO ---
+        function abrirModalCadastro() {
+            // Limpar campos do modal
+            document.getElementById('cad_chave').value = '';
+            document.getElementById('cad_nome').value = '';
+            document.getElementById('cad_guerra').value = '';
+            document.getElementById('cad_cpf').value = '';
+            document.getElementById('cad_senha').value = '';
+            // Abrir modal
+            document.getElementById('modalCadastro').style.display = 'flex';
+        }
+
+        async function solicitarCadastro() {
+            const chave = document.getElementById('cad_chave').value.trim();
+            const nome = document.getElementById('cad_nome').value.trim();
+            const guerra = document.getElementById('cad_guerra').value.trim();
+            const cpf = document.getElementById('cad_cpf').value.replace(/\D/g, '');
+            const senha = document.getElementById('cad_senha').value;
+
+            // Validações
+            if(!nome || !guerra || !cpf || !senha) {
+                alert('Preencha todos os campos obrigatórios.');
+                return;
+            }
+
+            if(cpf.length !== 11) {
+                alert('CPF deve conter 11 dígitos.');
+                return;
+            }
+
+            let status = 'PENDENTE';
+            let perfil = 'ATENDENTE';
+
+            try {
+                // Se chave foi fornecida, validar
+                if(chave) {
+                    const k = await api('tb_chaves_acesso', `codigo=eq.${chave}&ativa=eq.true&select=*`);
+                    if(k.length > 0) {
+                        status = 'VALIDADO';
+                        if(k[0].perfil_padrao) perfil = k[0].perfil_padrao;
+                    } else {
+                        alert('Chave de acesso inválida ou inativa.');
+                        return;
+                    }
+                }
+
+                await api('tb_usuarios', '', 'POST', {
+                    nome_completo: nome,
+                    nome_guerra: guerra,
+                    cpf_login: cpf,
+                    senha: senha,
+                    perfil_acesso: perfil,
+                    status_conta: status
+                });
+
+                const msg = status === 'VALIDADO' 
+                    ? 'Cadastro aprovado! Você pode fazer login agora.' 
+                    : 'Solicitação enviada com sucesso. Aguarde aprovação do administrador.';
+                alert(msg);
+                fecharModal('modalCadastro');
+            } catch(e) {
+                alert('Erro ao cadastrar: ' + e.message);
+            }
+        }
+
+        // --- ATENDIMENTO ---
+        async function buscarCep(cep) { cep=cep.replace(/\D/g,''); if(cep.length!==8)return; try{const r=await fetch(`https://viacep.com.br/ws/${cep}/json/`);const d=await r.json();if(!d.erro){ document.getElementById('endLog').value=d.logradouro; document.getElementById('endBairro').value=d.bairro; document.getElementById('endCidade').value=d.localidade; }}catch(e){} }
+        let timeoutLog; function sugerirLogradouro(txt) { clearTimeout(timeoutLog); const box=document.getElementById('sugestoesLog'); const cid=document.getElementById('endCidade').value; if(txt.length<4||!cid){box.classList.add('hidden');return;} timeoutLog=setTimeout(async()=>{ try{const r=await fetch(`https://nominatim.openstreetmap.org/search?street=${txt}&city=${cid}&state=Parana&format=json&limit=5`);const d=await r.json();box.innerHTML='';if(d.length){box.classList.remove('hidden');d.forEach(i=>{const div=document.createElement('div');div.className='sugg-item';div.innerText=i.display_name.split(',')[0];div.onclick=()=>{document.getElementById('endLog').value=div.innerText;box.classList.add('hidden');};box.appendChild(div);});}}catch(e){} },500); }
+        async function consultarPlaca() { const p=document.getElementById('vPlaca').value.toUpperCase().replace(/[^A-Z0-9]/g,''); const d=document.getElementById('vDesc').value; if(!p){ if(d){veiculosArray.push({placa:'S/P',desc:d});renderList('listaVeiculos',veiculosArray);document.getElementById('vDesc').value='';}return; } document.getElementById('modalPlaca').style.display='flex'; document.getElementById('modalPlacaBody').innerHTML='Consultando...'; try{const res=await fetch(`https://api.placas.app.br/v2/placas/${p}`); if(res.ok){const data=await res.json();veiculoTemp={placa:p,desc:`${data.marca} ${data.modelo} - ${data.cor}`};document.getElementById('modalPlacaBody').innerHTML=`<p><strong>${data.marca} ${data.modelo}</strong></p><p>${data.cor} | ${data.ano}</p>`;}else{veiculoTemp={placa:p,desc:d||'Não identificado'};document.getElementById('modalPlacaBody').innerHTML='<p style="color:orange">Não encontrado.</p>';}}catch(e){veiculoTemp={placa:p,desc:d||'Erro API'};document.getElementById('modalPlacaBody').innerHTML='Erro.';} }
+        function confirmarVeiculo() { if(veiculoTemp){ veiculosArray.push(veiculoTemp); renderList('listaVeiculos', veiculosArray); fecharModal('modalPlaca'); document.getElementById('vPlaca').value=''; document.getElementById('vDesc').value=''; } }
+        function fecharModal(id) { document.getElementById(id).style.display='none'; }
+        function addSuspeito() { const v=document.getElementById('sNome').value; if(v){ suspeitosArray.push(v); renderList('listaSuspeitos',suspeitosArray); document.getElementById('sNome').value=''; } }
+        function renderList(id, arr) { document.getElementById(id).innerHTML=arr.map((x,i)=>`<div class="list-entry"><span>${x.placa?`[${x.placa}] ${x.desc}`:x}</span><i class="fas fa-times remove-btn" onclick="removeItem('${id}',${i})"></i></div>`).join(''); }
+        function removeItem(id,i) { if(id==='listaVeiculos')veiculosArray.splice(i,1); else suspeitosArray.splice(i,1); renderList(id,id==='listaVeiculos'?veiculosArray:suspeitosArray); }
+        function toggleAnonimo(chk) { document.getElementById('solNome').value=chk.checked?'ANÔNIMO':''; }
+        function limparAtendimento() { document.forms[1].reset(); veiculosArray=[]; suspeitosArray=[]; renderList('listaVeiculos',[]); renderList('listaSuspeitos',[]); idEmEdicao=null; }
+        
+        function calcularRisco(tags) {
+            const highRisk = ['ARMA DE FOGO', 'ARMA BRANCA', 'EXPLOSIVO', 'EM ANDAMENTO'];
+            return tags.some(t => highRisk.includes(t)) ? 'CRITICA' : 'NORMAL';
+        }
+
+        async function salvar(destino) {
+            const btn = destino==='TRIAGEM'?document.getElementById('btnTriagem'):document.getElementById('btnGerar'); btn.innerText='...'; btn.disabled=true;
+            const checks = Array.from(document.querySelectorAll('.tag-check:checked')).map(c=>c.value);
+            const radios = Array.from(document.querySelectorAll('.tag-radio:checked')).map(c=>c.value);
+            const tags = [...checks, ...radios];
+            
+            const dados = {
+                solicitante: { nome:document.getElementById('solNome').value, telefone:document.getElementById('solTel').value },
+                endereco: { cep:document.getElementById('endCep').value, cidade:document.getElementById('endCidade').value, logradouro:document.getElementById('endLog').value, numero:document.getElementById('endNum').value, bairro:document.getElementById('endBairro').value, referencia:document.getElementById('endRef').value, formatado:`${document.getElementById('endLog').value}, ${document.getElementById('endNum').value} - ${document.getElementById('endBairro').value}` },
+                classificacoes: tags, veiculos:veiculosArray, suspeitos:suspeitosArray, natureza:document.getElementById('ocNatureza').value, prioridade: calcularRisco(tags)
+            };
+            const payload = { atendente_origem_id:usuarioAtual.id, status:destino==='TRIAGEM'?'EM_TRIAGEM':'AGUARDANDO', resumo_texto:document.getElementById('ocRelato').value, dados_preenchidos:dados };
+            try {
+                if(idEmEdicao) await api('tb_triagem', `id=eq.${idEmEdicao}`, 'PATCH', payload);
+                else await api('tb_triagem', '', 'POST', payload);
+                alert('Salvo!'); limparAtendimento(); navegar('atendimento');
+            } catch(e){ alert(e.message); } finally { btn.innerText=destino==='TRIAGEM'?'ENVIAR P/ TRIAGEM':'GERAR OCORRÊNCIA'; btn.disabled=false; }
+        }
+
+        // Armazenar ID da última ocorrência gerada para complementação
+        let ultimaOcorrenciaGerada = null;
+
+        async function salvarComplementar() {
+            const btn = document.getElementById('btnGerarComplementar'); btn.innerText='...'; btn.disabled=true;
+            const checks = Array.from(document.querySelectorAll('.tag-check:checked')).map(c=>c.value);
+            const radios = Array.from(document.querySelectorAll('.tag-radio:checked')).map(c=>c.value);
+            const tags = [...checks, ...radios];
+            
+            const dados = {
+                solicitante: { nome:document.getElementById('solNome').value, telefone:document.getElementById('solTel').value },
+                endereco: { cep:document.getElementById('endCep').value, cidade:document.getElementById('endCidade').value, logradouro:document.getElementById('endLog').value, numero:document.getElementById('endNum').value, bairro:document.getElementById('endBairro').value, referencia:document.getElementById('endRef').value, formatado:`${document.getElementById('endLog').value}, ${document.getElementById('endNum').value} - ${document.getElementById('endBairro').value}` },
+                classificacoes: tags, veiculos:veiculosArray, suspeitos:suspeitosArray, natureza:document.getElementById('ocNatureza').value, prioridade: calcularRisco(tags)
+            };
+            const payload = { atendente_origem_id:usuarioAtual.id, status:'AGUARDANDO', resumo_texto:document.getElementById('ocRelato').value, dados_preenchidos:dados };
+            try {
+                const resp = await api('tb_triagem', '', 'POST', payload);
+                // Armazenar ID da ocorrência gerada
+                ultimaOcorrenciaGerada = resp[0]?.id || null;
+                
+                if(ultimaOcorrenciaGerada) {
+                    // Limpar campo de complemento
+                    document.getElementById('comp_relato').value = '';
+                    
+                    // Limpar formulário de atendimento
+                    limparAtendimento();
+                    
+                    // Abrir modal de complementação
+                    document.getElementById('modalComplementacao').style.display = 'flex';
+                } else {
+                    alert('Ocorrência gerada, mas não foi possível abrir modal de complementação.');
+                }
+            } catch(e){ alert('Erro: '+e.message); } finally { btn.innerText='GERAR E COMPLEMENTAR'; btn.disabled=false; }
+        }
+
+        async function salvarComplementacaoFinal() {
+            if(!ultimaOcorrenciaGerada) {
+                alert('Erro: ID da ocorrência não encontrado.');
+                return;
+            }
+
+            const relato = document.getElementById('comp_relato').value;
+
+            try {
+                // Buscar ocorrência atual
+                const ocorrencias = await api('tb_triagem', `id=eq.${ultimaOcorrenciaGerada}&select=*`);
+                if(!ocorrencias || !ocorrencias.length) {
+                    alert('Ocorrência não encontrada.');
+                    return;
+                }
+
+                const oc = ocorrencias[0];
+                const dados = oc.dados_preenchidos;
+
+                // Atualizar com complementação
+                const novoResumo = oc.resumo_texto + (relato ? `\n\n[COMPLEMENTADO] ${relato}` : '');
+                
+                await api('tb_triagem', `id=eq.${ultimaOcorrenciaGerada}`, 'PATCH', {
+                    resumo_texto: novoResumo,
+                    dados_preenchidos: dados
+                });
+
+                alert('Complementação salva!');
+                fecharModal('modalComplementacao');
+                ultimaOcorrenciaGerada = null;
+            } catch(e) {
+                alert('Erro ao salvar: '+e.message);
+            }
+        }
+
+        async function retomarAtendimento(id) {
+            try {
+                const d = await api('tb_triagem', `id=eq.${id}&select=*`); const oc=d[0]; const info=oc.dados_preenchidos;
+                document.getElementById('solTel').value=info.solicitante.telefone||''; document.getElementById('solNome').value=info.solicitante.nome||'';
+                document.getElementById('endCep').value=info.endereco.cep||''; document.getElementById('endCidade').value=info.endereco.cidade||''; document.getElementById('endLog').value=info.endereco.logradouro||''; document.getElementById('endNum').value=info.endereco.numero||''; document.getElementById('endBairro').value=info.endereco.bairro||''; document.getElementById('endRef').value=info.endereco.referencia||'';
+                document.getElementById('ocNatureza').value=info.natureza||''; document.getElementById('ocRelato').value=oc.resumo_texto||'';
+                
+                if(info.classificacoes) info.classificacoes.forEach(val => { const el = document.querySelector(`input[value="${val}"]`); if(el) el.checked = true; });
+                veiculosArray=info.veiculos||[]; suspeitosArray=info.suspeitos||[]; renderList('listaVeiculos',veiculosArray); renderList('listaSuspeitos',suspeitosArray);
+                idEmEdicao=id; navegar('atendimento');
+            } catch(e){ alert('Erro ao abrir.'); }
+        }
+
+        async function carregarTriagem() {
+            const tb = document.getElementById('tabelaTriagemBody');
+            tb.innerHTML = '<tr><td colspan="5" style="padding: 20px; text-align: center; color: var(--text-muted);">Carregando...</td></tr>';
+            
+            try {
+                const d = await api('tb_triagem', 'status=eq.EM_TRIAGEM&order=criado_em.desc');
+                tb.innerHTML = '';
+                
+                if (!d.length) {
+                    tb.innerHTML = '<tr><td colspan="5" style="padding: 20px; text-align: center; color: var(--text-muted);">Nenhuma triagem pendente</td></tr>';
+                    return;
+                }
+                
+                d.forEach(item => {
+                    const info = item.dados_preenchidos;
+                    const telefone = info.solicitante?.telefone || '';
+                    const nome = info.solicitante?.nome || '';
+                    const cidade = info.endereco?.cidade || '';
+                    const bairro = info.endereco?.bairro || '';
+                    const natureza = info.natureza || '';
+                    
+                    // Texto de busca combinado
+                    const textoBusca = [telefone, nome, cidade, bairro, natureza].join(' ').toLowerCase();
+                    
+                    const tr = document.createElement('tr');
+                    tr.style.cssText = 'border-bottom: 1px solid var(--border); cursor: pointer;';
+                    tr.setAttribute('data-busca', textoBusca);
+                    tr.onmouseover = () => tr.style.background = 'rgba(255,255,255,0.05)';
+                    tr.onmouseout = () => tr.style.background = '';
+                    tr.onclick = () => retomarAtendimento(item.id);
+                    
+                    tr.innerHTML = `
+                        <td style="padding: 12px;">${telefone}</td>
+                        <td style="padding: 12px;">${nome}</td>
+                        <td style="padding: 12px;">${cidade}</td>
+                        <td style="padding: 12px;">${bairro}</td>
+                        <td style="padding: 12px;">${natureza}</td>
+                    `;
+                    
+                    tb.appendChild(tr);
+                });
+            } catch (e) {
+                tb.innerHTML = '<tr><td colspan="5" style="padding: 20px; text-align: center; color: #ff6b6b;">Erro ao carregar triagem</td></tr>';
+                console.error(e);
+            }
+        }
+
+        function filtrarTriagem(texto) {
+            const tb = document.getElementById('tabelaTriagemBody');
+            const filterText = texto.toLowerCase();
+            
+            if(tb) {
+                const linhas = tb.querySelectorAll('tr');
+                linhas.forEach(linha => {
+                    const buscaDados = linha.getAttribute('data-busca') || '';
+                    linha.style.display = buscaDados.includes(filterText) ? '' : 'none';
+                });
+            }
+        }
+
+        // --- MONITORAMENTO ---
+        async function carregarMonitoramento() {
+            const tbWait = document.getElementById('tableWait');
+            const tbAct = document.getElementById('tableActive');
+            const mobWait = document.getElementById('mobWaitBody');
+            const mobAct = document.getElementById('mobActiveBody');
+            
+            tbWait.innerHTML=''; tbAct.innerHTML=''; mobWait.innerHTML=''; mobAct.innerHTML='';
+            
+            try {
+                const data = await api('tb_triagem', 'status=in.(AGUARDANDO,EM_ANDAMENTO)&order=criado_em.desc');
+                let cw=0, ca=0;
+
+                data.forEach(d => {
+                    const info = d.dados_preenchidos;
+                    const isCrit = info.prioridade==='CRITICA';
+                    const icon = isCrit ? '🚨' : '🟢';
+                    const hora = new Date(d.criado_em).toLocaleTimeString().substr(0,5);
+                    const enderecoDica = `${info.endereco.logradouro}, ${info.endereco.numero}, ${info.endereco.bairro}, ${info.endereco.cidade}`;
+                    
+                    // CORREÇÃO DE BUG (Deep Search):
+                    // Em vez de JSON.stringify (que gera aspas duplas e quebra o HTML), 
+                    // montamos uma string segura apenas com os valores.
+                    const textoBusca = [
+                        info.natureza, 
+                        info.endereco.logradouro, 
+                        info.endereco.bairro, 
+                        info.solicitante.nome, 
+                        info.solicitante.telefone, 
+                        d.resumo_texto || '', 
+                        (d.viaturas_empenhadas || []).map(v => v.prefixo).join(' ')
+                    ].join(' ').toLowerCase().replace(/"/g, ''); // Remove aspas para não quebrar o HTML
+
+                    const atributoBusca = `data-busca="${textoBusca}"`;
+
+                    // ===== FILA DE ESPERA (AGUARDANDO) =====
+                    if(d.status==='AGUARDANDO') {
+                        // Importante: atributoBusca deve estar bem formatado
+                        const enderecoDicaCurtaAddress = `${info.endereco.logradouro}, ${info.endereco.numero}`;
+                        const tr = `<tr onclick="abrirModalOcorrencia('${d.id}')" style="cursor:pointer; ${isCrit?'color:#ff6b6b':''}" ${atributoBusca}>
+                            <td style="width:10%;">${icon}</td>
+                            <td style="width:30%;">${info.natureza}</td>
+                            <td style="width:20%;" title="${enderecoDicaCurtaAddress}">${info.endereco.cidade}</td>
+                            <td style="width:20%;" title="${enderecoDicaCurtaAddress}">${info.endereco.bairro}</td>
+                            <td style="width:20%;">${hora}</td>
+                        </tr>`;
+                        
+                        const card = `<div class="card-mobile" style="border-left-color:${isCrit?'var(--danger)':'var(--success)'}" onclick="abrirModalOcorrencia('${d.id}')" ${atributoBusca}>
+                            <div style="display:flex;justify-content:space-between;font-weight:bold;font-size:13px;margin-bottom:5px;"><span>${info.natureza}</span><span>${hora}</span></div>
+                            <div style="font-size:11px;color:#aaa;margin-bottom:5px;">${info.endereco.formatado}</div>
+                            <div style="display:flex;gap:5px;">
+                                ${isCrit ? `<span class="card-tag" style="background:var(--danger);color:white">CRÍTICO</span>` : ''}
+                            </div>
+                        </div>`;
+                        
+                        tbWait.innerHTML+=tr; 
+                        mobWait.innerHTML+=card; 
+                        cw++;
+                    }
+                    
+                    // ===== EM ANDAMENTO (COM LÓGICA DE MULTI-LINHAS) =====
+                    else if(d.status==='EM_ANDAMENTO') {
+                        const viaturas = d.viaturas_empenhadas || [];
+                        
+                        // Linha Principal (viatura PRINCIPAL)
+                        const principal = viaturas.find(v => v.funcao==='PRINCIPAL');
+                        const prefixoPrincipal = principal ? principal.prefixo : '-';
+                        const enderecoDicaCurtaAddress = `${info.endereco.logradouro}, ${info.endereco.numero}`;
+                        
+                        const trPrincipal = `<tr onclick="abrirModalOcorrencia('${d.id}')" style="cursor:pointer; ${isCrit?'color:#ff6b6b':''}" ${atributoBusca}>
+                            <td style="width:15%;">${prefixoPrincipal}</td>
+                            <td style="width:25%;">${info.natureza}</td>
+                            <td style="width:20%;" title="${enderecoDicaCurtaAddress}">${info.endereco.cidade}</td>
+                            <td style="width:20%;" title="${enderecoDicaCurtaAddress}">${info.endereco.bairro}</td>
+                            <td style="width:20%;">${d.status}</td>
+                        </tr>`;
+                        tbAct.innerHTML+=trPrincipal;
+                        
+                        // Linhas de Apoio
+                        viaturas.filter(v => v.funcao==='APOIO').forEach(apoio => {
+                            const trApoio = `<tr onclick="abrirModalOcorrencia('${d.id}')" style="cursor:pointer; color:#888; font-size:12px;" ${atributoBusca}>
+                                <td style="width:15%;">📍 APOIO ${apoio.prefixo}</td>
+                                <td style="width:25%; color:#666;">↳</td>
+                                <td style="width:20%; color:#666;">↳</td>
+                                <td style="width:20%; color:#666;">↳</td>
+                                <td style="width:20%; color:#666;">↳</td>
+                            </tr>`;
+                            tbAct.innerHTML+=trApoio;
+                        });
+                        ca++; // Conta ocorrências, não linhas totais? Aqui conta linhas. Ajuste se preferir contar ocorrências.
+                        
+                        // Card Mobile (só principal)
+                        const card = `<div class="card-mobile" style="border-left-color:var(--success)" onclick="abrirModalOcorrencia('${d.id}')" ${atributoBusca}>
+                            <div style="display:flex;justify-content:space-between;font-weight:bold;font-size:13px;margin-bottom:5px;"><span>${info.natureza}</span><span>${hora}</span></div>
+                            <div style="font-size:11px;color:#aaa;margin-bottom:5px;">${info.endereco.formatado}</div>
+                            <div style="display:flex;gap:5px;">
+                                <span class="card-tag" style="background:var(--success);color:black">🚔 ${prefixoPrincipal}</span>
+                                ${viaturas.filter(v=>v.funcao==='APOIO').length > 0 ? `<span class="card-tag" style="background:#ff9500;color:black">+${viaturas.filter(v=>v.funcao==='APOIO').length} APOIO</span>` : ''}
+                            </div>
+                        </div>`;
+                        
+                        mobAct.innerHTML+=card;
+                    }
+                });
+                
+                document.getElementById('deskCountW').innerText = cw;
+                document.getElementById('deskCountA').innerText = ca;
+
+            } catch(e) { console.log(e); }
+        }
+
+        
+        // --- ADMIN ---
+        function adminSwitch(module) {
+            ['usuarios','chaves','viaturas','naturezas','areas'].forEach(m=>{
+                const el=document.getElementById('admin-'+m);
+                if(el) el.classList.toggle('hidden', m!==module);
+                const tab=document.getElementById('admin-tab-'+m);
+                if(tab) tab.classList.toggle('active', m===module);
+            });
+            if(module==='usuarios') carregarUsuarios();
+            if(module==='chaves') carregarChaves();
+            if(module==='viaturas') carregarViaturas();
+        }
+
+        async function exportTable(table) {
+            try{
+                const data = await api(table, 'select=*');
+                const filename = `${table}_${new Date().toISOString().slice(0,19)}.json`;
+                const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+            }catch(e){ alert('Erro exportando: '+e.message); }
+        }
+
+        function triggerImport(){ document.getElementById('adminImportFile').click(); }
+
+        async function handleImportFile(e){
+            const f = e.target.files && e.target.files[0]; if(!f) return; try{
+                const text = await f.text(); const json = JSON.parse(text);
+                const table = prompt('Nome da tabela de destino (ex: tb_usuarios):', document.getElementById('adminExportTable').value);
+                if(!table) return alert('Importação cancelada');
+                if(!confirm(`Confirmar import para ${table}?`)) return;
+                
+                if(!Array.isArray(json)) throw new Error('JSON deve ser array');
+                for(const item of json){ try{ await api(table,'', 'POST', item); }catch(err){ console.warn(err); } }
+                
+                alert('Concluído');
+                if(table==='tb_usuarios') carregarUsuarios();
+            }catch(err){ alert('Arquivo inválido: '+err.message); }
+            e.target.value='';
+        }
+
+        async function carregarUsuarios(){
+            const tb = document.getElementById('adminTabelaUsuarios'); tb.innerHTML='<tr><td colspan="5" style="padding:12px;color:gray">Buscando...</td></tr>';
+            try{
+                const users = await api('tb_usuarios','select=*&order=criado_em.desc');
+                tb.innerHTML='';
+                users.forEach(u=>{
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td style="padding:10px">${u.nome_guerra||''}</td><td style="padding:10px">${u.cpf_login||''}</td><td style="padding:10px">${u.perfil||''}</td><td style="padding:10px">${u.status_conta||''}</td><td style="padding:10px"><div style="display:flex;gap:6px"><button class="btn btn-sm btn-success" onclick="aprovarUsuario('${u.id}')">✅</button><button class="btn btn-sm btn-outline" onclick="bloquearUsuario('${u.id}')">🚫</button><button class="btn btn-sm btn-outline" onclick="resetSenha('${u.id}')">🔄</button></div></td>`;
+                    tr.style.borderBottom = '1px solid var(--border)';
+                    tb.appendChild(tr);
+                });
+            }catch(e){ tb.innerHTML='<tr><td colspan="5">Erro.</td></tr>'; }
+        }
+
+        function openNewUserModal(){ document.getElementById('modalNewUser').style.display='flex'; }
+        async function criarUsuario(){
+            const nome=document.getElementById('nu_nome').value; const cpf=document.getElementById('nu_cpf').value; const perfil=document.getElementById('nu_perfil').value; const senha=document.getElementById('nu_senha').value||'123456';
+            try{ await api('tb_usuarios','', 'POST', { nome_guerra:nome, cpf_login:cpf, senha:senha, perfil_acesso:perfil, status_conta:'VALIDADO' }); fecharModal('modalNewUser'); alert('Criado'); carregarUsuarios(); }catch(e){ alert('Erro: '+e.message); }
+        }
+
+        async function aprovarUsuario(id){ if(!confirm('Aprovar?')) return; await api('tb_usuarios', `id=eq.${id}`, 'PATCH', { status_conta: 'VALIDADO' }); carregarUsuarios(); }
+        async function bloquearUsuario(id){ if(!confirm('Bloquear?')) return; await api('tb_usuarios', `id=eq.${id}`, 'PATCH', { status_conta: 'BLOQUEADO' }); carregarUsuarios(); }
+        async function resetSenha(id){ if(!confirm('Resetar senha?')) return; await api('tb_usuarios', `id=eq.${id}`, 'PATCH', { senha: '123' }); alert('Senha: 123'); }
+
+        // --- Chaves ---
+        function openNewKeyModal(){ document.getElementById('modalNewKey').style.display='flex'; }
+        async function criarChave(){
+            const codigo = document.getElementById('nk_codigo').value || ('KEY-'+Math.random().toString(36).slice(2,8).toUpperCase());
+            const val = document.getElementById('nk_validade').value;
+            const perfil = document.getElementById('nk_perfil').value;
+            
+            const payload = { codigo: codigo, validade_horas: val, perfil_padrao: perfil, ativa: true };
+            
+            try{ 
+                await api('tb_chaves_acesso','', 'POST', payload); 
+                fecharModal('modalNewKey'); alert('Chave criada'); carregarChaves(); 
+            } catch(e){ alert('Erro ao criar chave: '+e.message); }
+        }
+
+        async function carregarChaves(){
+            const tb = document.getElementById('adminTabelaChaves'); tb.innerHTML='<tr><td>...</td></tr>';
+            try{
+                const list = await api('tb_chaves_acesso','select=*&order=criado_em.desc');
+                tb.innerHTML='';
+                list.forEach(k=>{
+                    tb.innerHTML += `<tr style="border-bottom:1px solid var(--border);"><td style="padding:10px">${k.codigo}</td><td style="padding:10px">${k.perfil_padrao||'-'}</td><td style="padding:10px">${k.validade_horas}h</td><td style="padding:10px">${k.ativa?'Sim':'Não'}</td><td style="padding:10px"><div style="display:flex;gap:6px"><button class="btn btn-sm btn-outline" onclick="deleteChave('${k.id}')">Excluir</button></div></td></tr>`;
+                });
+            }catch(e){}
+        }
+        async function deleteChave(id){ if(!confirm('Excluir?')) return; await api('tb_chaves_acesso', `id=eq.${id}`, 'DELETE'); carregarChaves(); }
+
+        // --- Viaturas ---
+        function openNewViaturaModal(){ document.getElementById('modalNovaViatura').style.display='flex'; }
+        async function criarViatura(){
+            const prefixo=document.getElementById('nv_prefixo').value; 
+            const tipo=document.getElementById('nv_tipo').value; 
+            const placa=document.getElementById('nv_placa').value.toUpperCase();
+            const telefone=document.getElementById('nv_telefone').value.replace(/\D/g, '');
+            
+            if(!prefixo || !placa) return alert('Preencha prefixo e placa');
+            
+            try{ 
+                await api('tb_viaturas','', 'POST', { prefixo: prefixo, tipo: tipo, placa: placa, guarnicao: 'LIVRE', status_viatura: 'Disponível', telefone_vtr: telefone }); 
+                fecharModal('modalNovaViatura'); 
+                document.getElementById('nv_prefixo').value = '';
+                document.getElementById('nv_tipo').value = 'Rádio Patrulha';
+                document.getElementById('nv_placa').value = '';
+                document.getElementById('nv_telefone').value = '';
+                alert('Viatura criada'); 
+                carregarViaturas(); 
+                carregarFrota();
+            }catch(e){ alert('Erro: '+e.message); }
+        }
+
+        async function carregarViaturas(){
+            const tb = document.getElementById('adminTabelaViaturas'); tb.innerHTML='<tr><td colspan="6" style="padding:12px;color:gray">Buscando...</td></tr>';
+            try{
+                const viaturas = await api('tb_viaturas','select=*&order=prefixo.asc');
+                tb.innerHTML='';
+                viaturas.forEach(v=>{
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td style="padding:10px">${v.prefixo||''}</td><td style="padding:10px">${v.tipo||''}</td><td style="padding:10px">${v.placa||''}</td><td style="padding:10px">${v.guarnicao||'LIVRE'}</td><td style="padding:10px">${v.status_viatura||'DISPONIVEL'}</td><td style="padding:10px"><div style="display:flex;gap:6px"><button class="btn btn-sm btn-outline" onclick="excluirViatura('${v.id}')">Excluir</button></div></td>`;
+                    tr.style.borderBottom = '1px solid var(--border)';
+                    tb.appendChild(tr);
+                });
+            }catch(e){ tb.innerHTML='<tr><td colspan="6" style="padding:12px;color:orange">Erro.</td></tr>'; }
+        }
+        async function excluirViatura(id){ if(!confirm('Excluir viatura?')) return; await api('tb_viaturas', `id=eq.${id}`, 'DELETE'); carregarViaturas(); carregarFrota(); }
+
+        // --- FROTA ---
+        let frotaEmEdicao = null;
+
+        async function carregarFrota(){
+            const container = document.getElementById('listaFrota');
+            container.innerHTML = '<div style="padding:20px; color:gray;">Carregando...</div>';
+            try{
+                const viaturas = await api('tb_viaturas','select=*&order=prefixo.asc');
+                container.innerHTML = '';
+                
+                viaturas.forEach(v => {
+                    // Verificar se status é operacional (bloqueado)
+                    const statusOperacional = ['DESLOCANDO', 'NO_LOCAL', 'SAIDA'].includes(v.status_viatura);
+                    
+                    const linhaDiv = document.createElement('div');
+                    linhaDiv.style.cssText = 'background:#1a1a1a; border:1px solid var(--border); border-radius:6px; padding:12px; display:flex; justify-content:space-between; align-items:center; gap:10px;';
+                    
+                    // ESQUERDA - Prefixo, Tipo, Guarnição
+                    const esquerda = document.createElement('div');
+                    esquerda.style.cssText = 'flex:2; font-size:13px;';
+                    esquerda.innerHTML = `<div style="font-weight:700; font-size:14px;">${v.prefixo}</div><div style="color:var(--text-muted); font-size:11px;">${v.tipo} | ${v.guarnicao || 'LIVRE'}</div>`;
+                    
+                    // CENTRO - Dropdown de Status
+                    const centro = document.createElement('div');
+                    centro.style.cssText = 'flex:2; display:flex; flex-direction:column; gap:4px;';
+                    const selectStatus = document.createElement('select');
+                    selectStatus.style.cssText = 'padding:6px; background:#222; border:1px solid var(--border); border-radius:4px; color:white; font-size:12px; width:100%;';
+                    
+                    const opcoes = ['Fora de serviço', 'Disponível', 'Administrativo', 'Refeição', 'Manutenção', 'Abastecimento'];
+                    opcoes.forEach(op => {
+                        const option = document.createElement('option');
+                        option.value = op;
+                        option.text = op;
+                        if(op === v.status_viatura) option.selected = true;
+                        selectStatus.appendChild(option);
+                    });
+                    
+                    // Se status é operacional, desabilitar dropdown
+                    if(statusOperacional) {
+                        selectStatus.disabled = true;
+                        selectStatus.style.opacity = '0.6';
+                        selectStatus.title = 'Status bloqueado - viatura em operação';
+                    } else {
+                        selectStatus.onchange = () => atualizarStatusViatura(v.id, selectStatus.value);
+                    }
+                    
+                    centro.appendChild(selectStatus);
+                    if(statusOperacional) {
+                        const aviso = document.createElement('div');
+                        aviso.style.cssText = 'font-size:10px; color:var(--warning);';
+                        aviso.innerHTML = '🔒 Bloqueado - em operação';
+                        centro.appendChild(aviso);
+                    }
+                    
+                    // DIREITA - Botão Editar
+                    const direita = document.createElement('div');
+                    direita.style.cssText = 'flex:0.5; display:flex; gap:6px;';
+                    const btnEditar = document.createElement('button');
+                    btnEditar.className = 'btn btn-sm';
+                    btnEditar.innerHTML = '<i class="fas fa-pen"></i>';
+                    btnEditar.onclick = () => abrirEdicaoViatura(v);
+                    direita.appendChild(btnEditar);
+                    
+                    linhaDiv.appendChild(esquerda);
+                    linhaDiv.appendChild(centro);
+                    linhaDiv.appendChild(direita);
+                    
+                    container.appendChild(linhaDiv);
+                });
+            }catch(e){
+                container.innerHTML = '<div style="padding:20px; color:orange;">Erro ao carregar frota.</div>';
+            }
+        }
+
+        async function atualizarStatusViatura(id, novoStatus){
+            try{
+                await api('tb_viaturas', `id=eq.${id}`, 'PATCH', { status_viatura: novoStatus });
+                alert('Status atualizado');
+                carregarFrota();
+            }catch(e){
+                alert('Erro: '+e.message);
+                carregarFrota();
+            }
+        }
+
+        function abrirEdicaoViatura(viatura){
+            frotaEmEdicao = viatura;
+            document.getElementById('me_guarnicao').value = viatura.guarnicao || '';
+            document.getElementById('me_telefone').value = viatura.telefone_vtr || '';
+            document.getElementById('modalFrotaEditar').style.display = 'flex';
+        }
+
+        function abrirWhatsapp(){
+            const numero = document.getElementById('me_telefone').value.replace(/\D/g, '');
+            if(!numero) {
+                alert('Digite um telefone primeiro');
+                return;
+            }
+            const url = `https://wa.me/55${numero}`;
+            window.open(url, '_blank');
+        }
+
+        async function salvarEdicaoViatura(){
+            if(!frotaEmEdicao) return;
+            const guarnicao = document.getElementById('me_guarnicao').value;
+            const telefone = document.getElementById('me_telefone').value.replace(/\D/g, '');
+            
+            try{
+                await api('tb_viaturas', `id=eq.${frotaEmEdicao.id}`, 'PATCH', { guarnicao: guarnicao, telefone_vtr: telefone });
+                alert('Viatura atualizada');
+                fecharModal('modalFrotaEditar');
+                carregarFrota();
+            }catch(e){
+                alert('Erro: '+e.message);
+            }
+        }
+
+        // --- Funções Genéricas de Cadastro (Natureza/Área) ---
+        async function salvarNatureza() {
+            const nome = prompt("Nome da Natureza (Ex: ROUBO):");
+            if(nome) {
+                await api('tb_naturezas', '', 'POST', { nome: nome, risco_padrao: 'NORMAL' });
+                alert('Natureza salva!');
+            }
+        }
+        async function salvarArea() {
+            const nome = prompt("Nome da Área/Bairro:");
+            if(nome) {
+                await api('tb_areas', '', 'POST', { nome: nome });
+                alert('Área salva!');
+            }
+        }
+
+        // Funções dos Drawers
+        // VARIÁVEIS GLOBAIS MODAIS - já declaradas no topo
+
+        // Função para abrir Modal de Ocorrência
+        async function abrirModalOcorrencia(id) {
+            idOcorrenciaAberta = id;
+            try {
+                const dados = await api('tb_triagem', `id=eq.${id}&select=*`);
+                if(!dados || !dados.length) return;
+                
+                const d = dados[0];
+                const info = d.dados_preenchidos;
+                const createdTime = new Date(d.criado_em);
+                const nowTime = new Date();
+                const diffMinutes = Math.floor((nowTime - createdTime) / 60000);
+                const timerText = `${Math.floor(diffMinutes / 60).toString().padStart(2,'0')}:${(diffMinutes % 60).toString().padStart(2,'0')}`;
+                
+                // Preencher modal
+                document.getElementById('mo-natureza').innerText = info.natureza || 'Sem informação';
+                document.getElementById('mo-id').innerText = `ID: ${id.substring(0,8)}...`;
+                document.getElementById('mo-timer').innerText = timerText;
+                
+                // Tags
+                const tagsDiv = document.getElementById('mo-tags');
+                tagsDiv.innerHTML = '';
+                if(info.prioridade==='CRITICA') {
+                    const tag = document.createElement('span');
+                    tag.style.cssText = 'font-size:10px; padding:3px 8px; background:#ff6b6b; color:white; border-radius:3px;';
+                    tag.innerText = '🚨 CRÍTICO';
+                    tagsDiv.appendChild(tag);
+                }
+                
+                // Endereço e Solicitante
+                document.getElementById('mo-endereco').innerHTML = `<strong>${info.endereco.logradouro}, ${info.endereco.numero}</strong><br>${info.endereco.bairro}, ${info.endereco.cidade}`;
+                document.getElementById('mo-nome').innerText = `Nome: ${info.solicitante.nome || 'Anônimo'}`;
+                document.getElementById('mo-telefone').innerText = `Tel: ${info.solicitante.telefone || 'Não informado'}`;
+                
+                // Descrição/Histórico
+                document.getElementById('mo-historico').innerHTML = d.resumo_texto ? 
+                    d.resumo_texto.split('\n').map(msg => `<div class="historico-msg">${msg}</div>`).join('') :
+                    '<div style="color:#666;">Nenhuma informação</div>';
+                
+                // Lógica por Status
+                if(d.status === 'AGUARDANDO') {
+                    document.getElementById('mo-recursos-container').style.display = 'none';
+                    document.getElementById('mo-btn-acao').innerText = 'Despachar Viatura';
+                    document.getElementById('mo-btn-acao').onclick = () => abrirSelecaoFrotaModal(id, 'PRINCIPAL');
+                } else if(d.status === 'EM_ANDAMENTO') {
+                    // Renderizar recursos
+                    const recursosDiv = document.getElementById('mo-recursos');
+                    recursosDiv.innerHTML = '';
+                    const viaturas = d.viaturas_empenhadas || [];
+                    if(viaturas.length === 0) {
+                        recursosDiv.innerHTML = '<div style="color:#666;">Nenhum recurso</div>';
+                    } else {
+                        viaturas.forEach((vtr, idx) => {
+                            const itemDiv = document.createElement('div');
+                            itemDiv.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px; background:rgba(255,255,255,0.02); border-radius:4px; margin-bottom:6px;';
+                            itemDiv.innerHTML = `<span>${vtr.funcao==='PRINCIPAL' ? '⭐' : '📍'} ${vtr.prefixo}</span><div style="display:flex;gap:4px;"><button class="btn btn-sm btn-outline" onclick="promoverViatura('${id}', ${idx})">Promover</button><button class="btn btn-sm btn-danger" onclick="retirarViatura('${id}', ${idx})">Retirar</button></div>`;
+                            recursosDiv.appendChild(itemDiv);
+                        });
+                    }
+                    document.getElementById('mo-recursos-container').style.display = 'block';
+                    document.getElementById('mo-btn-acao').innerText = 'Adicionar Apoio';
+                    document.getElementById('mo-btn-acao').onclick = () => abrirSelecaoFrotaModal(id, 'APOIO');
+                }
+                
+                document.getElementById('modalOcorrencia').style.display = 'flex';
+            } catch(e) { 
+                console.error('Erro ao abrir modal ocorrência:', e);
+            }
+        }
+
+        // Função para finalizar (abre modal de finalização)
+        function finalizarOcorrenciaModal(id) {
+            idParaFinalizar = id;
+            document.getElementById('mf-bo').value = '';
+            document.getElementById('mf-observacoes').value = '';
+            document.getElementById('modalFinalizacao').style.display = 'flex';
+        }
+
+        // Confirmar finalização
+        async function confirmarFinalizacao() {
+            const bo = document.getElementById('mf-bo').value.trim();
+            const obs = document.getElementById('mf-observacoes').value.trim();
+            
+            if(!bo || !obs) return alert('Preencha BO e Observações');
+            
+            try {
+                const ocoDados = await api('tb_triagem', `id=eq.${idParaFinalizar}&select=*`);
+                if(!ocoDados.length) return;
+                const ocoAtual = ocoDados[0];
+                
+                // Criar nova observação
+                const novaObs = `${ocoAtual.resumo_texto || ''}\n[FINALIZAÇÃO ${new Date().toLocaleString()}] BO: ${bo} | Obs: ${obs}`;
+                
+                // Liberar viaturas
+                const viaturas = ocoAtual.viaturas_empenhadas || [];
+                for(const vtr of viaturas) {
+                    await api('tb_viaturas', `prefixo=eq.${vtr.prefixo}`, 'PATCH', {
+                        status_viatura: 'Disponível'
+                    });
+                }
+                
+                // Finalizar ocorrência
+                await api('tb_triagem', `id=eq.${idParaFinalizar}`, 'PATCH', {
+                    status: 'FINALIZADA',
+                    resumo_texto: novaObs
+                });
+                
+                alert('Ocorrência finalizada com sucesso!');
+                fecharModal('modalFinalizacao');
+                fecharModal('modalOcorrencia');
+                carregarMonitoramento();
+            } catch(e) {
+                console.error('Erro ao finalizar:', e);
+                alert('Erro ao finalizar ocorrência');
+            }
+        }
+
+        // Abrir seleção de frota em modal
+        async function abrirSelecaoFrotaModal(idOco, tipo) {
+            tipoFuncaoSelecao = tipo;
+            try {
+                const viaturas = await api('tb_viaturas', "status_viatura=eq.Disponível&select=*");
+                const lista = document.getElementById('msfLista');
+                lista.innerHTML = '';
+                
+                viaturas.forEach(v => {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn btn-info' ;
+                    btn.style.cssText = 'margin-bottom:10px; text-align:left; padding:12px;';
+                    btn.innerHTML = `<strong>${v.prefixo}</strong> - ${v.tipo} (${v.placa})`;
+                    btn.onclick = () => empenharViatura(idOco, v.prefixo, tipo);
+                    lista.appendChild(btn);
+                });
+                
+                document.getElementById('modalSelecaoFrota').style.display = 'flex';
+            } catch(e) {
+                console.error('Erro ao carregar viaturas:', e);
+            }
+        }
+
+        // Empenhar viatura
+        async function empenharViatura(idOco, prefixo, tipo) {
+            try {
+                const ocoDados = await api('tb_triagem', `id=eq.${idOco}&select=*`);
+                if(!ocoDados.length) return;
+                const ocoAtual = ocoDados[0];
+                
+                let viaturas = ocoAtual.viaturas_empenhadas || [];
+                const novaViatura = { prefixo: prefixo, funcao: tipo };
+                
+                // Se é PRINCIPAL e já existe um, converte o antigo para APOIO
+                if(tipo === 'PRINCIPAL' && viaturas.length > 0) {
+                    const principal = viaturas.find(v => v.funcao === 'PRINCIPAL');
+                    if(principal) principal.funcao = 'APOIO';
+                }
+                
+                viaturas.push(novaViatura);
+                
+                await api('tb_triagem', `id=eq.${idOco}`, 'PATCH', {
+                    viaturas_empenhadas: viaturas,
+                    status: tipo === 'PRINCIPAL' ? 'EM_ANDAMENTO' : ocoAtual.status
+                });
+                
+                // Marcar viatura como em uso
+                await api('tb_viaturas', `prefixo=eq.${prefixo}`, 'PATCH', {
+                    status_viatura: 'Em Atendimento'
+                });
+                
+                fecharModal('modalSelecaoFrota');
+                abrirModalOcorrencia(idOco);
+                carregarMonitoramento();
+            } catch(e) {
+                console.error('Erro ao empenhar viatura:', e);
+            }
+        }
+
+        // ===== FUNÇÕES DE AÇÃO - FROTA =====
+        async function despacharViatura(idOcorrencia, prefixo, funcao) {
+            // funcao pode ser 'PRINCIPAL' ou 'APOIO'
+            if(!confirm(`Despachar ${prefixo} como ${funcao}?`)) return;
+            
+            try {
+                // 1. Buscar ocorrência atual
+                const ocoDados = await api('tb_triagem', `id=eq.${idOcorrencia}&select=*`);
+                if(!ocoDados.length) return alert('Ocorrência não encontrada');
+                const ocoAtual = ocoDados[0];
+                const viaturas = ocoAtual.viaturas_empenhadas || [];
+                
+                // 2. Se é PRINCIPAL, demover a atual principal para APOIO
+                if(funcao==='PRINCIPAL') {
+                    const principalIdx = viaturas.findIndex(v => v.funcao==='PRINCIPAL');
+                    if(principalIdx >= 0) {
+                        viaturas[principalIdx].funcao = 'APOIO';
+                    }
+                }
+                
+                // 3. Adicionar nova viatura ao array
+                viaturas.push({ prefixo: prefixo, funcao: funcao });
+                
+                // 4. Atualizar tb_triagem com viaturas_empenhadas e status
+                await api('tb_triagem', `id=eq.${idOcorrencia}`, 'PATCH', {
+                    viaturas_empenhadas: viaturas,
+                    status: 'EM_ANDAMENTO'
+                });
+                
+                // 5. Atualizar status da viatura para DESLOCANDO
+                await api('tb_viaturas', `prefixo=eq.${prefixo}`, 'PATCH', {
+                    status_viatura: 'DESLOCANDO'
+                });
+                
+                alert(`${prefixo} despachado como ${funcao}`);
+                fecharModal('modalSelecaoFrota');
+                carregarMonitoramento();
+                abrirModalOcorrencia(idOcorrencia);
+                
+            } catch(e) {
+                console.log('Erro ao despachar viatura:', e);
+                alert('Erro ao despachar');
+            }
+        }
+
+        async function promoverViatura(idOcorrencia, indexApoio) {
+            // Promover viatura de APOIO para PRINCIPAL
+            try {
+                const ocoDados = await api('tb_triagem', `id=eq.${idOcorrencia}&select=*`);
+                if(!ocoDados.length) return;
+                const ocoAtual = ocoDados[0];
+                const viaturas = ocoAtual.viaturas_empenhadas || [];
+                
+                if(!viaturas[indexApoio]) return;
+                
+                // Demover principal para apoio
+                const principalIdx = viaturas.findIndex(v => v.funcao==='PRINCIPAL');
+                if(principalIdx >= 0) {
+                    viaturas[principalIdx].funcao = 'APOIO';
+                }
+                
+                // Promover apoio para principal
+                viaturas[indexApoio].funcao = 'PRINCIPAL';
+                
+                // Atualizar
+                await api('tb_triagem', `id=eq.${idOcorrencia}`, 'PATCH', {
+                    viaturas_empenhadas: viaturas
+                });
+                
+                alert(`${viaturas[indexApoio].prefixo} promovido a PRINCIPAL`);
+                abrirModalOcorrencia(idOcorrencia);
+                
+            } catch(e) {
+                console.log('Erro ao promover viatura:', e);
+            }
+        }
+
+        async function retirarViatura(idOcorrencia, indexVtr) {
+            // Retirar viatura de uma ocorrência
+            try {
+                const ocoDados = await api('tb_triagem', `id=eq.${idOcorrencia}&select=*`);
+                if(!ocoDados.length) return;
+                const ocoAtual = ocoDados[0];
+                let viaturas = ocoAtual.viaturas_empenhadas || [];
+                
+                if(!viaturas[indexVtr]) return;
+                const vtrRemovida = viaturas[indexVtr];
+                
+                // Remover do array
+                viaturas.splice(indexVtr, 1);
+                
+                // Se removeu a PRINCIPAL e há apoios, o primeiro apoio vira principal
+                const principalIdx = viaturas.findIndex(v => v.funcao==='PRINCIPAL');
+                if(principalIdx < 0 && viaturas.length > 0) {
+                    viaturas[0].funcao = 'PRINCIPAL';
+                }
+                
+                // Se não há mais viaturas, volta para AGUARDANDO
+                if(viaturas.length === 0) {
+                    await api('tb_triagem', `id=eq.${idOcorrencia}`, 'PATCH', {
+                        viaturas_empenhadas: [],
+                        status: 'AGUARDANDO'
+                    });
+                } else {
+                    await api('tb_triagem', `id=eq.${idOcorrencia}`, 'PATCH', {
+                        viaturas_empenhadas: viaturas
+                    });
+                }
+                
+                // Liberar viatura para Disponível
+                await api('tb_viaturas', `prefixo=eq.${vtrRemovida.prefixo}`, 'PATCH', {
+                    status_viatura: 'Disponível'
+                });
+                
+                alert(`${vtrRemovida.prefixo} retirado`);
+                carregarMonitoramento();
+                if(viaturas.length > 0) {
+                    abrirModalOcorrencia(idOcorrencia);
+                } else {
+                    fecharModal('modalOcorrencia');
+                }
+                
+            } catch(e) {
+                console.log('Erro ao retirar viatura:', e);
+            }
+        }
+
+        async function adicionarApoio() {
+            if(!idOcorrenciaSelecao) return alert('Abra um drawer primeiro');
+            abrirSelecaoFrota(idOcorrenciaSelecao, 'APOIO');
+        }
+
+        async function finalizarOcorrencia(id) {
+            if(!confirm('Finalizar esta ocorrência?')) return;
+            
+            try {
+                // 1. Buscar ocorrência
+                const ocoDados = await api('tb_triagem', `id=eq.${id}&select=*`);
+                if(!ocoDados.length) return;
+                const ocoAtual = ocoDados[0];
+                
+                // 2. Atualizar status da ocorrência para FINALIZADA
+                await api('tb_triagem', `id=eq.${id}`, 'PATCH', {
+                    status: 'FINALIZADA'
+                });
+                
+                // 3. Liberar todas as viaturas
+                const viaturas = ocoAtual.viaturas_empenhadas || [];
+                for(const vtr of viaturas) {
+                    await api('tb_viaturas', `prefixo=eq.${vtr.prefixo}`, 'PATCH', {
+                        status_viatura: 'Disponível'
+                    });
+                }
+                
+                alert('Ocorrência finalizada');
+                fecharDrawer('dir');
+                fecharDrawer('esq');
+                carregarMonitoramento();
+                
+            } catch(e) {
+                console.log('Erro ao finalizar ocorrência:', e);
+                alert('Erro ao finalizar');
+            }
+        }
+
+        // ===== FILTRO GLOBAL (DEEP SEARCH) =====
+        function filtrarMonitoramento(texto) {
+            const tbWait = document.getElementById('tableWait');
+            const tbAct = document.getElementById('tableActive');
+            const filterText = texto.toLowerCase();
+            
+            // Filtrar tabela de espera usando data-busca
+            if(tbWait) {
+                const linhasWait = tbWait.querySelectorAll('tr');
+                linhasWait.forEach(linha => {
+                    const buscaDados = linha.getAttribute('data-busca') || '';
+                    linha.style.display = buscaDados.includes(filterText) ? '' : 'none';
+                });
+            }
+            
+            // Filtrar tabela ativa usando data-busca
+            if(tbAct) {
+                const linhasAct = tbAct.querySelectorAll('tr');
+                linhasAct.forEach(linha => {
+                    const buscaDados = linha.getAttribute('data-busca') || '';
+                    linha.style.display = buscaDados.includes(filterText) ? '' : 'none';
+                });
+            }
+        }
+
+        // ===== SELEÇÃO DE FROTA =====
+        async function abrirSelecaoFrota(id, tipo) {
+            idOcorrenciaSelecao = id;
+            tipoFuncaoSelecao = tipo;
+            
+            const drawer = document.getElementById('drawer-selecao');
+            const listDiv = document.getElementById('listaSelecaoFrota');
+            
+            // Limpar classes de visibilidade
+            drawer.classList.remove('left-hidden', 'left-visible', 'right-hidden', 'right-visible');
+            
+            // Carregar viaturas
+            listDiv.innerHTML = '<div style="padding:20px; text-align:center; color:#999;">Carregando...</div>';
+            
+            try {
+                const viaturas = await api('tb_viaturas', 'status_viatura=in.(DISPONIVEL,Disponível)&order=prefixo.asc');
+                listDiv.innerHTML = '';
+                
+                if(viaturas.length === 0) {
+                    listDiv.innerHTML = `
+                        <div style="padding:30px; text-align:center;">
+                            <div style="border: 2px dashed #444; border-radius:8px; padding:20px; margin-bottom:15px;">
+                                <i class="fas fa-inbox" style="font-size:32px; color:#666; margin-bottom:10px; display:block;"></i>
+                                <div style="color:#999; font-size:13px;">Nenhuma viatura disponível no momento</div>
+                            </div>
+                            <button class="btn btn-sm btn-outline" onclick="abrirSelecaoFrota('${id}', '${tipo}')" style="width:100%;">
+                                <i class="fas fa-sync"></i> Atualizar
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    viaturas.forEach(v => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.style.cssText = 'background:#1a1a1a; border:1px solid #333; border-radius:6px; padding:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;';
+                        
+                        const infoDiv = document.createElement('div');
+                        infoDiv.style.cssText = 'flex:1;';
+                        infoDiv.innerHTML = `<div style="font-weight:700; font-size:13px; color:#fff;">${v.prefixo}</div><div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${v.tipo} | ${v.guarnicao || 'LIVRE'}</div>`;
+                        
+                        const btnDiv = document.createElement('div');
+                        const btnSelect = document.createElement('button');
+                        btnSelect.className = 'btn btn-sm btn-success';
+                        btnSelect.innerText = 'Confirmar';
+                        btnSelect.style.cssText = 'min-width:80px;';
+                        btnSelect.onclick = async () => {
+                            await despacharViatura(idOcorrenciaSelecao, v.prefixo, tipoFuncaoSelecao);
+                            fecharSelecaoFrota();
+                        };
+                        btnDiv.appendChild(btnSelect);
+                        
+                        itemDiv.appendChild(infoDiv);
+                        itemDiv.appendChild(btnDiv);
+                        listDiv.appendChild(itemDiv);
+                    });
+                }
+                
+                // Animar entrada
+                if(tipo === 'PRINCIPAL') {
+                    drawer.classList.add('left-hidden');
+                    // Force reflow
+                    void drawer.offsetHeight;
+                    drawer.classList.remove('left-hidden');
+                    drawer.classList.add('left-visible');
+                } else {
+                    drawer.classList.add('right-hidden');
+                    // Force reflow
+                    void drawer.offsetHeight;
+                    drawer.classList.remove('right-hidden');
+                    drawer.classList.add('right-visible');
+                }
+                
+            } catch(e) {
+                console.log('Erro ao carregar viaturas:', e);
+                listDiv.innerHTML = '<div style="padding:20px; color:#ff6b6b; text-align:center;">Erro ao carregar viaturas</div>';
+            }
+        }
+
+    </script>
+</body>
+</html>
