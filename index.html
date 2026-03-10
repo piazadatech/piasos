@@ -11,10 +11,17 @@
     <style>
         :root {
             --primary: #0d1b3a; --secondary: #1e3c72; --accent: #b21f1f;
-            --bg-dark: #09090b; --card-bg: #18181b; --border: #27272a;
-            --text-light: #e4e4e7; --text-muted: #a1a1aa;
+            --bg-dark: #f4f4f5; --card-bg: #ffffff; --border: #e4e4e7;
+            --text-light: #18181b; --text-muted: #71717a;
             --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6;
             --nav-height: 60px;
+            --bg-header: #e4e4e7; --bg-hover: rgba(0,0,0,0.05); --input-bg: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --bg-dark: #09090b; --card-bg: #18181b; --border: #27272a;
+            --text-light: #e4e4e7; --text-muted: #a1a1aa;
+            --bg-header: #222222; --bg-hover: rgba(255,255,255,0.05); --input-bg: #27272a;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
@@ -31,22 +38,45 @@
         .btn-outline:hover { border-color: var(--text-light); color: var(--text-light); }
         
         /* INPUTS COMPACTOS */
-        input, select, textarea { width: 100%; padding: 10px 10px 10px 30px; background-color: #27272a; border: 1px solid #3f3f46; border-radius: 6px; color: white; font-size: 14px; outline: none; }
+        input, select, textarea { width: 100%; padding: 10px 10px 10px 30px; background-color: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text-light); font-size: 14px; outline: none; }
         label { display: block; font-size: 10px; color: var(--text-muted); margin-bottom: 4px; font-weight: 700; text-transform: uppercase; }
         .input-wrapper { position: relative; margin-bottom: 12px; }
-        .input-wrapper i.icon-left { position: absolute; left: 8px; top: 32px; color: var(--text-muted); font-size: 13px; }
+        .input-wrapper i.icon-left { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 13px; pointer-events: none; }
         
         /* NAVBAR */
         #app-wrapper { display: flex; flex-direction: column; height: 100%; }
         .navbar { height: var(--nav-height); background: var(--card-bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); z-index: 50; }
-        .nav-brand { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 700; color: white; }
+        .nav-brand { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 700; color: var(--text-light); }
         .nav-menu { display: flex; gap: 5px; height: 100%; }
         .nav-item { display: flex; align-items: center; gap: 8px; padding: 0 15px; color: var(--text-muted); cursor: pointer; font-size: 13px; font-weight: 500; border-bottom: 3px solid transparent; transition: 0.2s; }
-        .nav-item.active { color: white; border-bottom-color: var(--secondary); background: rgba(255,255,255,0.02); }
+        .nav-item.active { color: var(--text-light); border-bottom-color: var(--secondary); background: var(--bg-hover); }
         .nav-user { display: flex; align-items: center; gap: 10px; }
-        .avatar { width: 30px; height: 30px; background: var(--secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; }
+        .avatar { width: 30px; height: 30px; background: var(--secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; color: #ffffff; }
         
-        @media (max-width: 768px) { .navbar { padding: 0 10px; } .nav-text, .nav-brand h2 { display: none; } .nav-item { padding: 0 12px; } }
+        @media (max-width: 768px) { 
+            .navbar { padding: 0 10px; } 
+            .nav-text, .nav-brand h2 { display: none; } 
+            .nav-item { padding: 0 12px; } 
+            .modal-grid-responsive { grid-template-columns: 1fr !important; }
+            .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .action-btns-wrapper { flex-direction: column !important; }
+            .nav-menu { overflow-x: auto; justify-content: flex-start; padding-bottom: 2px; scrollbar-width: none; }
+            .nav-menu::-webkit-scrollbar { display: none; }
+            .nav-item { white-space: nowrap; }
+
+            /* Triagem: table -> card mobile rules */
+            #view-triagem table, #view-triagem thead, #view-triagem tbody, #view-triagem th, #view-triagem td, #view-triagem tr { display: block; }
+            #view-triagem thead tr { position: absolute; top: -9999px; left: -9999px; }
+            #view-triagem tr { background: var(--bg-header); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; padding: 12px; }
+            #view-triagem td { border: none; position: relative; padding: 4px 0 4px 75px !important; font-size: 13px; text-align: left; }
+            #view-triagem td::before { position: absolute; left: 0; top: 6px; width: 70px; white-space: nowrap; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+            #view-triagem td:nth-of-type(1)::before { content: "Tel:"; }
+            #view-triagem td:nth-of-type(2)::before { content: "Nome:"; }
+            #view-triagem td:nth-of-type(3)::before { content: "Cidade:"; }
+            #view-triagem td:nth-of-type(4)::before { content: "Bairro:"; }
+            #view-triagem td:nth-of-type(5)::before { content: "Natureza:"; }
+            #view-triagem td:nth-of-type(5) { font-weight: 700; color: var(--text-light); margin-top: 8px; padding-top: 8px !important; border-top: 1px solid var(--border); font-size: 14px; }
+        }
 
         /* CONTEÚDO PRINCIPAL */
         .main-content { flex: 1; overflow-y: hidden; position: relative; display: flex; flex-direction: column; }
@@ -63,7 +93,7 @@
         .check-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
         .option-box { position: relative; height: 100%; }
         .option-box input { position: absolute; opacity: 0; width: 0; height: 0; }
-        .option-box label { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 4px; font-size: 10px; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; color: var(--text-muted); margin: 0; padding: 10px 5px; height: 100%; transition: 0.2s; }
+        .option-box label { background: var(--bg-hover); border: 1px solid var(--border); border-radius: 4px; font-size: 10px; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; color: var(--text-muted); margin: 0; padding: 10px 5px; height: 100%; transition: 0.2s; }
         .option-box input:checked + label { background: var(--secondary); color: white; border-color: var(--info); box-shadow: 0 0 10px rgba(30, 60, 114, 0.4); }
 
         /* === MONITORAMENTO HÍBRIDO (CSS RESPONSIVO) === */
@@ -71,19 +101,19 @@
         /* 1. Versão Desktop (Tabelas Fixas) */
         .desktop-monitor { display: flex; height: 100%; gap: 20px; padding: 20px; }
         .monitor-col { flex: 1; display: flex; flex-direction: column; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-        .monitor-header { padding: 15px; font-weight: 700; font-size: 14px; text-transform: uppercase; background: #222; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+        .monitor-header { padding: 15px; font-weight: 700; font-size: 14px; text-transform: uppercase; background: var(--bg-header); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
         .monitor-body { flex: 1; overflow-y: auto; }
         
         table.monitor-table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
-        table.monitor-table th { background: rgba(0,0,0,0.3); padding: 12px; text-align: left; color: var(--text-muted); font-size: 11px; position: sticky; top: 0; }
+        table.monitor-table th { background: var(--bg-hover); padding: 12px; text-align: left; color: var(--text-muted); font-size: 11px; position: sticky; top: 0; }
         table.monitor-table td { padding: 12px; border-bottom: 1px solid var(--border); cursor: pointer; }
         table.monitor-table tr:hover { background: rgba(255,255,255,0.05); }
 
         /* 2. Versão Mobile (Painéis Deslizantes) */
-        .mobile-monitor { display: none; width: 100%; height: 100%; overflow: hidden; background: #000; }
+        .mobile-monitor { display: none; width: 100%; height: 100%; overflow: hidden; background: var(--bg-dark); }
         .sliding-panel { height: 100%; display: flex; flex-direction: column; transition: flex-basis 0.4s ease, width 0.4s ease; border-right: 1px solid var(--border); overflow: hidden; position: relative; }
         .panel-expanded { flex-basis: 90%; } /* Ajuste mobile */
-        .panel-collapsed { flex-basis: 10%; background: #111; cursor: pointer; }
+        .panel-collapsed { flex-basis: 10%; background: var(--bg-header); cursor: pointer; }
         .panel-collapsed .monitor-body { display: none; }
         .panel-collapsed .monitor-header { writing-mode: vertical-rl; text-orientation: mixed; height: 100%; justify-content: center; padding: 0; font-size: 14px; letter-spacing: 2px; }
 
@@ -94,65 +124,65 @@
         }
 
         /* Card Mobile */
-        .card-mobile { background: #222; border: 1px solid var(--border); border-left-width: 4px; padding: 15px; margin: 10px; border-radius: 6px; cursor: pointer; }
-        .card-tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #333; color: #ccc; margin-right: 5px; }
+        .card-mobile { background: var(--bg-header); border: 1px solid var(--border); border-left-width: 4px; padding: 15px; margin: 10px; border-radius: 6px; cursor: pointer; }
+        .card-tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: var(--border); color: var(--text-muted); margin-right: 5px; }
 
         /* DRAWERS (Gavetas Laterais) */
-        .drawer { position: fixed; top: 0; width: 400px; height: 100%; background: #18181b; border: 1px solid #333; transition: transform 0.3s ease; z-index: 300; display: flex; flex-direction: column; }
-        .drawer-left { left: 0; border-right: 1px solid #333; transform: translateX(-100%); }
-        .drawer-right { right: 0; border-left: 1px solid #333; transform: translateX(100%); }
+        .drawer { position: fixed; top: 0; width: 400px; height: 100%; background: var(--card-bg); border: 1px solid var(--border); transition: transform 0.3s ease; z-index: 300; display: flex; flex-direction: column; }
+        .drawer-left { left: 0; border-right: 1px solid var(--border); transform: translateX(-100%); }
+        .drawer-right { right: 0; border-left: 1px solid var(--border); transform: translateX(100%); }
         .drawer-left.open { transform: translateX(0) !important; }
         .drawer-right.open { transform: translateX(0) !important; }
-        .drawer-header { padding: 15px; background: #222; border-bottom: 1px solid #333; flex-shrink: 0; }
+        .drawer-header { padding: 15px; background: var(--bg-header); border-bottom: 1px solid var(--border); flex-shrink: 0; }
         .drawer-header h3 { margin: 0 0 8px 0; font-size: 16px; font-weight: 700; }
         .drawer-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
         .drawer-body { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; }
-        .drawer-section { background: #222; border: 1px solid #333; border-radius: 6px; padding: 12px; }
+        .drawer-section { background: var(--bg-header); border: 1px solid var(--border); border-radius: 6px; padding: 12px; }
         .drawer-section-title { font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; margin-bottom: 8px; }
         .drawer-section-content { font-size: 12px; line-height: 1.5; }
-        .drawer-footer { padding: 12px; background: #222; border-top: 1px solid #333; display: flex; justify-content: space-between; flex-shrink: 0; }
+        .drawer-footer { padding: 12px; background: var(--bg-header); border-top: 1px solid var(--border); display: flex; justify-content: space-between; flex-shrink: 0; }
         .drawer-footer i { cursor: pointer; font-size: 16px; color: var(--secondary); transition: 0.2s; }
         .drawer-footer i:hover { color: var(--info); transform: scale(1.1); }
-        .btn-copy { font-size: 11px; padding: 4px 8px; background: #333; border: 1px solid #555; border-radius: 4px; cursor: pointer; color: white; }
-        .btn-copy:hover { background: #444; }
+        .btn-copy { font-size: 11px; padding: 4px 8px; background: var(--border); border: 1px solid var(--border); border-radius: 4px; cursor: pointer; color: var(--text-light); }
+        .btn-copy:hover { background: var(--bg-hover); }
         .tag-anonimo { display: inline-block; font-size: 9px; padding: 2px 6px; background: #ff6b6b; color: white; border-radius: 3px; margin-left: 8px; }
-        .historico-area { background: #1a1a1a; border: 1px solid #333; border-radius: 4px; padding: 10px; max-height: 200px; overflow-y: auto; font-size: 11px; line-height: 1.4; color: #ccc; }
-        .historico-msg { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #333; }
+        .historico-area { background: var(--bg-header); border: 1px solid var(--border); border-radius: 4px; padding: 10px; max-height: 200px; overflow-y: auto; font-size: 11px; line-height: 1.4; color: var(--text-muted); }
+        .historico-msg { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
         .historico-msg:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
         .historico-hora { font-size: 10px; color: var(--text-muted); }
         .lista-recursos { flex-shrink: 0; }
-        .recurso-item { background: #1a1a1a; border: 1px solid #333; border-left: 3px solid var(--success); border-radius: 4px; padding: 8px; margin-bottom: 6px; font-size: 11px; }
+        .recurso-item { background: var(--bg-header); border: 1px solid var(--border); border-left: 3px solid var(--success); border-radius: 4px; padding: 8px; margin-bottom: 6px; font-size: 11px; }
         
         /* --- DRAWER EXTRA (SELEÇÃO DE FROTA) --- */
-        .drawer-extra { position: fixed; top: 0; width: 320px; height: 100%; background: #121212; z-index: 250; transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); box-shadow: 0 0 20px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+        .drawer-extra { position: fixed; top: 0; width: 320px; height: 100%; background: var(--card-bg); z-index: 250; transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); box-shadow: 0 0 20px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
         .drawer-extra.left-hidden { left: 50px; opacity: 0; pointer-events: none; }
-        .drawer-extra.left-visible { left: 400px; opacity: 1; pointer-events: auto; border-left: 1px solid #333; }
+        .drawer-extra.left-visible { left: 400px; opacity: 1; pointer-events: auto; border-left: 1px solid var(--border); }
         .drawer-extra.right-hidden { right: 50px; opacity: 0; pointer-events: none; }
-        .drawer-extra.right-visible { right: 400px; opacity: 1; pointer-events: auto; border-right: 1px solid #333; }
+        .drawer-extra.right-visible { right: 400px; opacity: 1; pointer-events: auto; border-right: 1px solid var(--border); }
         
         .tooltip { position: relative; display: inline-block; }
-        .tooltip .tooltiptext { visibility: hidden; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 8px; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -60px; opacity: 0; transition: opacity 0.3s; font-size: 11px; width: 120px; white-space: normal; }
-        .tooltip .tooltiptext::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #333 transparent transparent transparent; }
+        .tooltip .tooltiptext { visibility: hidden; background-color: var(--border); color: var(--text-light); text-align: center; border-radius: 6px; padding: 8px; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -60px; opacity: 0; transition: opacity 0.3s; font-size: 11px; width: 120px; white-space: normal; }
+        .tooltip .tooltiptext::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: var(--border) transparent transparent transparent; }
         .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
 
         /* MODAL GERAL */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-        .modal-content { background: #121212; width: 95%; max-width: 600px; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; max-height: 90vh; box-shadow: 0 20px 50px black; }
-        .modal-header { padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: #1a1a1a; border-radius: 12px 12px 0 0; }
+        .modal-content { background: var(--card-bg); width: 95%; max-width: 600px; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; max-height: 90vh; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .modal-header { padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--bg-header); border-radius: 12px 12px 0 0; }
         .modal-body { padding: 20px; overflow-y: auto; }
-        .modal-footer { padding: 15px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; background: #1a1a1a; border-radius: 0 0 12px 12px; }
+        .modal-footer { padding: 15px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; background: var(--bg-header); border-radius: 0 0 12px 12px; }
 
         /* Viaturas */
-        .viatura-item { padding: 12px; border: 1px solid var(--border); margin-bottom: 8px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; background: #1a1a1a; }
+        .viatura-item { padding: 12px; border: 1px solid var(--border); margin-bottom: 8px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; background: var(--bg-header); }
         .viatura-item:hover { background: var(--secondary); border-color: var(--info); }
 
         #login-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--bg-dark); z-index: 100; }
         .login-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 30px; width: 90%; max-width: 380px; }
-        .suggestions { position: absolute; background: #333; width: 100%; z-index: 10; max-height: 150px; overflow-y: auto; border: 1px solid var(--border); top: 55px; border-radius: 0 0 6px 6px; }
-        .sugg-item { padding: 10px; border-bottom: 1px solid #444; font-size: 12px; cursor: pointer; }
+        .suggestions { position: absolute; background: var(--border); width: 100%; z-index: 10; max-height: 150px; overflow-y: auto; border: 1px solid var(--border); top: 55px; border-radius: 0 0 6px 6px; }
+        .sugg-item { padding: 10px; border-bottom: 1px solid var(--border); font-size: 12px; cursor: pointer; }
         .sugg-item:hover { background: var(--secondary); }
         .dynamic-list { margin-top: 10px; display: flex; flex-direction: column; gap: 5px; }
-        .list-entry { background: #222; padding: 8px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; border: 1px solid var(--border); }
+        .list-entry { background: var(--bg-header); padding: 8px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; border: 1px solid var(--border); }
     </style>
 </head>
 <body>
@@ -195,7 +225,7 @@
                 <div class="nav-item" id="nav-frota" onclick="navegar('frota')"><i class="fas fa-car"></i> <span class="nav-text">FROTA</span></div>
                 <div class="nav-item" id="nav-admin" onclick="navegar('admin')"><i class="fas fa-users-cog"></i> <span class="nav-text">ADMIN</span></div>
             </div>
-            <div class="nav-user"><div class="avatar" id="userAvatar">U</div><i class="fas fa-sign-out-alt" onclick="logout()" style="color:var(--text-muted); cursor:pointer;"></i></div>
+            <div class="nav-user"><i id="themeToggleBtn" class="fas fa-moon" onclick="toggleTheme()" style="color:var(--text-muted); cursor:pointer; font-size:18px; margin-right:10px; transition:0.3s;" title="Alternar Tema"></i><div class="avatar" id="userAvatar">U</div><i class="fas fa-sign-out-alt" onclick="logout()" style="color:var(--text-muted); cursor:pointer;"></i></div>
         </div>
 
         <div class="main-content">
@@ -211,16 +241,19 @@
                         <div>
                             <div class="section-box">
                                 <div class="section-title"><i class="fas fa-user"></i> Solicitante</div>
-                                <div style="display: flex; gap: 10px;">
-                                    <div style="flex:1"><label>Telefone</label><div class="input-wrapper"><i class="fas fa-phone icon-left"></i><input type="tel" id="solTel"></div></div>
-                                    <div style="flex:2"><label>Nome</label><div class="input-wrapper"><i class="fas fa-user icon-left"></i><input type="text" id="solNome"></div></div>
+                                <div style="display:flex; gap: 10px;">
+                                    <div style="flex:1"><label>Telefone</label><div class="input-wrapper"><i class="fas fa-phone icon-left"></i><input type="tel" id="solTel" maxlength="15" oninput="mascaraTelefone(this)"></div></div>
+                                    <div style="flex:2">
+                                        <label>Nome</label>
+                                        <div class="input-wrapper"><i class="fas fa-user icon-left"></i><input type="text" id="solNome"></div>
+                                        <div class="option-box" style="height:auto; margin-top:6px;"><input type="checkbox" id="chkAnon" onchange="toggleAnonimo(this)"><label for="chkAnon" style="width:fit-content; background:transparent; border:none; padding:0; justify-content:flex-start;">Anônimo</label></div>
+                                    </div>
                                 </div>
-                                <div class="option-box" style="height:auto;"><input type="checkbox" id="chkAnon" onchange="toggleAnonimo(this)"><label for="chkAnon" style="width:fit-content; background:transparent; border:none; padding:0; justify-content:flex-start;">Anônimo</label></div>
                             </div>
                             <div class="section-box">
                                 <div class="section-title"><i class="fas fa-map-marker-alt"></i> Local</div>
                                 <div style="display: flex; gap: 10px;">
-                                    <div style="width: 100px;"><label>CEP</label><div class="input-wrapper"><i class="fas fa-search icon-left"></i><input type="tel" id="endCep" onblur="buscarCep(this.value)"></div></div>
+                                    <div style="width: 130px;"><label>CEP</label><div class="input-wrapper"><i class="fas fa-search icon-left"></i><input type="tel" id="endCep" onblur="buscarCep(this.value)" maxlength="9"></div></div>
                                     <div style="flex: 1;"><label>Cidade</label><div class="input-wrapper"><i class="fas fa-city icon-left"></i><input type="text" id="endCidade"></div></div>
                                 </div>
                                 <div style="position: relative;">
@@ -228,10 +261,14 @@
                                     <div id="sugestoesLog" class="suggestions hidden"></div>
                                 </div>
                                 <div style="display: flex; gap: 10px;">
-                                    <div style="width: 80px;"><label>Nº</label><div class="input-wrapper"><i class="fas fa-hashtag icon-left"></i><input type="text" id="endNum"></div></div>
+                                    <div style="width: 130px;"><label>Nº</label><div class="input-wrapper"><i class="fas fa-hashtag icon-left"></i><input type="text" id="endNum"></div></div>
                                     <div style="flex: 1;"><label>Bairro</label><div class="input-wrapper"><i class="fas fa-map icon-left"></i><input type="text" id="endBairro"></div></div>
                                 </div>
-                                <div><label>Referência</label><div class="input-wrapper"><i class="fas fa-map-pin icon-left"></i><input type="text" id="endRef"></div></div>
+                                <div>
+                                    <label>Referência</label>
+                                    <div class="input-wrapper"><i class="fas fa-map-pin icon-left"></i><input type="text" id="endRef"></div>
+                                    <div style="margin-top:6px; max-width:220px;"><button type="button" class="btn btn-sm btn-outline" onclick="adicionarSemPontoReferencia()">+ SEM REFERÊNCIA</button></div>
+                                </div>
                             </div>
                             <div class="section-box">
                                 <div class="section-title"><i class="fas fa-tags"></i> Classificação</div>
@@ -266,10 +303,14 @@
                             </div>
                             <div class="section-box">
                                 <div class="section-title"><i class="fas fa-car"></i> Veículos / Suspeitos</div>
-                                <div style="margin-bottom: 15px;"><label>Veículo</label><div style="display: flex; gap: 5px;"><input type="text" id="vPlaca" placeholder="PLACA" style="width: 100px; text-transform: uppercase;"><input type="text" id="vDesc" placeholder="Descrição"><button type="button" class="btn btn-sm" onclick="consultarPlaca()"><i class="fas fa-search"></i></button></div><div id="listaVeiculos" class="dynamic-list"></div></div>
-                                <div><label>Suspeito</label><div style="display: flex; gap: 5px;"><input type="text" id="sNome" placeholder="Características..."><button type="button" class="btn btn-sm" onclick="addSuspeito()"><i class="fas fa-plus"></i></button></div><div id="listaSuspeitos" class="dynamic-list"></div></div>
+                                <div style="margin-bottom: 15px;"><label>Veículo</label><div style="display: flex; gap: 5px;"><input type="text" id="vPlaca" placeholder="PLACA" style="width: 100px; text-transform: uppercase; transition: 0.3s background-color;" onblur="consultarPlacaApi()"><input type="text" id="vDesc" placeholder="Descrição"><button type="button" class="btn btn-sm" onclick="addVeiculo()" style="background:var(--input-bg); color:var(--text-light); border:1px solid var(--border);"><i class="fas fa-plus"></i></button></div><div id="listaVeiculos" class="dynamic-list"></div></div>
+                                <div><label>Suspeito</label><div style="display: flex; gap: 5px;"><input type="text" id="sNome" placeholder="Características..."><button type="button" class="btn btn-sm" onclick="addSuspeito()" style="background:var(--input-bg); color:var(--text-light); border:1px solid var(--border);"><i class="fas fa-plus"></i></button></div><div id="listaSuspeitos" class="dynamic-list"></div></div>
                             </div>
-                            <div style="display: flex; gap: 10px; flex-wrap: wrap;"><button type="button" class="btn btn-info" id="btnTriagem" onclick="salvar('TRIAGEM')" style="flex: 1; min-width: 150px;">ENVIAR P/ TRIAGEM</button><button type="button" class="btn btn-danger" id="btnGerar" onclick="salvar('DESPACHO')" style="flex: 1; min-width: 150px;">GERAR OCORRÊNCIA</button><button type="button" class="btn btn-success" id="btnGerarComplementar" onclick="salvarComplementar()" style="flex: 1; min-width: 150px;">GERAR E COMPLEMENTAR</button></div>
+                            <div class="action-btns-wrapper" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <button type="button" class="btn btn-danger" id="btnGerar" onclick="salvar('DESPACHO')" style="flex: 1; min-width: 150px;">GERAR OCORRÊNCIA</button>
+                                <button type="button" class="btn btn-success" id="btnGerarComplementar" onclick="salvarComplementar()" style="flex: 1; min-width: 150px;">GERAR E COMPLEMENTAR</button>
+                                <button type="button" class="btn btn-info" id="btnTriagem" onclick="salvar('TRIAGEM')" style="flex: 1; min-width: 150px;">TRIAGEM</button>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -277,18 +318,18 @@
 
             <div id="view-triagem" class="scroll-content hidden">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                    <h2 style="font-size:18px;">Rascunhos (Triagem)</h2>
+                    <h2 style="font-size:18px;">Triagem</h2>
                     <button class="btn btn-sm btn-outline" onclick="carregarTriagem()"><i class="fas fa-sync"></i></button>
                 </div>
 
                 <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; height: 100%; max-height: 70vh;">
                     <div style="padding: 12px; border-bottom: 1px solid var(--border);">
                         <input type="text" id="filtroTriagem" placeholder="🔍 Buscar por telefone, nome, cidade, bairro, natureza..." 
-                            style="width:100%; padding:10px; background:#222; border:1px solid var(--border); border-radius:6px; color:white; font-size:13px;"
+                            style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--border); border-radius:6px; color:var(--text-light); font-size:13px;"
                             oninput="filtrarTriagem(this.value)">
                     </div>
-                    <div style="flex: 1; overflow-y: auto;">
-                        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                        <div class="table-wrapper" style="flex: 1; overflow-y: auto;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 13px; text-align: left;">
                             <thead style="position: sticky; top: 0;">
                                 <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border);">
                                     <th style="padding: 12px; text-align: left; color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase;">Telefone</th>
@@ -379,7 +420,7 @@
                         <button class="btn btn-sm btn-outline" onclick="adminSwitch('areas')" id="admin-tab-areas">Áreas</button>
                     </div>
                     <div style="display:flex; gap:8px; align-items:center;">
-                        <select id="adminExportTable" style="padding:8px; background:#111; border:1px solid var(--border); color:var(--text-light); border-radius:6px;">
+                        <select id="adminExportTable" style="padding:8px; background:var(--input-bg); border:1px solid var(--border); color:var(--text-light); border-radius:6px;">
                             <option value="tb_usuarios">tb_usuarios</option>
                             <option value="tb_chaves_acesso">tb_chaves_acesso</option>
                             <option value="tb_viaturas">tb_viaturas</option>
@@ -489,7 +530,7 @@
         
     </div>
 
-    <div id="modalPlaca" class="modal-overlay"><div class="modal-content" style="max-width:350px;"><div class="modal-header"><h3>Veículo</h3><i class="fas fa-times" onclick="fecharModal('modalPlaca')" style="cursor:pointer;"></i></div><div class="modal-body" id="modalPlacaBody"><p>Consultando...</p></div><div class="modal-footer"><button class="btn btn-sm" onclick="confirmarVeiculo()">ADICIONAR</button></div></div></div>
+    
 
     <div id="modalFrotaEditar" class="modal-overlay">
         <div class="modal-content" style="max-width:420px;">
@@ -514,7 +555,7 @@
     </div>
 
     <!-- MODAL DE COMPLEMENTAÇÃO -->
-    <div id="modalComplementacao" class="modal-overlay">
+    <div id="modalComplementacao" class="modal-overlay" style="z-index: 220;">
         <div class="modal-content" style="max-width:500px;">
             <div class="modal-header">
                 <h3>Complementar Ocorrência</h3>
@@ -537,37 +578,48 @@
     <!-- MODAIS MONITORAMENTO -->
     <div id="modalOcorrencia" class="modal-overlay">
         <div class="modal-content" style="max-width:700px; max-height:85vh;">
-            <div class="modal-header">
-                <h3 id="mo-natureza" style="margin:0 0 8px 0; font-size:18px;">Ocorrência</h3>
-                <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="modal-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div>
+                    <h3 id="mo-natureza" style="margin:0 0 8px 0; font-size:18px;">Ocorrência</h3>
                     <div style="display:flex; gap:15px; font-size:11px; color:var(--text-muted);">
                         <span id="mo-id">ID: --</span>
                         <span id="mo-timer">00:00</span>
                     </div>
-                    <i class="fas fa-times" onclick="fecharModal('modalOcorrencia')" style="cursor:pointer; font-size:18px; color:var(--text-muted);"></i>
+                    <div id="mo-tags" style="display:flex; gap:4px; flex-wrap:wrap; margin-top:8px;"></div>
                 </div>
-                <div id="mo-tags" style="display:flex; gap:4px; flex-wrap:wrap; margin-top:8px;"></div>
+                <i class="fas fa-times" onclick="fecharModal('modalOcorrencia')" style="cursor:pointer; font-size:20px; color:var(--text-muted); padding:5px;"></i>
             </div>
-            <div class="modal-body" style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
-                <div>
+            <div class="modal-body" style="display:flex; flex-direction:column; gap:15px;">
+                <div class="modal-grid-responsive" style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                <div style="padding:12px; background:var(--bg-header); border:1px solid var(--border); border-radius:6px;">
                     <div class="drawer-section-title"><i class="fas fa-map-pin"></i> Local</div>
-                    <div id="mo-endereco" style="font-size:12px; line-height:1.4;">Endereço</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                        <div id="mo-endereco" style="font-size:12px; line-height:1.4;">Endereço</div>
+                        <button class="btn btn-sm btn-outline" id="mo-btn-mapa" title="Abrir no Mapa" style="padding:10px;"><i class="fas fa-map-marked-alt" style="font-size:16px;"></i></button>
+                    </div>
                 </div>
-                <div>
+                <div style="padding:12px; background:var(--bg-header); border:1px solid var(--border); border-radius:6px;">
                     <div class="drawer-section-title"><i class="fas fa-user"></i> Solicitante</div>
-                    <div id="mo-nome" style="font-size:12px;">Nome: --</div>
-                    <div id="mo-telefone" style="font-size:12px;">Tel: --</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                        <div>
+                            <div id="mo-nome" style="font-size:12px;">Nome: --</div>
+                            <div id="mo-telefone" style="font-size:12px;">Tel: --</div>
+                        </div>
+                        <button class="btn btn-sm btn-success" id="mo-btn-ligar" title="Ligar" style="padding:10px;"><i class="fas fa-phone" style="font-size:16px;"></i></button>
+                    </div>
                 </div>
-            </div>
-            <div style="margin-bottom:15px;">
-                <div class="drawer-section-title"><i class="fas fa-history"></i> Descrição</div>
-                <div id="mo-historico" class="historico-area" style="max-height:150px;">Nenhuma informação</div>
-            </div>
-            <div id="mo-recursos-container" style="margin-bottom:15px; display:none;">
-                <div class="drawer-section-title"><i class="fas fa-car"></i> Recursos</div>
-                <div id="mo-recursos" style="font-size:11px;">Nenhum recurso</div>
+                </div>
+                <div style="padding:12px; background:var(--bg-header); border:1px solid var(--border); border-radius:6px;">
+                    <div class="drawer-section-title"><i class="fas fa-history"></i> Descrição</div>
+                    <div id="mo-historico" style="font-size:12px; line-height:1.5; color:var(--text-light);">Nenhuma informação</div>
+                </div>
+                <div id="mo-recursos-container" style="display:none;">
+                    <div class="drawer-section-title"><i class="fas fa-car"></i> Recursos</div>
+                    <div id="mo-recursos" style="font-size:11px;">Nenhum recurso</div>
+                </div>
             </div>
             <div class="modal-footer" style="display:flex; gap:10px;">
+                <button class="btn" id="mo-btn-complementar" onclick="abrirComplementoMonitoramento()" style="width: auto; background: var(--secondary); color: white;"><i class="fas fa-plus"></i> Complementar</button>
                 <button class="btn btn-info" id="mo-btn-editar" onclick="editarEndereco()"><i class="fas fa-pen"></i> Editar Endereço</button>
                 <button class="btn btn-success" id="mo-btn-acao" onclick="abrirSelecaoFrotaModal(idOcorrenciaAberta, 'PRINCIPAL')">Despachar</button>
                 <button class="btn btn-danger" id="mo-btn-finalizar" onclick="finalizarOcorrenciaModal(idOcorrenciaAberta)"><i class="fas fa-flag"></i> Finalizar</button>
@@ -621,7 +673,24 @@
         let timerOcorrencia = null;
         let veiculosArray = [], suspeitosArray = [], veiculoTemp = null, idEmEdicao = null, idSelecionadoDespacho = null, ocoAtual = null;
 
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modais = document.querySelectorAll('.modal-overlay');
+                modais.forEach(modal => modal.style.display = 'none');
+            }
+        });
+
         window.onload = function() {
+            // Carregar preferência de tema
+            const temaSalvo = localStorage.getItem('piabi_theme');
+            if(temaSalvo === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.getElementById('themeToggleBtn').className = 'fas fa-sun';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                document.getElementById('themeToggleBtn').className = 'fas fa-moon';
+            }
+            
             const sessao = localStorage.getItem('piabi_user');
             if(sessao) { usuarioAtual = JSON.parse(sessao); mostrarApp(); } 
             else { document.getElementById('login-wrapper').style.display = 'flex'; }
@@ -679,6 +748,14 @@
         function toggleMenu(force) { const sb=document.querySelector('.sidebar'); const ov=document.querySelector('.mobile-overlay'); const open=force!==undefined?force:!sb.classList.contains('open'); if(open){sb.classList.add('open');ov.style.display='block';}else{sb.classList.remove('open');ov.style.display='none';} }
         function mostrarApp() { document.getElementById('login-wrapper').style.display='none'; document.getElementById('app-wrapper').classList.remove('hidden'); document.getElementById('userAvatar').innerText=usuarioAtual.nome_guerra[0]; document.getElementById('mobileUserAvatar').innerText=usuarioAtual.nome_guerra[0]; navegar('atendimento'); }
         function logout() { localStorage.removeItem('piabi_user'); window.location.reload(); }
+        function toggleTheme() { 
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            const btn = document.getElementById('themeToggleBtn');
+            btn.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            localStorage.setItem('piabi_theme', newTheme);
+        }
         
         async function handleLogin(e) { 
             e.preventDefault(); 
@@ -761,11 +838,88 @@
 
         // --- ATENDIMENTO ---
         async function buscarCep(cep) { cep=cep.replace(/\D/g,''); if(cep.length!==8)return; try{const r=await fetch(`https://viacep.com.br/ws/${cep}/json/`);const d=await r.json();if(!d.erro){ document.getElementById('endLog').value=d.logradouro; document.getElementById('endBairro').value=d.bairro; document.getElementById('endCidade').value=d.localidade; }}catch(e){} }
+        
+        function mascaraTelefone(el) {
+            if(!el) return;
+            
+            // Remove tudo que não for número
+            let v = el.value.replace(/\D/g, '');
+            
+            // Limita a 11 dígitos no máximo
+            v = v.substring(0, 11);
+            
+            let formatado = '';
+            
+            if (v.length === 0) {
+                formatado = '';
+            } else if (v.length <= 2) {
+                formatado = '(' + v;
+            } else if (v.length <= 6) {
+                // Formato (XX) XXXX
+                formatado = '(' + v.substring(0, 2) + ') ' + v.substring(2);
+            } else if (v.length <= 10) {
+                // Formato (XX) XXXX-XXXX (Fixo)
+                formatado = '(' + v.substring(0, 2) + ') ' + v.substring(2, 6) + '-' + v.substring(6);
+            } else {
+                // Formato (XX) XXXXX-XXXX (Celular)
+                formatado = '(' + v.substring(0, 2) + ') ' + v.substring(2, 7) + '-' + v.substring(7);
+            }
+            
+            el.value = formatado;
+        }
+
+        // Função: adicionar "Sem ponto de referência" ao campo endRef
+        function adicionarSemPontoReferencia() {
+            const inp = document.getElementById('endRef');
+            if(!inp) return;
+            const suffix = 'SEM PONTO DE REFERÊNCIA';
+            if(!inp.value || inp.value.trim() === '') {
+                inp.value = suffix;
+            } else {
+                // Evita duplicar o mesmo sufixo
+                if(inp.value.includes(suffix)) return;
+                inp.value = inp.value + ' - ' + suffix;
+            }
+        }
         let timeoutLog; function sugerirLogradouro(txt) { clearTimeout(timeoutLog); const box=document.getElementById('sugestoesLog'); const cid=document.getElementById('endCidade').value; if(txt.length<4||!cid){box.classList.add('hidden');return;} timeoutLog=setTimeout(async()=>{ try{const r=await fetch(`https://nominatim.openstreetmap.org/search?street=${txt}&city=${cid}&state=Parana&format=json&limit=5`);const d=await r.json();box.innerHTML='';if(d.length){box.classList.remove('hidden');d.forEach(i=>{const div=document.createElement('div');div.className='sugg-item';div.innerText=i.display_name.split(',')[0];div.onclick=()=>{document.getElementById('endLog').value=div.innerText;box.classList.add('hidden');};box.appendChild(div);});}}catch(e){} },500); }
-        async function consultarPlaca() { const p=document.getElementById('vPlaca').value.toUpperCase().replace(/[^A-Z0-9]/g,''); const d=document.getElementById('vDesc').value; if(!p){ if(d){veiculosArray.push({placa:'S/P',desc:d});renderList('listaVeiculos',veiculosArray);document.getElementById('vDesc').value='';}return; } document.getElementById('modalPlaca').style.display='flex'; document.getElementById('modalPlacaBody').innerHTML='Consultando...'; try{const res=await fetch(`https://api.placas.app.br/v2/placas/${p}`); if(res.ok){const data=await res.json();veiculoTemp={placa:p,desc:`${data.marca} ${data.modelo} - ${data.cor}`};document.getElementById('modalPlacaBody').innerHTML=`<p><strong>${data.marca} ${data.modelo}</strong></p><p>${data.cor} | ${data.ano}</p>`;}else{veiculoTemp={placa:p,desc:d||'Não identificado'};document.getElementById('modalPlacaBody').innerHTML='<p style="color:orange">Não encontrado.</p>';}}catch(e){veiculoTemp={placa:p,desc:d||'Erro API'};document.getElementById('modalPlacaBody').innerHTML='Erro.';} }
-        function confirmarVeiculo() { if(veiculoTemp){ veiculosArray.push(veiculoTemp); renderList('listaVeiculos', veiculosArray); fecharModal('modalPlaca'); document.getElementById('vPlaca').value=''; document.getElementById('vDesc').value=''; } }
+        async function consultarPlacaApi() {
+            const el = document.getElementById('vPlaca');
+            const p = el.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
+            if(!p || p.length < 7) { el.style.backgroundColor = 'var(--input-bg)'; return; }
+            try {
+                const res = await fetch(`https://api.placas.app.br/v2/placas/${p}`);
+                if(res.ok) {
+                    const data = await res.json();
+                    document.getElementById('vDesc').value = `${data.marca} ${data.modelo} - ${data.cor} - ${data.ano}`;
+                    el.style.backgroundColor = 'rgba(16, 185, 129, 0.15)';
+                } else {
+                    el.style.backgroundColor = 'rgba(239, 68, 68, 0.15)';
+                }
+            } catch(e) {
+                el.style.backgroundColor = 'rgba(239, 68, 68, 0.15)';
+            }
+        }
+
+        function addVeiculo() {
+            const p = document.getElementById('vPlaca').value.toUpperCase();
+            const d = document.getElementById('vDesc').value.toUpperCase();
+            if(p || d) {
+                veiculosArray.push({placa: p || 'S/P', desc: d || 'SEM DESCRIÇÃO'});
+                renderList('listaVeiculos', veiculosArray);
+                document.getElementById('vPlaca').value = '';
+                document.getElementById('vDesc').value = '';
+                document.getElementById('vPlaca').style.backgroundColor = 'var(--input-bg)';
+            }
+        }
         function fecharModal(id) { document.getElementById(id).style.display='none'; }
-        function addSuspeito() { const v=document.getElementById('sNome').value; if(v){ suspeitosArray.push(v); renderList('listaSuspeitos',suspeitosArray); document.getElementById('sNome').value=''; } }
+        function addSuspeito() { 
+            const v = document.getElementById('sNome').value.toUpperCase(); 
+            if(v) { 
+                suspeitosArray.push(v); 
+                renderList('listaSuspeitos', suspeitosArray); 
+                document.getElementById('sNome').value=''; 
+            } 
+        }
         function renderList(id, arr) { document.getElementById(id).innerHTML=arr.map((x,i)=>`<div class="list-entry"><span>${x.placa?`[${x.placa}] ${x.desc}`:x}</span><i class="fas fa-times remove-btn" onclick="removeItem('${id}',${i})"></i></div>`).join(''); }
         function removeItem(id,i) { if(id==='listaVeiculos')veiculosArray.splice(i,1); else suspeitosArray.splice(i,1); renderList(id,id==='listaVeiculos'?veiculosArray:suspeitosArray); }
         function toggleAnonimo(chk) { document.getElementById('solNome').value=chk.checked?'ANÔNIMO':''; }
@@ -778,21 +932,43 @@
 
         async function salvar(destino) {
             const btn = destino==='TRIAGEM'?document.getElementById('btnTriagem'):document.getElementById('btnGerar'); btn.innerText='...'; btn.disabled=true;
+            if(document.getElementById('vPlaca').value || document.getElementById('vDesc').value) addVeiculo();
+            if(document.getElementById('sNome').value) addSuspeito();
             const checks = Array.from(document.querySelectorAll('.tag-check:checked')).map(c=>c.value);
             const radios = Array.from(document.querySelectorAll('.tag-radio:checked')).map(c=>c.value);
             const tags = [...checks, ...radios];
             
             const dados = {
-                solicitante: { nome:document.getElementById('solNome').value, telefone:document.getElementById('solTel').value },
-                endereco: { cep:document.getElementById('endCep').value, cidade:document.getElementById('endCidade').value, logradouro:document.getElementById('endLog').value, numero:document.getElementById('endNum').value, bairro:document.getElementById('endBairro').value, referencia:document.getElementById('endRef').value, formatado:`${document.getElementById('endLog').value}, ${document.getElementById('endNum').value} - ${document.getElementById('endBairro').value}` },
-                classificacoes: tags, veiculos:veiculosArray, suspeitos:suspeitosArray, natureza:document.getElementById('ocNatureza').value, prioridade: calcularRisco(tags)
+                solicitante: {
+                    nome: document.getElementById('solNome').value.toUpperCase(),
+                    telefone: document.getElementById('solTel').value
+                },
+                endereco: {
+                    cep: document.getElementById('endCep').value,
+                    cidade: document.getElementById('endCidade').value.toUpperCase(),
+                    logradouro: document.getElementById('endLog').value.toUpperCase(),
+                    numero: document.getElementById('endNum').value.toUpperCase(),
+                    bairro: document.getElementById('endBairro').value.toUpperCase(),
+                    referencia: document.getElementById('endRef').value.toUpperCase(),
+                    formatado: `${document.getElementById('endLog').value.toUpperCase()}, ${document.getElementById('endNum').value.toUpperCase()} - ${document.getElementById('endBairro').value.toUpperCase()}, ${document.getElementById('endCidade').value.toUpperCase()}`
+                },
+                classificacoes: tags,
+                veiculos: veiculosArray.map(v => ({ placa: v.placa ? v.placa.toUpperCase() : v.placa, desc: v.desc ? v.desc.toUpperCase() : v.desc })),
+                suspeitos: suspeitosArray.map(s => s ? s.toUpperCase() : s),
+                natureza: document.getElementById('ocNatureza').value.toUpperCase(),
+                prioridade: calcularRisco(tags)
             };
-            const payload = { atendente_origem_id:usuarioAtual.id, status:destino==='TRIAGEM'?'EM_TRIAGEM':'AGUARDANDO', resumo_texto:document.getElementById('ocRelato').value, dados_preenchidos:dados };
+            const payload = {
+                atendente_origem_id: usuarioAtual.id,
+                status: destino === 'TRIAGEM' ? 'EM_TRIAGEM' : 'AGUARDANDO',
+                resumo_texto: document.getElementById('ocRelato').value.toUpperCase(),
+                dados_preenchidos: dados
+            };
             try {
                 if(idEmEdicao) await api('tb_triagem', `id=eq.${idEmEdicao}`, 'PATCH', payload);
                 else await api('tb_triagem', '', 'POST', payload);
                 alert('Salvo!'); limparAtendimento(); navegar('atendimento');
-            } catch(e){ alert(e.message); } finally { btn.innerText=destino==='TRIAGEM'?'ENVIAR P/ TRIAGEM':'GERAR OCORRÊNCIA'; btn.disabled=false; }
+            } catch(e){ alert(e.message); } finally { btn.innerText = destino==='TRIAGEM' ? 'TRIAGEM' : 'GERAR OCORRÊNCIA'; btn.disabled=false; }
         }
 
         // Armazenar ID da última ocorrência gerada para complementação
@@ -800,16 +976,38 @@
 
         async function salvarComplementar() {
             const btn = document.getElementById('btnGerarComplementar'); btn.innerText='...'; btn.disabled=true;
+            if(document.getElementById('vPlaca').value || document.getElementById('vDesc').value) addVeiculo();
+            if(document.getElementById('sNome').value) addSuspeito();
             const checks = Array.from(document.querySelectorAll('.tag-check:checked')).map(c=>c.value);
             const radios = Array.from(document.querySelectorAll('.tag-radio:checked')).map(c=>c.value);
             const tags = [...checks, ...radios];
             
             const dados = {
-                solicitante: { nome:document.getElementById('solNome').value, telefone:document.getElementById('solTel').value },
-                endereco: { cep:document.getElementById('endCep').value, cidade:document.getElementById('endCidade').value, logradouro:document.getElementById('endLog').value, numero:document.getElementById('endNum').value, bairro:document.getElementById('endBairro').value, referencia:document.getElementById('endRef').value, formatado:`${document.getElementById('endLog').value}, ${document.getElementById('endNum').value} - ${document.getElementById('endBairro').value}` },
-                classificacoes: tags, veiculos:veiculosArray, suspeitos:suspeitosArray, natureza:document.getElementById('ocNatureza').value, prioridade: calcularRisco(tags)
+                solicitante: {
+                    nome: document.getElementById('solNome').value.toUpperCase(),
+                    telefone: document.getElementById('solTel').value
+                },
+                endereco: {
+                    cep: document.getElementById('endCep').value,
+                    cidade: document.getElementById('endCidade').value.toUpperCase(),
+                    logradouro: document.getElementById('endLog').value.toUpperCase(),
+                    numero: document.getElementById('endNum').value.toUpperCase(),
+                    bairro: document.getElementById('endBairro').value.toUpperCase(),
+                    referencia: document.getElementById('endRef').value.toUpperCase(),
+                    formatado: `${document.getElementById('endLog').value.toUpperCase()}, ${document.getElementById('endNum').value.toUpperCase()} - ${document.getElementById('endBairro').value.toUpperCase()}, ${document.getElementById('endCidade').value.toUpperCase()}`
+                },
+                classificacoes: tags,
+                veiculos: veiculosArray.map(v => ({ placa: v.placa ? v.placa.toUpperCase() : v.placa, desc: v.desc ? v.desc.toUpperCase() : v.desc })),
+                suspeitos: suspeitosArray.map(s => s ? s.toUpperCase() : s),
+                natureza: document.getElementById('ocNatureza').value.toUpperCase(),
+                prioridade: calcularRisco(tags)
             };
-            const payload = { atendente_origem_id:usuarioAtual.id, status:'AGUARDANDO', resumo_texto:document.getElementById('ocRelato').value, dados_preenchidos:dados };
+            const payload = {
+                atendente_origem_id: usuarioAtual.id,
+                status: 'AGUARDANDO',
+                resumo_texto: document.getElementById('ocRelato').value.toUpperCase(),
+                dados_preenchidos: dados
+            };
             try {
                 const resp = await api('tb_triagem', '', 'POST', payload);
                 // Armazenar ID da ocorrência gerada
@@ -830,13 +1028,19 @@
             } catch(e){ alert('Erro: '+e.message); } finally { btn.innerText='GERAR E COMPLEMENTAR'; btn.disabled=false; }
         }
 
+        function abrirComplementoMonitoramento() {
+            ultimaOcorrenciaGerada = idOcorrenciaAberta;
+            document.getElementById('comp_relato').value = '';
+            document.getElementById('modalComplementacao').style.display = 'flex';
+        }
+
         async function salvarComplementacaoFinal() {
             if(!ultimaOcorrenciaGerada) {
                 alert('Erro: ID da ocorrência não encontrado.');
                 return;
             }
 
-            const relato = document.getElementById('comp_relato').value;
+            const relato = document.getElementById('comp_relato').value.toUpperCase();
 
             try {
                 // Buscar ocorrência atual
@@ -849,8 +1053,10 @@
                 const oc = ocorrencias[0];
                 const dados = oc.dados_preenchidos;
 
-                // Atualizar com complementação
-                const novoResumo = oc.resumo_texto + (relato ? `\n\n[COMPLEMENTADO] ${relato}` : '');
+                // Atualizar com complementação (inclui horário)
+                const horaAtual = new Date();
+                const horaFormatada = horaAtual.getHours().toString().padStart(2, '0') + ':' + horaAtual.getMinutes().toString().padStart(2, '0');
+                const novoResumo = oc.resumo_texto + (relato ? `\n\n[COMPLEMENTO - ${horaFormatada}]: ${relato}` : '');
                 
                 await api('tb_triagem', `id=eq.${ultimaOcorrenciaGerada}`, 'PATCH', {
                     resumo_texto: novoResumo,
@@ -859,6 +1065,7 @@
 
                 alert('Complementação salva!');
                 fecharModal('modalComplementacao');
+                if(document.getElementById('modalOcorrencia').style.display === 'flex') { abrirModalOcorrencia(ultimaOcorrenciaGerada); carregarMonitoramento(); }
                 ultimaOcorrenciaGerada = null;
             } catch(e) {
                 alert('Erro ao salvar: '+e.message);
@@ -1191,11 +1398,12 @@
                 container.innerHTML = '';
                 
                 viaturas.forEach(v => {
-                    // Verificar se status é operacional (bloqueado)
-                    const statusOperacional = ['DESLOCANDO', 'NO_LOCAL', 'SAIDA'].includes(v.status_viatura);
-                    
+                    // Estados que indicam viatura empenhada/despachada (bloqueia edição de status)
+                    const dispatchedStates = ['Despachada', 'DESLOCANDO', 'Em Atendimento', 'NO_LOCAL', 'SAIDA'];
+                    const isDispatched = dispatchedStates.includes(v.status_viatura);
+
                     const linhaDiv = document.createElement('div');
-                    linhaDiv.style.cssText = 'background:#1a1a1a; border:1px solid var(--border); border-radius:6px; padding:12px; display:flex; justify-content:space-between; align-items:center; gap:10px;';
+                    linhaDiv.style.cssText = 'background:var(--bg-header); border:1px solid var(--border); border-radius:6px; padding:12px; display:flex; justify-content:space-between; align-items:center; gap:10px;';
                     
                     // ESQUERDA - Prefixo, Tipo, Guarnição
                     const esquerda = document.createElement('div');
@@ -1206,31 +1414,34 @@
                     const centro = document.createElement('div');
                     centro.style.cssText = 'flex:2; display:flex; flex-direction:column; gap:4px;';
                     const selectStatus = document.createElement('select');
-                    selectStatus.style.cssText = 'padding:6px; background:#222; border:1px solid var(--border); border-radius:4px; color:white; font-size:12px; width:100%;';
-                    
-                    const opcoes = ['Fora de serviço', 'Disponível', 'Administrativo', 'Refeição', 'Manutenção', 'Abastecimento'];
-                    opcoes.forEach(op => {
+                    selectStatus.style.cssText = 'padding:6px; background:var(--input-bg); border:1px solid var(--border); border-radius:4px; color:var(--text-light); font-size:12px; width:100%;';
+                    // Se viatura estiver despachada/em uso, mostrar select com única opção 'Despachada' (travado)
+                    if(isDispatched) {
                         const option = document.createElement('option');
-                        option.value = op;
-                        option.text = op;
-                        if(op === v.status_viatura) option.selected = true;
+                        option.value = 'Despachada';
+                        option.text = 'Despachada';
+                        option.selected = true;
                         selectStatus.appendChild(option);
-                    });
-                    
-                    // Se status é operacional, desabilitar dropdown
-                    if(statusOperacional) {
                         selectStatus.disabled = true;
                         selectStatus.style.opacity = '0.6';
-                        selectStatus.title = 'Status bloqueado - viatura em operação';
+                        selectStatus.title = 'Viatura despachada - edição de status bloqueada';
                     } else {
+                        const opcoes = ['Fora de serviço', 'Disponível', 'Administrativo', 'Refeição', 'Manutenção', 'Abastecimento'];
+                        opcoes.forEach(op => {
+                            const option = document.createElement('option');
+                            option.value = op;
+                            option.text = op;
+                            if(op === v.status_viatura) option.selected = true;
+                            selectStatus.appendChild(option);
+                        });
                         selectStatus.onchange = () => atualizarStatusViatura(v.id, selectStatus.value);
                     }
                     
                     centro.appendChild(selectStatus);
-                    if(statusOperacional) {
+                    if(isDispatched) {
                         const aviso = document.createElement('div');
                         aviso.style.cssText = 'font-size:10px; color:var(--warning);';
-                        aviso.innerHTML = '🔒 Bloqueado - em operação';
+                        aviso.innerHTML = '🔒 Bloqueado - viatura despachada';
                         centro.appendChild(aviso);
                     }
                     
@@ -1345,15 +1556,29 @@
                     tagsDiv.appendChild(tag);
                 }
                 
-                // Endereço e Solicitante
-                document.getElementById('mo-endereco').innerHTML = `<strong>${info.endereco.logradouro}, ${info.endereco.numero}</strong><br>${info.endereco.bairro}, ${info.endereco.cidade}`;
+                // Endereço com Referência
+                const refText = info.endereco.referencia ? `<br><span style="color:var(--warning);">Ref: ${info.endereco.referencia}</span>` : '';
+                document.getElementById('mo-endereco').innerHTML = `<strong>${info.endereco.logradouro}, ${info.endereco.numero}</strong><br>${info.endereco.bairro}, ${info.endereco.cidade}${refText}`;
+
+                // Ações dos novos botões (Mapa e Ligar)
+                document.getElementById('mo-btn-mapa').onclick = () => window.open(`https://maps.google.com/?q=${encodeURIComponent(info.endereco.formatado)}`, '_blank');
+                const numTelefone = info.solicitante.telefone ? info.solicitante.telefone.replace(/\D/g, '') : '';
+                document.getElementById('mo-btn-ligar').onclick = () => { if(numTelefone) window.location.href = `tel:+55${numTelefone}`; else alert('Sem número válido'); };
+
+                // Solicitante
                 document.getElementById('mo-nome').innerText = `Nome: ${info.solicitante.nome || 'Anônimo'}`;
                 document.getElementById('mo-telefone').innerText = `Tel: ${info.solicitante.telefone || 'Não informado'}`;
-                
-                // Descrição/Histórico
-                document.getElementById('mo-historico').innerHTML = d.resumo_texto ? 
-                    d.resumo_texto.split('\n').map(msg => `<div class="historico-msg">${msg}</div>`).join('') :
-                    '<div style="color:#666;">Nenhuma informação</div>';
+
+                // Descrição + Veículos + Suspeitos
+                let histHTML = d.resumo_texto ? d.resumo_texto.replace(/\n/g, '<br>') : '<span style="color:var(--text-muted);">Nenhuma informação principal</span>';
+
+                if (info.veiculos && info.veiculos.length > 0) {
+                    histHTML += '<br><br><strong>Veículo(s):</strong><br>' + info.veiculos.map(v => `[${v.placa || 'S/P'}] ${v.desc}`).join('<br>');
+                }
+                if (info.suspeitos && info.suspeitos.length > 0) {
+                    histHTML += '<br><br><strong>Suspeito/Autor:</strong><br>' + info.suspeitos.join('<br>');
+                }
+                document.getElementById('mo-historico').innerHTML = histHTML;
                 
                 // Lógica por Status
                 if(d.status === 'AGUARDANDO') {
@@ -1368,12 +1593,17 @@
                     if(viaturas.length === 0) {
                         recursosDiv.innerHTML = '<div style="color:#666;">Nenhum recurso</div>';
                     } else {
-                        viaturas.forEach((vtr, idx) => {
-                            const itemDiv = document.createElement('div');
-                            itemDiv.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px; background:rgba(255,255,255,0.02); border-radius:4px; margin-bottom:6px;';
-                            itemDiv.innerHTML = `<span>${vtr.funcao==='PRINCIPAL' ? '⭐' : '📍'} ${vtr.prefixo}</span><div style="display:flex;gap:4px;"><button class="btn btn-sm btn-outline" onclick="promoverViatura('${id}', ${idx})">Promover</button><button class="btn btn-sm btn-danger" onclick="retirarViatura('${id}', ${idx})">Retirar</button></div>`;
-                            recursosDiv.appendChild(itemDiv);
-                        });
+                            viaturas.forEach((vtr, idx) => {
+                                const itemDiv = document.createElement('div');
+                                itemDiv.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px; background:rgba(255,255,255,0.02); border-radius:4px; margin-bottom:6px;';
+                                // Mostrar botão "Promover" apenas se a viatura não for a PRINCIPAL
+                                let actions = `<button class="btn btn-sm btn-danger" onclick="retirarViatura('${id}', ${idx})">Retirar</button>`;
+                                if(vtr.funcao !== 'PRINCIPAL') {
+                                    actions = `<button class="btn btn-sm btn-outline" onclick="promoverViatura('${id}', ${idx})">Promover</button>` + actions;
+                                }
+                                itemDiv.innerHTML = `<span>${vtr.funcao==='PRINCIPAL' ? '⭐' : '📍'} ${vtr.prefixo}</span><div style="display:flex;gap:4px;">${actions}</div>`;
+                                recursosDiv.appendChild(itemDiv);
+                            });
                     }
                     document.getElementById('mo-recursos-container').style.display = 'block';
                     document.getElementById('mo-btn-acao').innerText = 'Adicionar Apoio';
@@ -1479,9 +1709,9 @@
                     status: tipo === 'PRINCIPAL' ? 'EM_ANDAMENTO' : ocoAtual.status
                 });
                 
-                // Marcar viatura como em uso
+                // Marcar viatura como em uso (padronizado para 'Despachada')
                 await api('tb_viaturas', `prefixo=eq.${prefixo}`, 'PATCH', {
-                    status_viatura: 'Em Atendimento'
+                    status_viatura: 'Despachada'
                 });
                 
                 fecharModal('modalSelecaoFrota');
@@ -1521,9 +1751,9 @@
                     status: 'EM_ANDAMENTO'
                 });
                 
-                // 5. Atualizar status da viatura para DESLOCANDO
+                // 5. Atualizar status da viatura para 'Despachada'
                 await api('tb_viaturas', `prefixo=eq.${prefixo}`, 'PATCH', {
-                    status_viatura: 'DESLOCANDO'
+                    status_viatura: 'Despachada'
                 });
                 
                 alert(`${prefixo} despachado como ${funcao}`);
@@ -1762,3 +1992,4 @@
     </script>
 </body>
 </html>
+
