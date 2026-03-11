@@ -372,7 +372,7 @@
                         </div>
                         <div class="monitor-body">
                             <table class="monitor-table">
-                                <thead><tr><th style="width:10%;">RISCO</th><th style="width:30%;">NATUREZA</th><th style="width:20%;">CIDADE</th><th style="width:20%;">BAIRRO</th><th style="width:20%;">HORA</th></tr></thead>
+                                <thead><tr><th style="width:10%;">RISCO</th><th style="width:30%;">NATUREZA</th><th style="width:15%;">CIDADE</th><th style="width:20%;">BAIRRO</th><th style="width:25%;">DATA/HORA/TIMER</th></tr></thead>
                                 <tbody id="tableWait"></tbody>
                             </table>
                         </div>
@@ -384,7 +384,7 @@
                         </div>
                         <div class="monitor-body">
                             <table class="monitor-table">
-                                <thead><tr><th style="width:15%;">VTR</th><th style="width:25%;">NATUREZA</th><th style="width:20%;">CIDADE</th><th style="width:20%;">BAIRRO</th><th style="width:20%;">STATUS</th></tr></thead>
+                                <thead><tr><th style="width:12%;">VTR</th><th style="width:20%;">NATUREZA</th><th style="width:15%;">CIDADE</th><th style="width:15%;">BAIRRO</th><th style="width:23%;">DATA/HORA/TIMER</th><th style="width:15%;">STATUS</th></tr></thead>
                                 <tbody id="tableActive"></tbody>
                             </table>
                         </div>
@@ -701,6 +701,9 @@
             const sessao = localStorage.getItem('piabi_user');
             if(sessao) { usuarioAtual = JSON.parse(sessao); mostrarApp(); } 
             else { document.getElementById('login-wrapper').style.display = 'flex'; }
+            
+            // Loop de atualização automática do monitoramento a cada 60 segundos
+            setInterval(() => { const vm = document.getElementById('view-monitoramento'); if(vm && !vm.classList.contains('hidden')) carregarMonitoramento(); }, 60000);
         }
 
         async function api(tabela, query, method='GET', body=null) {
@@ -915,6 +918,62 @@
             "VIOLÊNCIA DOMÉSTICA E FAMILIAR"
         ];
         
+        // controle de navegação por teclado
+        let naturezaNavIndex = -1;
+        let naturezaCurrentMatches = [];
+        
+        function renderNaturezaMatches(matches) {
+            const box = document.getElementById('sugestoesNatureza');
+            naturezaCurrentMatches = matches;
+            naturezaNavIndex = -1;
+            box.innerHTML = '';
+            matches.forEach((n,i) => {
+                const div = document.createElement('div');
+                div.className = 'sugg-item';
+                div.innerText = n;
+                div.dataset.index = i;
+                div.onclick = () => selectNatureza(n);
+                box.appendChild(div);
+            });
+        }
+        
+        function selectNatureza(val) {
+            document.getElementById('ocNatureza').value = val;
+            const box = document.getElementById('sugestoesNatureza');
+            box.classList.add('hidden');
+        }
+        
+        function updateNaturezaHighlight() {
+            const box = document.getElementById('sugestoesNatureza');
+            const items = box.querySelectorAll('.sugg-item');
+            items.forEach((el,i) => {
+                if(i === naturezaNavIndex) el.style.background = 'var(--bg-hover)';
+                else el.style.background = '';
+            });
+        }
+        
+        document.getElementById('ocNatureza').addEventListener('keydown', function(e) {
+            const box = document.getElementById('sugestoesNatureza');
+            if(box.classList.contains('hidden')) return;
+            if(e.key === 'ArrowDown') {
+                e.preventDefault();
+                if(naturezaNavIndex < naturezaCurrentMatches.length - 1) {
+                    naturezaNavIndex++;
+                    updateNaturezaHighlight();
+                }
+            } else if(e.key === 'ArrowUp') {
+                e.preventDefault();
+                if(naturezaNavIndex > 0) {
+                    naturezaNavIndex--;
+                    updateNaturezaHighlight();
+                }
+            } else if(e.key === 'Enter' || e.key === 'Tab') {
+                e.preventDefault();
+                if(naturezaNavIndex >= 0) selectNatureza(naturezaCurrentMatches[naturezaNavIndex]);
+                else if(naturezaCurrentMatches.length > 0) selectNatureza(naturezaCurrentMatches[0]);
+            }
+        });
+        
         function sugerirNatureza(txt) {
             const box = document.getElementById('sugestoesNatureza');
             if (!txt || txt.length < 1) {
@@ -923,16 +982,9 @@
             }
             const filtro = txt.toUpperCase();
             const matches = naturezasList.filter(n => n.includes(filtro));
-            box.innerHTML = '';
             if (matches.length) {
                 box.classList.remove('hidden');
-                matches.forEach(n => {
-                    const div = document.createElement('div');
-                    div.className = 'sugg-item';
-                    div.innerText = n;
-                    div.onclick = () => { document.getElementById('ocNatureza').value = n; box.classList.add('hidden'); };
-                    box.appendChild(div);
-                });
+                renderNaturezaMatches(matches);
             } else {
                 box.classList.add('hidden');
             }
@@ -1245,23 +1297,28 @@
 
                     // ===== FILA DE ESPERA (AGUARDANDO) =====
                     if(d.status==='AGUARDANDO') {
-                        // Importante: atributoBusca deve estar bem formatado
+                        const hDataW = new Date(d.criado_em);
+                        const diffMW = Math.floor((new Date() - hDataW) / 60000);
+                        const timerTxtW = diffMW >= 0 ? `(${diffMW.toString().padStart(2,'0')}m)` : '(00m)';
+                        const dhTxtW = `${hDataW.getDate().toString().padStart(2,'0')}/${(hDataW.getMonth()+1).toString().padStart(2,'0')} ${hDataW.getHours().toString().padStart(2,'0')}:${hDataW.getMinutes().toString().padStart(2,'0')}`;
+
                         const enderecoDicaCurtaAddress = `${info.endereco.logradouro}, ${info.endereco.numero}`;
-                        const tr = `<tr onclick="abrirModalOcorrencia('${d.id}')" style="cursor:pointer; ${isCrit?'color:#ff6b6b':''}" ${atributoBusca}>
-                            <td style="width:10%;">${icon}</td>
-                            <td style="width:30%;">${info.natureza}</td>
-                            <td style="width:20%;" title="${enderecoDicaCurtaAddress}">${info.endereco.cidade}</td>
-                            <td style="width:20%;" title="${enderecoDicaCurtaAddress}">${info.endereco.bairro}</td>
-                            <td style="width:20%;">${hora}</td>
-                        </tr>`;
                         
-                        const card = `<div class="card-mobile" style="border-left-color:${isCrit?'var(--danger)':'var(--success)'}" onclick="abrirModalOcorrencia('${d.id}')" ${atributoBusca}>
-                            <div style="display:flex;justify-content:space-between;font-weight:bold;font-size:13px;margin-bottom:5px;"><span>${info.natureza}</span><span>${hora}</span></div>
-                            <div style="font-size:11px;color:#aaa;margin-bottom:5px;">${info.endereco.formatado}</div>
-                            <div style="display:flex;gap:5px;">
-                                ${isCrit ? `<span class="card-tag" style="background:var(--danger);color:white">CRÍTICO</span>` : ''}
-                            </div>
-                        </div>`;
+                        const tr = `<tr onclick="abrirModalOcorrencia('${d.id}')" style="cursor:pointer; ${isCrit?'color:#ff6b6b':''}" ${atributoBusca}>
+        <td style="width:10%;">${icon}</td>
+        <td style="width:30%;">${info.natureza}</td>
+        <td style="width:15%;" title="${enderecoDicaCurtaAddress}">${info.endereco.cidade}</td>
+        <td style="width:20%;" title="${enderecoDicaCurtaAddress}">${info.endereco.bairro}</td>
+        <td style="width:25%; font-weight:600; color:var(--warning);">${dhTxtW} ${timerTxtW}</td>
+    </tr>`;
+                        
+                        const card = `<div class="card-mobile" style="border-left-color:${isCrit?'var(--danger)':'var(--warning)'}" onclick="abrirModalOcorrencia('${d.id}')" ${atributoBusca}>
+        <div style="display:flex;justify-content:space-between;font-weight:bold;font-size:13px;margin-bottom:5px;"><span>${info.natureza}</span><span>${dhTxtW} ${timerTxtW}</span></div>
+        <div style="font-size:11px;color:#aaa;margin-bottom:5px;">${info.endereco.formatado}</div>
+        <div style="display:flex;gap:5px;">
+            ${isCrit ? `<span class="card-tag" style="background:var(--danger);color:white">CRÍTICO</span>` : ''}
+        </div>
+    </div>`;
                         
                         tbWait.innerHTML+=tr; 
                         mobWait.innerHTML+=card; 
@@ -1277,38 +1334,44 @@
                         const prefixoPrincipal = principal ? principal.prefixo : '-';
                         const enderecoDicaCurtaAddress = `${info.endereco.logradouro}, ${info.endereco.numero}`;
                         
+                        const statusTatico = principal ? (principal.status_deslocamento || 'DESPACHADA') : 'DESPACHADA';
+                        const horaRef = principal ? (principal.hora_status || d.criado_em) : d.criado_em;
+                        const hData = new Date(horaRef);
+                        const diffM = Math.floor((new Date() - hData)/60000);
+                        const timerTxt = diffM >= 0 ? `(${diffM.toString().padStart(2,'0')}m)` : '(00m)';
+                        const dhTxt = `${hData.getDate().toString().padStart(2,'0')}/${(hData.getMonth()+1).toString().padStart(2,'0')} ${hData.getHours().toString().padStart(2,'0')}:${hData.getMinutes().toString().padStart(2,'0')}`;
+
                         const trPrincipal = `<tr onclick="abrirModalOcorrencia('${d.id}')" style="cursor:pointer; ${isCrit?'color:#ff6b6b':''}" ${atributoBusca}>
-                            <td style="width:15%;">${prefixoPrincipal}</td>
-                            <td style="width:25%;">${info.natureza}</td>
-                            <td style="width:20%;" title="${enderecoDicaCurtaAddress}">${info.endereco.cidade}</td>
-                            <td style="width:20%;" title="${enderecoDicaCurtaAddress}">${info.endereco.bairro}</td>
-                            <td style="width:20%;">${d.status}</td>
+                            <td style="width:12%;">${prefixoPrincipal}</td>
+                            <td style="width:20%;">${info.natureza}</td>
+                            <td style="width:15%;" title="${enderecoDicaCurtaAddress}">${info.endereco.cidade}</td>
+                            <td style="width:15%;" title="${enderecoDicaCurtaAddress}">${info.endereco.bairro}</td>
+                            <td style="width:23%; font-weight:600; color:var(--info);">${dhTxt} ${timerTxt}</td>
+                            <td style="width:15%; font-weight:bold;">${statusTatico}</td>
                         </tr>`;
                         tbAct.innerHTML+=trPrincipal;
                         
                         // Linhas de Apoio
                         viaturas.filter(v => v.funcao==='APOIO').forEach(apoio => {
                             const trApoio = `<tr onclick="abrirModalOcorrencia('${d.id}')" style="cursor:pointer; color:#888; font-size:12px;" ${atributoBusca}>
-                                <td style="width:15%;">📍 APOIO ${apoio.prefixo}</td>
-                                <td style="width:25%; color:#666;">↳</td>
-                                <td style="width:20%; color:#666;">↳</td>
-                                <td style="width:20%; color:#666;">↳</td>
-                                <td style="width:20%; color:#666;">↳</td>
+                                <td style="width:12%;">📍 APOIO ${apoio.prefixo}</td>
+                                <td style="width:20%; color:#666;">↳</td><td style="width:15%; color:#666;">↳</td>
+                                <td style="width:15%; color:#666;">↳</td><td style="width:23%; color:#666;">↳</td><td style="width:15%; color:#666;">↳</td>
                             </tr>`;
                             tbAct.innerHTML+=trApoio;
                         });
-                        ca++; // Conta ocorrências, não linhas totais? Aqui conta linhas. Ajuste se preferir contar ocorrências.
+                        ca++;
                         
                         // Card Mobile (só principal)
                         const card = `<div class="card-mobile" style="border-left-color:var(--success)" onclick="abrirModalOcorrencia('${d.id}')" ${atributoBusca}>
                             <div style="display:flex;justify-content:space-between;font-weight:bold;font-size:13px;margin-bottom:5px;"><span>${info.natureza}</span><span>${hora}</span></div>
                             <div style="font-size:11px;color:#aaa;margin-bottom:5px;">${info.endereco.formatado}</div>
-                            <div style="display:flex;gap:5px;">
+                            <div style="display:flex;gap:5px; flex-wrap:wrap;">
                                 <span class="card-tag" style="background:var(--success);color:black">🚔 ${prefixoPrincipal}</span>
+                                <span class="card-tag" style="background:var(--bg-hover);color:var(--info)">⏱ ${timerTxt} ${statusTatico}</span>
                                 ${viaturas.filter(v=>v.funcao==='APOIO').length > 0 ? `<span class="card-tag" style="background:#ff9500;color:black">+${viaturas.filter(v=>v.funcao==='APOIO').length} APOIO</span>` : ''}
                             </div>
                         </div>`;
-                        
                         mobAct.innerHTML+=card;
                     }
                 });
@@ -1659,11 +1722,18 @@
                             viaturas.forEach((vtr, idx) => {
                                 const itemDiv = document.createElement('div');
                                 itemDiv.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px; background:rgba(255,255,255,0.02); border-radius:4px; margin-bottom:6px;';
-                                // Mostrar botão "Promover" apenas se a viatura não for a PRINCIPAL
+                                // Status tático de deslocamento
+                                const st = vtr.status_deslocamento || 'DESPACHADA';
+                                let btnTatico = '';
+                                if(st === 'DESPACHADA') btnTatico = `<button class="btn btn-sm" style="background:var(--warning); color:black;" onclick="atualizarStatusTatico('${id}', ${idx}, 'NO LOCAL')">📍 NO LOCAL</button>`;
+                                else if(st === 'NO LOCAL') btnTatico = `<button class="btn btn-sm" style="background:#8b5cf6; color:white;" onclick="atualizarStatusTatico('${id}', ${idx}, 'SAIU')">💨 SAIU</button>`;
+                                else if(st === 'SAIU') btnTatico = `<button class="btn btn-sm btn-outline" style="cursor:not-allowed;" disabled>FINALIZANDO O ATENDIMENTO</button>`;
+
                                 let actions = `<button class="btn btn-sm btn-danger" onclick="retirarViatura('${id}', ${idx})">Retirar</button>`;
                                 if(vtr.funcao !== 'PRINCIPAL') {
                                     actions = `<button class="btn btn-sm btn-outline" onclick="promoverViatura('${id}', ${idx})">Promover</button>` + actions;
                                 }
+                                actions = btnTatico + actions;
                                 itemDiv.innerHTML = `<span>${vtr.funcao==='PRINCIPAL' ? '⭐' : '📍'} ${vtr.prefixo}</span><div style="display:flex;gap:4px;">${actions}</div>`;
                                 recursosDiv.appendChild(itemDiv);
                             });
@@ -1757,7 +1827,7 @@
                 const ocoAtual = ocoDados[0];
                 
                 let viaturas = ocoAtual.viaturas_empenhadas || [];
-                const novaViatura = { prefixo: prefixo, funcao: tipo };
+                const novaViatura = { prefixo: prefixo, funcao: tipo, status_deslocamento: 'DESPACHADA', hora_status: new Date().toISOString() };
                 
                 // Se é PRINCIPAL e já existe um, converte o antigo para APOIO
                 if(tipo === 'PRINCIPAL' && viaturas.length > 0) {
@@ -1806,7 +1876,7 @@
                 }
                 
                 // 3. Adicionar nova viatura ao array
-                viaturas.push({ prefixo: prefixo, funcao: funcao });
+                viaturas.push({ prefixo: prefixo, funcao: funcao, status_deslocamento: 'DESPACHADA', hora_status: new Date().toISOString() });
                 
                 // 4. Atualizar tb_triagem com viaturas_empenhadas e status
                 await api('tb_triagem', `id=eq.${idOcorrencia}`, 'PATCH', {
@@ -1910,6 +1980,23 @@
             } catch(e) {
                 console.log('Erro ao retirar viatura:', e);
             }
+        }
+
+        async function atualizarStatusTatico(idOcorrencia, indexVtr, novoStatus) {
+            try {
+                const ocoDados = await api('tb_triagem', `id=eq.${idOcorrencia}&select=*`);
+                if(!ocoDados.length) return;
+                const ocoAtual = ocoDados[0];
+                let viaturas = ocoAtual.viaturas_empenhadas || [];
+                if(!viaturas[indexVtr]) return;
+                
+                viaturas[indexVtr].status_deslocamento = novoStatus;
+                viaturas[indexVtr].hora_status = new Date().toISOString();
+                
+                await api('tb_triagem', `id=eq.${idOcorrencia}`, 'PATCH', { viaturas_empenhadas: viaturas });
+                carregarMonitoramento();
+                abrirModalOcorrencia(idOcorrencia);
+            } catch(e) { console.error('Erro status tático:', e); }
         }
 
         async function adicionarApoio() {
