@@ -298,7 +298,14 @@
                         <div>
                             <div class="section-box">
                                 <div class="section-title"><i class="fas fa-file-alt"></i> Ocorrência</div>
-                                <div><label>Natureza</label><div class="input-wrapper"><i class="fas fa-exclamation-circle icon-left"></i><input type="text" id="ocNatureza" placeholder="ROUBO"></div></div>
+                                <div style="position: relative;">
+    <label>Natureza</label>
+    <div class="input-wrapper">
+        <i class="fas fa-exclamation-circle icon-left"></i>
+        <input type="text" id="ocNatureza" placeholder="" autocomplete="off" oninput="sugerirNatureza(this.value)">
+    </div>
+    <div id="sugestoesNatureza" class="suggestions hidden"></div>
+</div>
                                 <div class="input-wrapper"><label>Descrição</label><textarea id="ocRelato" style="height: 100px; padding-left:10px; resize:none;"></textarea></div>
                             </div>
                             <div class="section-box">
@@ -323,15 +330,15 @@
                 </div>
 
                 <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; height: 100%; max-height: 70vh;">
-                    <div style="padding: 12px; border-bottom: 1px solid var(--border);">
+                    <div style="padding: 12px; border-bottom: 1px solid var(--border); background: var(--bg-header);">
                         <input type="text" id="filtroTriagem" placeholder="🔍 Buscar por telefone, nome, cidade, bairro, natureza..." 
-                            style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--border); border-radius:6px; color:var(--text-light); font-size:13px;"
+                            style="width:100%; padding:10px; background:#ffffff; border:1px solid var(--border); border-radius:6px; color:var(--text-light); font-size:13px;"
                             oninput="filtrarTriagem(this.value)">
                     </div>
                         <div class="table-wrapper" style="flex: 1; overflow-y: auto;">
-                            <table style="width: 100%; border-collapse: collapse; font-size: 13px; text-align: left;">
+                            <table class="monitor-table" style="width: 100%;">
                             <thead style="position: sticky; top: 0;">
-                                <tr style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border);">
+                                <tr>
                                     <th style="padding: 12px; text-align: left; color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase;">Telefone</th>
                                     <th style="padding: 12px; text-align: left; color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase;">Nome</th>
                                     <th style="padding: 12px; text-align: left; color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase;">Cidade</th>
@@ -399,9 +406,9 @@
                     </div>
                 </div>
 
-                <div style="padding:10px; background:#1a1a1a; border-top:1px solid var(--border); flex-shrink:0;">
+                <div style="padding:10px; background:var(--card-bg); border-top:1px solid var(--border); flex-shrink:0;">
                     <input type="text" id="filtroMonitoramento" placeholder="🔍 Buscar por natureza, área, solicitante, viatura..." 
-                        style="width:100%; padding:10px; background:#222; border:1px solid var(--border); border-radius:6px; color:white; font-size:13px;"
+                        style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--border); border-radius:6px; color:var(--text-light); font-size:13px;"
                         oninput="filtrarMonitoramento(this.value)">
                 </div>
 
@@ -619,7 +626,7 @@
                 </div>
             </div>
             <div class="modal-footer" style="display:flex; gap:10px;">
-                <button class="btn" id="mo-btn-complementar" onclick="abrirComplementoMonitoramento()" style="width: auto; background: var(--secondary); color: white;"><i class="fas fa-plus"></i> Complementar</button>
+                <button class="btn" id="mo-btn-complementar" onclick="abrirComplementoMonitoramento()" style="width: auto; background: var(--secondary); color: white;">COMPLEMENTAR</button>
                 <button class="btn btn-info" id="mo-btn-editar" onclick="editarEndereco()"><i class="fas fa-pen"></i> Editar Endereço</button>
                 <button class="btn btn-success" id="mo-btn-acao" onclick="abrirSelecaoFrotaModal(idOcorrenciaAberta, 'PRINCIPAL')">Despachar</button>
                 <button class="btn btn-danger" id="mo-btn-finalizar" onclick="finalizarOcorrenciaModal(idOcorrenciaAberta)"><i class="fas fa-flag"></i> Finalizar</button>
@@ -882,6 +889,62 @@
             }
         }
         let timeoutLog; function sugerirLogradouro(txt) { clearTimeout(timeoutLog); const box=document.getElementById('sugestoesLog'); const cid=document.getElementById('endCidade').value; if(txt.length<4||!cid){box.classList.add('hidden');return;} timeoutLog=setTimeout(async()=>{ try{const r=await fetch(`https://nominatim.openstreetmap.org/search?street=${txt}&city=${cid}&state=Parana&format=json&limit=5`);const d=await r.json();box.innerHTML='';if(d.length){box.classList.remove('hidden');d.forEach(i=>{const div=document.createElement('div');div.className='sugg-item';div.innerText=i.display_name.split(',')[0];div.onclick=()=>{document.getElementById('endLog').value=div.innerText;box.classList.add('hidden');};box.appendChild(div);});}}catch(e){} },500); }
+
+        // lista de naturezas estática para autocomplete
+        const naturezasList = [
+            "ABORDAGEM DE SUSPEITOS",
+            "ACIDENTE DE TRÂNSITO",
+            "AMEAÇA",
+            "APOIO AO SAMU",
+            "APOIO A OUTROS ORGÃOS",
+            "APOIO A OUTRA OPM",
+            "CONSUMO DE ENTORPECENTES",
+            "DANO",
+            "DESAPARECIMENTO DE PESSOA",
+            "DESCUMPRIMENTO DE MEDIDA PROTETIVA",
+            "DISPARO DE ALARME",
+            "ESTELIONATO",
+            "FURTO",
+            "FURTO OU ROUBO DE VEÍCULOS",
+            "INFRAÇÃO DE TRÂNSITO",
+            "PERTURBAÇÃO DO TRABALHO OU SOSSEGO ALHEIO",
+            "POLICIAMENTO PRESENÇA",
+            "ROUBO",
+            "SUICÍDIO",
+            "TRÁFICO DE ENTORPECENTES",
+            "VIOLÊNCIA DOMÉSTICA E FAMILIAR"
+        ];
+        
+        function sugerirNatureza(txt) {
+            const box = document.getElementById('sugestoesNatureza');
+            if (!txt || txt.length < 1) {
+                box.classList.add('hidden');
+                return;
+            }
+            const filtro = txt.toUpperCase();
+            const matches = naturezasList.filter(n => n.includes(filtro));
+            box.innerHTML = '';
+            if (matches.length) {
+                box.classList.remove('hidden');
+                matches.forEach(n => {
+                    const div = document.createElement('div');
+                    div.className = 'sugg-item';
+                    div.innerText = n;
+                    div.onclick = () => { document.getElementById('ocNatureza').value = n; box.classList.add('hidden'); };
+                    box.appendChild(div);
+                });
+            } else {
+                box.classList.add('hidden');
+            }
+        }
+        
+        // esconder sugestões quando clicar fora
+        document.addEventListener('click', function(e){
+            if(!e.target.closest('#ocNatureza') && !e.target.closest('#sugestoesNatureza')){
+                const b = document.getElementById('sugestoesNatureza');
+                if(b) b.classList.add('hidden');
+            }
+        });
         async function consultarPlacaApi() {
             const el = document.getElementById('vPlaca');
             const p = el.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
@@ -1992,4 +2055,3 @@
     </script>
 </body>
 </html>
-
