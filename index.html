@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Piabitech - CAD v11 (Híbrido)</title>
+    <title>PIASOS</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -231,9 +231,8 @@
         <div class="main-content">
             
             <div id="view-atendimento" class="scroll-content">
-                <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
+                <div style="margin-bottom:15px;">
                     <h1 style="font-size: 18px;">Novo Atendimento</h1>
-                    <button class="btn btn-outline btn-sm" onclick="limparAtendimento()">LIMPAR</button>
                 </div>
 
                 <form onsubmit="return false;">
@@ -317,6 +316,8 @@
                                 <button type="button" class="btn btn-danger" id="btnGerar" onclick="salvar('DESPACHO')" style="flex: 1; min-width: 150px;">GERAR OCORRÊNCIA</button>
                                 <button type="button" class="btn btn-success" id="btnGerarComplementar" onclick="salvarComplementar()" style="flex: 1; min-width: 150px;">GERAR E COMPLEMENTAR</button>
                                 <button type="button" class="btn btn-info" id="btnTriagem" onclick="salvar('TRIAGEM')" style="flex: 1; min-width: 150px;">TRIAGEM</button>
+                                <button type="button" class="btn" onclick="alert('Módulo de Informativos em desenvolvimento.')" style="flex: 1; min-width: 150px; background: var(--warning); color: white;"><i class="fas fa-bullhorn"></i> INFORMATIVO</button>
+                                <button type="button" class="btn" onclick="limparAtendimento()" style="flex: 1; min-width: 150px; background: var(--input-bg); color: var(--text-light); border: 1px solid var(--border);"><i class="fas fa-broom"></i> LIMPAR</button>
                             </div>
                         </div>
                     </div>
@@ -1028,6 +1029,7 @@
             const el = document.getElementById('vPlaca');
             const p = el.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
             if(!p || p.length < 7) { el.style.backgroundColor = 'var(--input-bg)'; return; }
+            
             try {
                 const res = await fetch(`https://api.placas.app.br/v2/placas/${p}`);
                 if(res.ok) {
@@ -1036,9 +1038,13 @@
                     el.style.backgroundColor = 'rgba(16, 185, 129, 0.15)';
                 } else {
                     el.style.backgroundColor = 'rgba(239, 68, 68, 0.15)';
+                    // Alerta de erro de resposta do servidor
+                    alert('Diagnóstico API: Erro HTTP ' + res.status + ' - O servidor recusou a consulta (possível bloqueio CORS ou limite excedido).');
                 }
             } catch(e) {
                 el.style.backgroundColor = 'rgba(239, 68, 68, 0.15)';
+                // Alerta de erro de conexão/CORS
+                alert('Diagnóstico API: Falha de conexão. Motivo: ' + e.message + ' (Provável bloqueio CORS no navegador).');
             }
         }
 
