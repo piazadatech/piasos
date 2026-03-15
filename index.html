@@ -393,14 +393,14 @@
 
                 <div class="mobile-monitor">
                     <div id="mob-panel-wait" class="sliding-panel panel-expanded" onclick="expandMob('wait')">
-                        <div class="monitor-header" style="background:#222; border-bottom:2px solid var(--warning);">
+                        <div class="monitor-header" style="background:var(--bg-header); border-bottom:2px solid var(--warning);">
                             <span><i class="fas fa-clock"></i> Fila</span>
                         </div>
                         <div class="monitor-body" id="mobWaitBody" style="background:rgba(0,0,0,0.3); padding:10px;"></div>
                     </div>
                     <div id="mob-panel-active" class="sliding-panel panel-collapsed" onclick="expandMob('active')">
-                        <div class="monitor-header" style="background:#222; border-bottom:2px solid var(--success);">
-                            <span><i class="fas fa-broadcast-tower"></i> Rádio</span>
+                        <div class="monitor-header" style="background:var(--bg-header); border-bottom:2px solid var(--success);">
+                            <span><i class="fas fa-broadcast-tower"></i> DESPACHADAS</span>
                         </div>
                         <div class="monitor-body" id="mobActiveBody" style="background:rgba(0,0,0,0.3); padding:10px;"></div>
                     </div>
@@ -575,8 +575,38 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-success" onclick="salvarComplementacaoFinal()">Salvar Complementação</button>
+                <button type="button" class="btn btn-sm btn-success" onclick="salvarComplementacaoFinal()">SALVAR</button>
                 <button type="button" class="btn btn-sm btn-outline" onclick="fecharModal('modalComplementacao')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+<div id="modalEditarEndereco" class="modal-overlay" style="z-index: 230;">
+        <div class="modal-content" style="max-width:600px;">
+            <div class="modal-header">
+                <h3>Editar Endereço</h3>
+                <i class="fas fa-times" onclick="fecharModal('modalEditarEndereco')" style="cursor:pointer;"></i>
+            </div>
+            <div class="modal-body">
+                <div class="section-box" style="margin-bottom:0;">
+                    <div style="display: flex; gap: 10px;">
+                        <div style="width: 130px;"><label>CEP</label><div class="input-wrapper"><i class="fas fa-search icon-left"></i><input type="tel" id="ed_cep" maxlength="9"></div></div>
+                        <div style="flex: 1;"><label>Cidade</label><div class="input-wrapper"><i class="fas fa-city icon-left"></i><input type="text" id="ed_cidade"></div></div>
+                    </div>
+                    <label>Logradouro</label><div class="input-wrapper"><i class="fas fa-road icon-left"></i><input type="text" id="ed_log"></div>
+                    <div style="display: flex; gap: 10px;">
+                        <div style="width: 130px;"><label>Nº</label><div class="input-wrapper"><i class="fas fa-hashtag icon-left"></i><input type="text" id="ed_num"></div></div>
+                        <div style="flex: 1;"><label>Bairro</label><div class="input-wrapper"><i class="fas fa-map icon-left"></i><input type="text" id="ed_bairro"></div></div>
+                    </div>
+                    <div>
+                        <label>Referência</label>
+                        <div class="input-wrapper"><i class="fas fa-map-pin icon-left"></i><input type="text" id="ed_ref"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="display:flex; gap:10px;">
+                <button type="button" class="btn btn-sm btn-outline" onclick="fecharModal('modalEditarEndereco')">CANCELAR</button>
+                <button type="button" id="btnSalvarEdicaoEnd" class="btn btn-sm btn-success" onclick="salvarEdicaoEndereco()">SALVAR</button>
             </div>
         </div>
     </div>
@@ -733,8 +763,6 @@
             const nav = document.getElementById('nav-'+tela);
             if(nav) nav.classList.add('active');
             
-            if(window.innerWidth <= 768) toggleMenu(false);
-            
             // Carregamentos específicos
             if(tela === 'triagem') carregarTriagem();
             if(tela === 'monitoramento') { carregarMonitoramento(); expandMob('wait'); }
@@ -755,8 +783,7 @@
             }
         }
 
-        function toggleMenu(force) { const sb=document.querySelector('.sidebar'); const ov=document.querySelector('.mobile-overlay'); const open=force!==undefined?force:!sb.classList.contains('open'); if(open){sb.classList.add('open');ov.style.display='block';}else{sb.classList.remove('open');ov.style.display='none';} }
-        function mostrarApp() { document.getElementById('login-wrapper').style.display='none'; document.getElementById('app-wrapper').classList.remove('hidden'); document.getElementById('userAvatar').innerText=usuarioAtual.nome_guerra[0]; document.getElementById('mobileUserAvatar').innerText=usuarioAtual.nome_guerra[0]; navegar('atendimento'); }
+        function mostrarApp() { document.getElementById('login-wrapper').style.display='none'; document.getElementById('app-wrapper').classList.remove('hidden'); document.getElementById('userAvatar').innerText=usuarioAtual.nome_guerra[0]; navegar('atendimento'); }
         function logout() { localStorage.removeItem('piabi_user'); window.location.reload(); }
         function toggleTheme() { 
             const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
@@ -1184,6 +1211,58 @@
                 ultimaOcorrenciaGerada = null;
             } catch(e) {
                 alert('Erro ao salvar: '+e.message);
+            }
+        }
+
+        async function editarEndereco() {
+            if(!idOcorrenciaAberta) return;
+            try {
+                const dados = await api('tb_triagem', `id=eq.${idOcorrenciaAberta}&select=*`);
+                if(!dados || !dados.length) return;
+                const info = dados[0].dados_preenchidos.endereco;
+
+                document.getElementById('ed_cep').value = info.cep || '';
+                document.getElementById('ed_cidade').value = info.cidade || '';
+                document.getElementById('ed_log').value = info.logradouro || '';
+                document.getElementById('ed_num').value = info.numero || '';
+                document.getElementById('ed_bairro').value = info.bairro || '';
+                document.getElementById('ed_ref').value = info.referencia || '';
+
+                document.getElementById('modalEditarEndereco').style.display = 'flex';
+            } catch(e) { alert('Erro ao carregar endereço: ' + e.message); }
+        }
+
+        async function salvarEdicaoEndereco() {
+            const btn = document.getElementById('btnSalvarEdicaoEnd');
+            btn.innerText = '...'; btn.disabled = true;
+            try {
+                const dados = await api('tb_triagem', `id=eq.${idOcorrenciaAberta}&select=*`);
+                if(!dados || !dados.length) return;
+                
+                let dp = dados[0].dados_preenchidos;
+
+                dp.endereco.cep = document.getElementById('ed_cep').value;
+                dp.endereco.cidade = document.getElementById('ed_cidade').value.toUpperCase();
+                dp.endereco.logradouro = document.getElementById('ed_log').value.toUpperCase();
+                dp.endereco.numero = document.getElementById('ed_num').value.toUpperCase();
+                dp.endereco.bairro = document.getElementById('ed_bairro').value.toUpperCase();
+                dp.endereco.referencia = document.getElementById('ed_ref').value.toUpperCase();
+                
+                // Reconstrói a string formatada com a cidade no final
+                dp.endereco.formatado = `${dp.endereco.logradouro}, ${dp.endereco.numero} - ${dp.endereco.bairro}, ${dp.endereco.cidade}`;
+
+                await api('tb_triagem', `id=eq.${idOcorrenciaAberta}`, 'PATCH', { dados_preenchidos: dp });
+
+                alert('Endereço atualizado com sucesso!');
+                fecharModal('modalEditarEndereco');
+                
+                // Atualiza a interface
+                carregarMonitoramento();
+                abrirModalOcorrencia(idOcorrenciaAberta);
+            } catch(e) {
+                alert('Erro ao salvar endereço: ' + e.message);
+            } finally {
+                btn.innerText = 'SALVAR'; btn.disabled = false;
             }
         }
 
