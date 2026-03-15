@@ -1028,23 +1028,28 @@
         async function consultarPlacaApi() {
             const el = document.getElementById('vPlaca');
             const p = el.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
-            if(!p || p.length < 7) { el.style.backgroundColor = 'var(--input-bg)'; return; }
+            if(!p || p.length < 7) { 
+                el.style.backgroundColor = 'var(--input-bg)'; 
+                document.getElementById('vDesc').value = '';
+                return; 
+            }
             
             try {
-                const res = await fetch(`https://api.placas.app.br/v2/placas/${p}`);
+                // Utiliza o corsproxy.io como ponte para evitar o bloqueio CORS do navegador
+                const res = await fetch(`https://corsproxy.io/?https://api.placas.app.br/v2/placas/${p}`);
+                
                 if(res.ok) {
                     const data = await res.json();
                     document.getElementById('vDesc').value = `${data.marca} ${data.modelo} - ${data.cor} - ${data.ano}`;
                     el.style.backgroundColor = 'rgba(16, 185, 129, 0.15)';
                 } else {
                     el.style.backgroundColor = 'rgba(239, 68, 68, 0.15)';
-                    // Alerta de erro de resposta do servidor
-                    alert('Diagnóstico API: Erro HTTP ' + res.status + ' - O servidor recusou a consulta (possível bloqueio CORS ou limite excedido).');
+                    document.getElementById('vDesc').value = 'PLACA NÃO ENCONTRADA';
                 }
             } catch(e) {
                 el.style.backgroundColor = 'rgba(239, 68, 68, 0.15)';
-                // Alerta de erro de conexão/CORS
-                alert('Diagnóstico API: Falha de conexão. Motivo: ' + e.message + ' (Provável bloqueio CORS no navegador).');
+                document.getElementById('vDesc').value = 'ERRO DE CONEXÃO';
+                console.error('Erro CORS/Rede na API de Placas:', e);
             }
         }
 
