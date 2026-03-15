@@ -64,18 +64,9 @@
             .nav-menu::-webkit-scrollbar { display: none; }
             .nav-item { white-space: nowrap; }
 
-            /* Triagem: table -> card mobile rules */
-            #view-triagem table, #view-triagem thead, #view-triagem tbody, #view-triagem th, #view-triagem td, #view-triagem tr { display: block; }
-            #view-triagem thead tr { position: absolute; top: -9999px; left: -9999px; }
-            #view-triagem tr { background: var(--bg-header); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; padding: 12px; }
-            #view-triagem td { border: none; position: relative; padding: 4px 0 4px 75px !important; font-size: 13px; text-align: left; }
-            #view-triagem td::before { position: absolute; left: 0; top: 6px; width: 70px; white-space: nowrap; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-            #view-triagem td:nth-of-type(1)::before { content: "Tel:"; }
-            #view-triagem td:nth-of-type(2)::before { content: "Nome:"; }
-            #view-triagem td:nth-of-type(3)::before { content: "Cidade:"; }
-            #view-triagem td:nth-of-type(4)::before { content: "Bairro:"; }
-            #view-triagem td:nth-of-type(5)::before { content: "Natureza:"; }
-            #view-triagem td:nth-of-type(5) { font-weight: 700; color: var(--text-light); margin-top: 8px; padding-top: 8px !important; border-top: 1px solid var(--border); font-size: 14px; }
+            #modalOcorrencia .modal-footer { gap: 5px !important; justify-content: space-between; }
+            #modalOcorrencia .modal-footer .btn { font-size: 9px !important; padding: 8px 4px !important; letter-spacing: -0.3px; flex: 1; text-align: center; }
+            #modalOcorrencia .modal-footer .btn i { margin-right: 2px; }
         }
 
         /* CONTEÚDO PRINCIPAL */
@@ -266,7 +257,12 @@
                                 <div>
                                     <label>Referência</label>
                                     <div class="input-wrapper"><i class="fas fa-map-pin icon-left"></i><input type="text" id="endRef"></div>
-                                    <div style="margin-top:6px; max-width:220px;"><button type="button" class="btn btn-sm btn-outline" onclick="adicionarSemPontoReferencia()">+ SEM REFERÊNCIA</button></div>
+                                    <div style="margin-top:6px; display: flex; gap: 8px;">
+    <button type="button" class="btn btn-sm btn-outline" style="max-width:220px;" onclick="adicionarSemPontoReferencia()">+ SEM REFERÊNCIA</button>
+    <button type="button" class="btn btn-sm btn-outline" title="Verificar no Mapa" style="width: auto; padding: 6px 15px;" onclick="abrirMapaAtendimento()">
+        <i class="fas fa-map-marked-alt" style="font-size:14px;"></i>
+    </button>
+</div>
                                 </div>
                             </div>
                             <div class="section-box">
@@ -324,34 +320,43 @@
                 </form>
             </div>
 
-            <div id="view-triagem" class="scroll-content hidden">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <div id="view-triagem" class="hidden" style="height:100%; display:flex; flex-direction:column;">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; flex-shrink:0;">
                     <h2 style="font-size:18px;">Triagem</h2>
                     <button class="btn btn-sm btn-outline" onclick="carregarTriagem()"><i class="fas fa-sync"></i></button>
                 </div>
 
-                <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; height: 100%; max-height: 70vh;">
-                    <div style="padding: 12px; border-bottom: 1px solid var(--border); background: var(--bg-header);">
-                        <input type="text" id="filtroTriagem" placeholder="🔍 Buscar por telefone, nome, cidade, bairro, natureza..." 
-                            style="width:100%; padding:10px; background:#ffffff; border:1px solid var(--border); border-radius:6px; color:var(--text-light); font-size:13px;"
-                            oninput="filtrarTriagem(this.value)">
+                <div class="desktop-monitor" style="flex:1; padding:0 15px; overflow-y:auto; margin-bottom:10px;">
+                    <div class="monitor-col" style="border-top: 3px solid var(--secondary); width: 100%;">
+                        <div class="monitor-header">
+                            <span><i class="fas fa-list-alt"></i> Fila de Triagem</span>
+                            <span id="deskCountTriagem">0</span>
+                        </div>
+                        <div class="monitor-body">
+                            <table class="monitor-table" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th style="width:15%;">TELEFONE</th>
+                                        <th style="width:25%;">NOME</th>
+                                        <th style="width:20%;">CIDADE</th>
+                                        <th style="width:20%;">BAIRRO</th>
+                                        <th style="width:20%;">NATUREZA</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaTriagemBody"></tbody>
+                            </table>
+                        </div>
                     </div>
-                        <div class="table-wrapper" style="flex: 1; overflow-y: auto;">
-                            <table class="monitor-table" style="width: 100%;">
-                            <thead style="position: sticky; top: 0;">
-                                <tr>
-                                    <th style="padding: 12px; text-align: left; color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase;">Telefone</th>
-                                    <th style="padding: 12px; text-align: left; color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase;">Nome</th>
-                                    <th style="padding: 12px; text-align: left; color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase;">Cidade</th>
-                                    <th style="padding: 12px; text-align: left; color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase;">Bairro</th>
-                                    <th style="padding: 12px; text-align: left; color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase;">Natureza</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaTriagemBody">
-                                <tr><td colspan="5" style="padding: 20px; text-align: center; color: var(--text-muted);">Carregando...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+                </div>
+
+                <div class="mobile-monitor" style="flex:1; flex-direction:column; overflow-y:auto; padding:10px;">
+                    <div id="mobTriagemBody" style="display:flex; flex-direction:column; gap:10px;"></div>
+                </div>
+
+                <div style="padding:10px; background:var(--card-bg); border-top:1px solid var(--border); flex-shrink:0;">
+                    <input type="text" id="filtroTriagem" placeholder="🔍 Buscar por telefone, nome, cidade, bairro, natureza..." 
+                        style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--border); border-radius:6px; color:var(--text-light); font-size:13px;"
+                        oninput="filtrarTriagem(this.value)">
                 </div>
             </div>
 
@@ -919,6 +924,29 @@
                 inp.value = inp.value + ' - ' + suffix;
             }
         }
+
+        function abrirMapaAtendimento() {
+            const logradouro = document.getElementById('endLog').value.trim();
+            const numero = document.getElementById('endNum').value.trim();
+            const bairro = document.getElementById('endBairro').value.trim();
+            const cidade = document.getElementById('endCidade').value.trim();
+            
+            if(!logradouro && !cidade) {
+                alert('Preencha ao menos o logradouro ou a cidade para abrir o mapa.');
+                return;
+            }
+            
+            // Monta o endereço de forma inteligente ignorando campos vazios
+            const partes = [];
+            if(logradouro) partes.push(logradouro);
+            if(numero) partes.push(numero);
+            if(bairro) partes.push('- ' + bairro);
+            if(cidade) partes.push(cidade);
+            
+            const enderecoFormatado = partes.join(', ');
+            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(enderecoFormatado)}`, '_blank');
+        }
+
         let timeoutLog; function sugerirLogradouro(txt) { clearTimeout(timeoutLog); const box=document.getElementById('sugestoesLog'); const cid=document.getElementById('endCidade').value; if(txt.length<4||!cid){box.classList.add('hidden');return;} timeoutLog=setTimeout(async()=>{ try{const r=await fetch(`https://nominatim.openstreetmap.org/search?street=${txt}&city=${cid}&state=Parana&format=json&limit=5`);const d=await r.json();box.innerHTML='';if(d.length){box.classList.remove('hidden');d.forEach(i=>{const div=document.createElement('div');div.className='sugg-item';div.innerText=i.display_name.split(',')[0];div.onclick=()=>{document.getElementById('endLog').value=div.innerText;box.classList.add('hidden');};box.appendChild(div);});}}catch(e){} },500); }
 
         // lista de naturezas estática para autocomplete
@@ -1292,44 +1320,68 @@
 
         async function carregarTriagem() {
             const tb = document.getElementById('tabelaTriagemBody');
+            const mb = document.getElementById('mobTriagemBody');
+            const countTriagem = document.getElementById('deskCountTriagem');
+            
             tb.innerHTML = '<tr><td colspan="5" style="padding: 20px; text-align: center; color: var(--text-muted);">Carregando...</td></tr>';
+            mb.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted);">Carregando...</div>';
             
             try {
                 const d = await api('tb_triagem', 'status=eq.EM_TRIAGEM&order=criado_em.desc');
-                tb.innerHTML = '';
+                tb.innerHTML = ''; mb.innerHTML = '';
+                if(countTriagem) countTriagem.innerText = d.length;
                 
                 if (!d.length) {
                     tb.innerHTML = '<tr><td colspan="5" style="padding: 20px; text-align: center; color: var(--text-muted);">Nenhuma triagem pendente</td></tr>';
+                    mb.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted);">Nenhuma triagem pendente</div>';
                     return;
                 }
                 
                 d.forEach(item => {
                     const info = item.dados_preenchidos;
-                    const telefone = info.solicitante?.telefone || '';
-                    const nome = info.solicitante?.nome || '';
-                    const cidade = info.endereco?.cidade || '';
-                    const bairro = info.endereco?.bairro || '';
-                    const natureza = info.natureza || '';
+                    const telefone = info.solicitante?.telefone || '-';
+                    const nome = info.solicitante?.nome || 'ANÔNIMO';
+                    const cidade = info.endereco?.cidade || '-';
+                    const bairro = info.endereco?.bairro || '-';
+                    const natureza = info.natureza || '-';
                     
-                    // Texto de busca combinado
                     const textoBusca = [telefone, nome, cidade, bairro, natureza].join(' ').toLowerCase();
+                    const atributoBusca = `data-busca="${textoBusca}"`;
                     
-                    const tr = document.createElement('tr');
-                    tr.style.cssText = 'border-bottom: 1px solid var(--border); cursor: pointer;';
-                    tr.setAttribute('data-busca', textoBusca);
-                    tr.onmouseover = () => tr.style.background = 'rgba(255,255,255,0.05)';
-                    tr.onmouseout = () => tr.style.background = '';
-                    tr.onclick = () => retomarAtendimento(item.id);
+                    // Linha Desktop
+                    const tr = `<tr style="cursor: pointer; border-bottom: 1px solid var(--border);" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background=''" onclick="retomarAtendimento('${item.id}')" ${atributoBusca}>
+                        <td style="padding: 12px; width:15%;">${telefone}</td>
+                        <td style="padding: 12px; width:25%;">${nome}</td>
+                        <td style="padding: 12px; width:20%;">${cidade}</td>
+                        <td style="padding: 12px; width:20%;">${bairro}</td>
+                        <td style="padding: 12px; width:20%; font-weight:700;">${natureza}</td>
+                    </tr>`;
                     
-                    tr.innerHTML = `
-                        <td style="padding: 12px;">${telefone}</td>
-                        <td style="padding: 12px;">${nome}</td>
-                        <td style="padding: 12px;">${cidade}</td>
-                        <td style="padding: 12px;">${bairro}</td>
-                        <td style="padding: 12px;">${natureza}</td>
-                    `;
+                    // Cartão Mobile (Borda Azul Escuro)
+                    const dCriacao = new Date(item.criado_em);
+                    const timerTxt = `${dCriacao.getDate().toString().padStart(2,'0')}/${(dCriacao.getMonth()+1).toString().padStart(2,'0')} ${dCriacao.getHours().toString().padStart(2,'0')}:${dCriacao.getMinutes().toString().padStart(2,'0')}`;
                     
-                    tb.appendChild(tr);
+                    const card = `<div class="card-mobile" style="border-left-color: var(--secondary); margin: 0;" onclick="retomarAtendimento('${item.id}')" ${atributoBusca}>
+                        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:13px; margin-bottom:8px;">
+                            <span style="color:var(--text-light);">${natureza}</span>
+                            <span style="font-size:11px; color:var(--text-muted);">${timerTxt}</span>
+                        </div>
+                        <div style="font-size:12px; color:var(--text-light); margin-bottom:4px;">
+                            <i class="fas fa-user" style="color:var(--text-muted); width:16px;"></i> ${nome}
+                        </div>
+                        <div style="font-size:12px; color:var(--text-light); margin-bottom:8px;">
+                            <i class="fas fa-phone" style="color:var(--text-muted); width:16px;"></i> ${telefone}
+                        </div>
+                        <div style="font-size:11px; color:var(--text-muted); margin-bottom:10px;">
+                            <i class="fas fa-map-marker-alt" style="width:16px;"></i> ${bairro}, ${cidade}
+                        </div>
+                        <div style="display:flex;">
+                            <span class="card-tag" style="background:var(--secondary); color:white;">TRIAGEM PENDENTE</span>
+                        </div>
+                    </div>`;
+                    
+                    tb.innerHTML += tr;
+                    mb.innerHTML += card;
                 });
             } catch (e) {
                 tb.innerHTML = '<tr><td colspan="5" style="padding: 20px; text-align: center; color: #ff6b6b;">Erro ao carregar triagem</td></tr>';
@@ -1338,14 +1390,17 @@
         }
 
         function filtrarTriagem(texto) {
-            const tb = document.getElementById('tabelaTriagemBody');
             const filterText = texto.toLowerCase();
-            
+            const tb = document.getElementById('tabelaTriagemBody');
             if(tb) {
-                const linhas = tb.querySelectorAll('tr');
-                linhas.forEach(linha => {
-                    const buscaDados = linha.getAttribute('data-busca') || '';
-                    linha.style.display = buscaDados.includes(filterText) ? '' : 'none';
+                tb.querySelectorAll('tr').forEach(linha => {
+                    linha.style.display = (linha.getAttribute('data-busca') || '').includes(filterText) ? '' : 'none';
+                });
+            }
+            const mb = document.getElementById('mobTriagemBody');
+            if(mb) {
+                mb.querySelectorAll('.card-mobile').forEach(card => {
+                    card.style.display = (card.getAttribute('data-busca') || '').includes(filterText) ? '' : 'none';
                 });
             }
         }
@@ -2129,25 +2184,39 @@
 
         // ===== FILTRO GLOBAL (DEEP SEARCH) =====
         function filtrarMonitoramento(texto) {
-            const tbWait = document.getElementById('tableWait');
-            const tbAct = document.getElementById('tableActive');
             const filterText = texto.toLowerCase();
             
-            // Filtrar tabela de espera usando data-busca
+            // Filtrar Desktop (Tabelas)
+            const tbWait = document.getElementById('tableWait');
             if(tbWait) {
-                const linhasWait = tbWait.querySelectorAll('tr');
-                linhasWait.forEach(linha => {
+                tbWait.querySelectorAll('tr').forEach(linha => {
                     const buscaDados = linha.getAttribute('data-busca') || '';
                     linha.style.display = buscaDados.includes(filterText) ? '' : 'none';
                 });
             }
             
-            // Filtrar tabela ativa usando data-busca
+            const tbAct = document.getElementById('tableActive');
             if(tbAct) {
-                const linhasAct = tbAct.querySelectorAll('tr');
-                linhasAct.forEach(linha => {
+                tbAct.querySelectorAll('tr').forEach(linha => {
                     const buscaDados = linha.getAttribute('data-busca') || '';
                     linha.style.display = buscaDados.includes(filterText) ? '' : 'none';
+                });
+            }
+
+            // Filtrar Mobile (Cartões)
+            const mobWait = document.getElementById('mobWaitBody');
+            if(mobWait) {
+                mobWait.querySelectorAll('.card-mobile').forEach(card => {
+                    const buscaDados = card.getAttribute('data-busca') || '';
+                    card.style.display = buscaDados.includes(filterText) ? '' : 'none';
+                });
+            }
+
+            const mobAct = document.getElementById('mobActiveBody');
+            if(mobAct) {
+                mobAct.querySelectorAll('.card-mobile').forEach(card => {
+                    const buscaDados = card.getAttribute('data-busca') || '';
+                    card.style.display = buscaDados.includes(filterText) ? '' : 'none';
                 });
             }
         }
