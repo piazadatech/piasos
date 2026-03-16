@@ -266,7 +266,14 @@
                                 </div>
                             </div>
                             <div class="section-box">
-                                <div class="section-title"><i class="fas fa-tags"></i> Classificação</div>
+                                <div class="section-title" style="display:flex; justify-content:space-between;">
+                                    <span><i class="fas fa-tags"></i> Classificação</span>
+                                    <div style="display:flex; gap:5px;">
+                                        <button type="button" class="btn btn-sm btn-info" id="tabPiasos" onclick="switchTabClassif('PIASOS')">PIASOS</button>
+                                        <button type="button" class="btn btn-sm btn-outline" id="tabSade" onclick="switchTabClassif('SADE')">SADE</button>
+                                    </div>
+                                </div>
+                                <div id="boxPiasos">
                                 <div class="classif-group"><span class="classif-label">PERIGO IMEDIATO</span>
                                     <div class="check-grid">
                                         <div class="option-box"><input type="checkbox" id="p1" class="tag-check" value="ARMA DE FOGO"><label for="p1">ARMA DE FOGO</label></div>
@@ -288,6 +295,41 @@
                                         <div class="option-box"><input type="radio" name="tempoAto" id="ta3" class="tag-radio" value="ACONTECEU A ALGUM TEMPO"><label for="ta3">JÁ OCORREU</label></div>
                                     </div>
                                 </div>
+                                </div>
+                                <div id="boxSade" class="hidden">
+    <div class="classif-group">
+        <span class="classif-label">HÁ PESSOAS FERIDAS EM RISCO DE MORTE?</span>
+        <div class="check-grid">
+            <div class="option-box"><input type="radio" name="sdFeri" id="sdF2" class="sade-radio" value="FERIDOS (NÃO)"><label for="sdF2">NÃO</label></div>
+            <div class="option-box"><input type="radio" name="sdFeri" id="sdF1" class="sade-radio" value="FERIDOS (SIM)"><label for="sdF1">SIM</label></div>
+            <div class="option-box"><input type="radio" name="sdFeri" id="sdF3" class="sade-radio" value="FERIDOS (SUSPEITA)"><label for="sdF3">HÁ SUSPEITA</label></div>
+        </div>
+    </div>
+    <div class="classif-group">
+        <span class="classif-label">AUTOR DO FATO ESTÁ NO LOCAL?</span>
+        <div class="check-grid">
+            <div class="option-box"><input type="radio" name="sdAutor" id="sdA2" class="sade-radio" value="AUTOR (NÃO)"><label for="sdA2">NÃO</label></div>
+            <div class="option-box"><input type="radio" name="sdAutor" id="sdA1" class="sade-radio" value="AUTOR (SIM)"><label for="sdA1">SIM</label></div>
+            <div class="option-box"><input type="radio" name="sdAutor" id="sdA3" class="sade-radio" value="AUTOR (SUSPEITA)"><label for="sdA3">HÁ SUSPEITA</label></div>
+        </div>
+    </div>
+    <div class="classif-group">
+        <span class="classif-label">AUTOR DO FATO ESTÁ ARMADO?</span>
+        <div class="check-grid">
+            <div class="option-box"><input type="radio" name="sdArma" id="sdAr2" class="sade-radio" value="ARMADO (NÃO)"><label for="sdAr2">NÃO</label></div>
+            <div class="option-box"><input type="radio" name="sdArma" id="sdAr1" class="sade-radio" value="ARMADO (SIM)"><label for="sdAr1">SIM</label></div>
+            <div class="option-box"><input type="radio" name="sdArma" id="sdAr3" class="sade-radio" value="ARMADO (SUSPEITA)"><label for="sdAr3">HÁ SUSPEITA</label></div>
+        </div>
+    </div>
+    <div class="classif-group">
+        <span class="classif-label">HÁ RISCO DE TUMULTO NO LOCAL?</span>
+        <div class="check-grid">
+            <div class="option-box"><input type="radio" name="sdTum" id="sdT2" class="sade-radio" value="TUMULTO (NÃO)"><label for="sdT2">NÃO</label></div>
+            <div class="option-box"><input type="radio" name="sdTum" id="sdT1" class="sade-radio" value="TUMULTO (SIM)"><label for="sdT1">SIM</label></div>
+            <div class="option-box"><input type="radio" name="sdTum" id="sdT3" class="sade-radio" value="TUMULTO (SUSPEITA)"><label for="sdT3">HÁ SUSPEITA</label></div>
+        </div>
+    </div>
+</div>
                             </div>
                         </div>
                         <div>
@@ -301,7 +343,14 @@
     </div>
     <div id="sugestoesNatureza" class="suggestions hidden"></div>
 </div>
-                                <div class="input-wrapper"><label>Descrição</label><textarea id="ocRelato" style="height: 100px; padding-left:10px; resize:none;"></textarea></div>
+                                <div class="input-wrapper"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+    <label style="margin:0;">Descrição</label>
+    <div style="display:flex; gap:5px;">
+        <button type="button" class="btn-copy" onclick="configurarGroq()" title="Config API Groq"><i class="fas fa-cog"></i></button>
+        <button type="button" class="btn-copy" id="btnDesfazerPui" onclick="desfazerPui()" disabled title="Desfazer"><i class="fas fa-undo"></i></button>
+        <button type="button" class="btn btn-sm btn-info" onclick="aplicarPui()" style="padding:2px 8px; font-size:10px;"><i class="fas fa-magic"></i> PUI</button>
+    </div>
+</div><textarea id="ocRelato" style="height: 100px; padding-left:10px; resize:none;"></textarea></div>
                             </div>
                             <div class="section-box">
                                 <div class="section-title"><i class="fas fa-car"></i> Veículos / Suspeitos</div>
@@ -630,7 +679,11 @@
                     </div>
                     <div id="mo-tags" style="display:flex; gap:4px; flex-wrap:wrap; margin-top:8px;"></div>
                 </div>
-                <i class="fas fa-times" onclick="fecharModal('modalOcorrencia')" style="cursor:pointer; font-size:20px; color:var(--text-muted); padding:5px;"></i>
+                <div style="display:flex; gap:15px; align-items:center;">
+                    <i class="fas fa-copy" id="iconeCopiarSade" onclick="copiarParaSade(idOcorrenciaAberta)" title="Copiar p/ SADE" style="cursor:pointer; font-size:18px; color:var(--text-muted); transition:0.2s;"></i>
+                    <i class="fab fa-whatsapp" onclick="compartilharWhatsApp(idOcorrenciaAberta)" title="Compartilhar WhatsApp" style="cursor:pointer; font-size:18px; color:var(--text-muted); transition:0.2s;"></i>
+                    <i class="fas fa-times" onclick="fecharModal('modalOcorrencia')" style="cursor:pointer; font-size:20px; color:var(--text-muted);"></i>
+                </div>
             </div>
             <div class="modal-body" style="display:flex; flex-direction:column; gap:15px;">
                 <div class="modal-grid-responsive" style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
@@ -722,6 +775,45 @@
                 modais.forEach(modal => modal.style.display = 'none');
             }
         });
+
+function switchTabClassif(aba) {
+    document.getElementById('boxPiasos').classList.toggle('hidden', aba !== 'PIASOS');
+    document.getElementById('boxSade').classList.toggle('hidden', aba !== 'SADE');
+    document.getElementById('tabPiasos').className = aba === 'PIASOS' ? 'btn btn-sm btn-info' : 'btn btn-sm btn-outline';
+    document.getElementById('tabSade').className = aba === 'SADE' ? 'btn btn-sm btn-info' : 'btn btn-sm btn-outline';
+}
+
+let txtOrigPui = '';
+function configurarGroq() {
+    document.getElementById('puiApiKey').value = localStorage.getItem('gk') || '';
+    document.getElementById('puiPrompt').value = localStorage.getItem('gp') || 'Aja como revisor de COPOM. Corrija a gramática, deixe o texto direto, militar e em CAIXA ALTA. Não invente dados. Mantenha tags {{D_X}} e {{P_X}}.';
+    document.getElementById('modalConfigPui').style.display = 'flex';
+}
+
+function salvarConfigPui() {
+    localStorage.setItem('gk', document.getElementById('puiApiKey').value.trim());
+    localStorage.setItem('gp', document.getElementById('puiPrompt').value.trim());
+    fecharModal('modalConfigPui');
+}
+function desfazerPui() { if(txtOrigPui) { document.getElementById('ocRelato').value = txtOrigPui; document.getElementById('btnDesfazerPui').disabled = true; } }
+
+async function aplicarPui() {
+    const k = localStorage.getItem('gk'); if(!k) return alert('Configure API Key Groq');
+    const promptSys = localStorage.getItem('gp') || 'Aja como revisor de COPOM. Corrija a gramática, deixe o texto direto, militar e em CAIXA ALTA. Não invente dados. Mantenha tags {{D_X}} e {{P_X}}.';
+    const ta = document.getElementById('ocRelato'); const txt = ta.value; if(!txt.trim()) return;
+    
+    let mask = txt; const map = { d: [], p: [] };
+    mask = mask.replace(/\b\d{3}\.\d{3}\.\d{3}-\d{2}\b|\b\d{11}\b|\b\d{1,2}\.\d{3}\.\d{3}-[A-Za-z0-9]{1}\b/g, m => { map.d.push(m); return `{{D_${map.d.length-1}}}`; });
+    mask = mask.replace(/\b[A-Z]{3}[0-9][0-9A-Z][0-9]{2}\b|\b[A-Z]{3}-?\d{4}\b/gi, m => { map.p.push(m); return `{{P_${map.p.length-1}}}`; });
+    
+    txtOrigPui = txt; ta.value = 'IA PROCESSANDO...';
+    try {
+        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', { method: 'POST', headers: { 'Authorization': `Bearer ${k}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ model: "llama3-8b-8192", messages: [{role: "system", content: promptSys}, {role: "user", content: mask}], temperature: 0.2 }) });
+        let fim = (await res.json()).choices[0].message.content.toUpperCase();
+        map.d.forEach((v,i)=> fim = fim.replace(`{{D_${i}}}`, v)); map.p.forEach((v,i)=> fim = fim.replace(`{{P_${i}}}`, v.toUpperCase()));
+        ta.value = fim; document.getElementById('btnDesfazerPui').disabled = false;
+    } catch(e) { ta.value = txtOrigPui; alert('Erro IA'); }
+}
 
         window.onload = function() {
             // Carregar preferência de tema
@@ -1123,8 +1215,8 @@
         function limparAtendimento() { document.forms[1].reset(); veiculosArray=[]; suspeitosArray=[]; renderList('listaVeiculos',[]); renderList('listaSuspeitos',[]); idEmEdicao=null; }
         
         function calcularRisco(tags) {
-            const highRisk = ['ARMA DE FOGO', 'ARMA BRANCA', 'EXPLOSIVO', 'EM ANDAMENTO'];
-            return tags.some(t => highRisk.includes(t)) ? 'CRITICA' : 'NORMAL';
+            const critic = ['ARMA DE FOGO', 'ARMA BRANCA', 'EXPLOSIVO', 'EM ANDAMENTO', 'FERIDOS (SIM)', 'ARMADO (SIM)'];
+            return tags.some(t => critic.includes(t)) ? 'CRITICA' : 'NORMAL';
         }
 
         async function salvar(destino) {
@@ -1132,7 +1224,7 @@
             if(document.getElementById('vPlaca').value || document.getElementById('vDesc').value) addVeiculo();
             if(document.getElementById('sNome').value) addSuspeito();
             const checks = Array.from(document.querySelectorAll('.tag-check:checked')).map(c=>c.value);
-            const radios = Array.from(document.querySelectorAll('.tag-radio:checked')).map(c=>c.value);
+            const radios = Array.from(document.querySelectorAll('.tag-radio:checked, .sade-radio:checked')).map(c=>c.value);
             const tags = [...checks, ...radios];
             
             const dados = {
@@ -1176,7 +1268,7 @@
             if(document.getElementById('vPlaca').value || document.getElementById('vDesc').value) addVeiculo();
             if(document.getElementById('sNome').value) addSuspeito();
             const checks = Array.from(document.querySelectorAll('.tag-check:checked')).map(c=>c.value);
-            const radios = Array.from(document.querySelectorAll('.tag-radio:checked')).map(c=>c.value);
+            const radios = Array.from(document.querySelectorAll('.tag-radio:checked, .sade-radio:checked')).map(c=>c.value);
             const tags = [...checks, ...radios];
             
             const dados = {
@@ -1266,58 +1358,6 @@
                 ultimaOcorrenciaGerada = null;
             } catch(e) {
                 alert('Erro ao salvar: '+e.message);
-            }
-        }
-
-        async function editarEndereco() {
-            if(!idOcorrenciaAberta) return;
-            try {
-                const dados = await api('tb_triagem', `id=eq.${idOcorrenciaAberta}&select=*`);
-                if(!dados || !dados.length) return;
-                const info = dados[0].dados_preenchidos.endereco;
-
-                document.getElementById('ed_cep').value = info.cep || '';
-                document.getElementById('ed_cidade').value = info.cidade || '';
-                document.getElementById('ed_log').value = info.logradouro || '';
-                document.getElementById('ed_num').value = info.numero || '';
-                document.getElementById('ed_bairro').value = info.bairro || '';
-                document.getElementById('ed_ref').value = info.referencia || '';
-
-                document.getElementById('modalEditarEndereco').style.display = 'flex';
-            } catch(e) { alert('Erro ao carregar endereço: ' + e.message); }
-        }
-
-        async function salvarEdicaoEndereco() {
-            const btn = document.getElementById('btnSalvarEdicaoEnd');
-            btn.innerText = '...'; btn.disabled = true;
-            try {
-                const dados = await api('tb_triagem', `id=eq.${idOcorrenciaAberta}&select=*`);
-                if(!dados || !dados.length) return;
-                
-                let dp = dados[0].dados_preenchidos;
-
-                dp.endereco.cep = document.getElementById('ed_cep').value;
-                dp.endereco.cidade = document.getElementById('ed_cidade').value.toUpperCase();
-                dp.endereco.logradouro = document.getElementById('ed_log').value.toUpperCase();
-                dp.endereco.numero = document.getElementById('ed_num').value.toUpperCase();
-                dp.endereco.bairro = document.getElementById('ed_bairro').value.toUpperCase();
-                dp.endereco.referencia = document.getElementById('ed_ref').value.toUpperCase();
-                
-                // Reconstrói a string formatada com a cidade no final
-                dp.endereco.formatado = `${dp.endereco.logradouro}, ${dp.endereco.numero} - ${dp.endereco.bairro}, ${dp.endereco.cidade}`;
-
-                await api('tb_triagem', `id=eq.${idOcorrenciaAberta}`, 'PATCH', { dados_preenchidos: dp });
-
-                alert('Endereço atualizado com sucesso!');
-                fecharModal('modalEditarEndereco');
-                
-                // Atualiza a interface
-                carregarMonitoramento();
-                abrirModalOcorrencia(idOcorrenciaAberta);
-            } catch(e) {
-                alert('Erro ao salvar endereço: ' + e.message);
-            } finally {
-                btn.innerText = 'SALVAR'; btn.disabled = false;
             }
         }
 
@@ -1836,12 +1876,15 @@
                 // Tags
                 const tagsDiv = document.getElementById('mo-tags');
                 tagsDiv.innerHTML = '';
-                if(info.prioridade==='CRITICA') {
-                    const tag = document.createElement('span');
-                    tag.style.cssText = 'font-size:10px; padding:3px 8px; background:#ff6b6b; color:white; border-radius:3px;';
-                    tag.innerText = '🚨 CRÍTICO';
-                    tagsDiv.appendChild(tag);
-                }
+                (info.classificacoes || []).forEach(tg => {
+                    let bg = 'var(--border)'; let tc = 'var(--text-muted)';
+                    if(["ARMA DE FOGO", "ARMA BRANCA", "EXPLOSIVO", "FERIDOS (SIM)", "ARMADO (SIM)"].includes(tg)) { bg = 'var(--danger)'; tc = 'white'; }
+                    else if(["EM ANDAMENTO", "ARMADO (SUSPEITA)", "TUMULTO (SIM)"].includes(tg)) { bg = 'var(--warning)'; tc = 'black'; }
+                    else { bg = 'var(--bg-hover)'; tc = 'var(--text-light)'; }
+                    const el = document.createElement('span');
+                    el.style.cssText = `font-size:9px; padding:3px 6px; background:${bg}; color:${tc}; border-radius:3px; font-weight:700;`;
+                    el.innerText = tg; tagsDiv.appendChild(el);
+                });
                 
                 // Endereço com Referência
                 const refText = info.endereco.referencia ? `<br><span style="color:var(--warning);">Ref: ${info.endereco.referencia}</span>` : '';
@@ -2319,6 +2362,118 @@
             }
         }
 
+async function copiarParaSade(id) {
+    try {
+        const d = await api('tb_triagem', `id=eq.${id}&select=*`);
+        const info = d[0].dados_preenchidos;
+        const icn = document.getElementById('iconeCopiarSade');
+        
+        const isAnon = (info.solicitante.nome||'').toUpperCase().includes('ANÔNIMO');
+        const isSemRef = (info.endereco.referencia||'').toUpperCase().includes('SEM PONTO DE REFERÊNCIA');
+        
+        let textoDescricao = `${d[0].resumo_texto || ''}\n\n`;
+        textoDescricao += `${info.endereco.cidade || ''}\n`;
+        textoDescricao += `${info.endereco.logradouro || ''}\n`;
+        textoDescricao += `${info.endereco.numero || ''}\n`;
+        textoDescricao += `${info.endereco.bairro || ''}\n`;
+        textoDescricao += `${info.endereco.referencia || 'SEM PONTO DE REFERÊNCIA'}`;
+
+        if (info.veiculos && info.veiculos.length > 0) {
+            textoDescricao += `\n\nVEÍCULOS:\n${info.veiculos.map(v => `[${v.placa||'S/P'}] ${v.desc}`).join('\n')}`;
+        }
+        if (info.suspeitos && info.suspeitos.length > 0) {
+            textoDescricao += `\n\nSUSPEITOS:\n${info.suspeitos.join('\n')}`;
+        }
+
+        const jSade = {
+            "NOME": info.solicitante.nome||"", "TELEFONE": info.solicitante.telefone||"", 
+            "municipio_endereco": info.endereco.cidade||"", "pesquisa_endereco": info.endereco.logradouro||"", 
+            "NUMERO": info.endereco.numero||"", "pesquisa_bairro": info.endereco.bairro||"", 
+            "COMPLEMENTO": info.endereco.referencia||"", "CLASSIFICACAO_ATENDIMENTO": info.natureza||"", 
+            "DESCRICAO": textoDescricao, 
+            "extensao_anonimo": isAnon, "extensao_sem_ref": isSemRef
+        };
+
+        const tags = info.classificacoes || [];
+        if(tags.includes('FERIDOS (NÃO)')) jSade["RESPOSTA_NIVEL_CRIME_0_0"] = true;
+        if(tags.includes('FERIDOS (SIM)')) jSade["RESPOSTA_NIVEL_CRIME_0_1"] = true;
+        if(tags.includes('FERIDOS (SUSPEITA)')) jSade["RESPOSTA_NIVEL_CRIME_0_2"] = true;
+
+        if(tags.includes('AUTOR (NÃO)')) jSade["RESPOSTA_NIVEL_CRIME_1_0"] = true;
+        if(tags.includes('AUTOR (SIM)')) jSade["RESPOSTA_NIVEL_CRIME_1_1"] = true;
+        if(tags.includes('AUTOR (SUSPEITA)')) jSade["RESPOSTA_NIVEL_CRIME_1_2"] = true;
+
+        if(tags.includes('ARMADO (NÃO)')) jSade["RESPOSTA_NIVEL_CRIME_2_0"] = true;
+        if(tags.includes('ARMADO (SIM)')) jSade["RESPOSTA_NIVEL_CRIME_2_1"] = true;
+        if(tags.includes('ARMADO (SUSPEITA)')) jSade["RESPOSTA_NIVEL_CRIME_2_2"] = true;
+
+        if(tags.includes('TUMULTO (NÃO)')) jSade["RESPOSTA_NIVEL_CRIME_3_0"] = true;
+        if(tags.includes('TUMULTO (SIM)')) jSade["RESPOSTA_NIVEL_CRIME_3_1"] = true;
+        if(tags.includes('TUMULTO (SUSPEITA)')) jSade["RESPOSTA_NIVEL_CRIME_3_2"] = true;
+
+        await navigator.clipboard.writeText(JSON.stringify(jSade));
+        icn.className = 'fas fa-check'; icn.style.color = 'var(--success)';
+        setTimeout(() => { icn.className = 'fas fa-copy'; icn.style.color = 'var(--text-muted)'; }, 2000);
+    } catch(e) { alert('Erro: ' + e.message); }
+}
+
+async function compartilharWhatsApp(id) {
+    try {
+        const d = await api('tb_triagem', `id=eq.${id}&select=*`); const i = d[0].dados_preenchidos;
+        const txt = `🚨 *OCORRÊNCIA:* ${i.natureza}\n📍 *LOCAL:* ${i.endereco.logradouro}, ${i.endereco.numero} - ${i.endereco.bairro}\n👤 *SOLICITANTE:* ${i.solicitante.nome} - ${i.solicitante.telefone}\n📝 *RELATO:*\n${d[0].resumo_texto || 'Sem relato'}`;
+        await navigator.clipboard.writeText(txt);
+        window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+    } catch(e) { alert('Erro no WPP'); }
+}
+
+async function editarEndereco() {
+    try {
+        const d = await api('tb_triagem', `id=eq.${idOcorrenciaAberta}&select=*`); const e = d[0].dados_preenchidos.endereco;
+        document.getElementById('ed_cep').value = e.cep || ''; document.getElementById('ed_cidade').value = e.cidade || '';
+        document.getElementById('ed_log').value = e.logradouro || ''; document.getElementById('ed_num').value = e.numero || '';
+        document.getElementById('ed_bairro').value = e.bairro || ''; document.getElementById('ed_ref').value = e.referencia || '';
+        document.getElementById('modalEditarEndereco').style.display = 'flex';
+    } catch(e) {}
+}
+
+async function salvarEdicaoEndereco() {
+    try {
+        const d = await api('tb_triagem', `id=eq.${idOcorrenciaAberta}&select=*`); const info = d[0].dados_preenchidos;
+        info.endereco.cep = document.getElementById('ed_cep').value; info.endereco.cidade = document.getElementById('ed_cidade').value.toUpperCase();
+        info.endereco.logradouro = document.getElementById('ed_log').value.toUpperCase(); info.endereco.numero = document.getElementById('ed_num').value.toUpperCase();
+        info.endereco.bairro = document.getElementById('ed_bairro').value.toUpperCase(); info.endereco.referencia = document.getElementById('ed_ref').value.toUpperCase();
+        info.endereco.formatado = `${info.endereco.logradouro}, ${info.endereco.numero} - ${info.endereco.bairro}, ${info.endereco.cidade}`;
+        await api('tb_triagem', `id=eq.${idOcorrenciaAberta}`, 'PATCH', { dados_preenchidos: info });
+        fecharModal('modalEditarEndereco'); carregarMonitoramento(); abrirModalOcorrencia(idOcorrenciaAberta);
+    } catch(e) { alert('Erro ao salvar endereço'); }
+}
+
     </script>
+
+<div id="modalConfigPui" class="modal-overlay" style="z-index: 250;">
+    <div class="modal-content" style="max-width:500px;">
+        <div class="modal-header">
+            <h3><i class="fas fa-cog"></i> Configuração PUI (Groq)</h3>
+            <i class="fas fa-times" onclick="fecharModal('modalConfigPui')" style="cursor:pointer;"></i>
+        </div>
+        <div class="modal-body">
+            <label>Chave API (Groq)</label>
+            <div class="input-wrapper" style="margin-bottom:5px;">
+                <i class="fas fa-key icon-left"></i>
+                <input type="password" id="puiApiKey" placeholder="gsk_...">
+            </div>
+            <div style="font-size:11px; margin-bottom:15px; text-align:right;">
+                <a href="https://console.groq.com/keys" target="_blank" style="color:var(--info); text-decoration:none;">🔗 Gerar chave gratuita no Groq</a>
+            </div>
+            <label>Prompt do Sistema (Instrução da IA)</label>
+            <textarea id="puiPrompt" rows="5" style="width:100%; background:var(--bg-input); color:var(--text-light); border:1px solid var(--border); border-radius:4px; padding:10px; font-size:12px; resize:vertical;"></textarea>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-sm btn-outline" onclick="fecharModal('modalConfigPui')">CANCELAR</button>
+            <button type="button" class="btn btn-sm btn-success" onclick="salvarConfigPui()">SALVAR CONFIGURAÇÃO</button>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
