@@ -236,7 +236,7 @@
                                     <div style="flex:2">
                                         <label>Nome</label>
                                         <div class="input-wrapper"><i class="fas fa-user icon-left"></i><input type="text" id="solNome"></div>
-                                        <div class="option-box" style="height:auto; margin-top:6px;"><input type="checkbox" id="chkAnon" onchange="toggleAnonimo(this)"><label for="chkAnon" style="width:fit-content; background:transparent; border:none; padding:0; justify-content:flex-start;">Anônimo</label></div>
+                                        <div style="margin-top:6px; max-width:120px;"><button type="button" class="btn btn-sm btn-outline" onclick="toggleAnonimoBtn()">ANÔNIMO</button></div>
                                     </div>
                                 </div>
                             </div>
@@ -258,7 +258,7 @@
                                     <label>Referência</label>
                                     <div class="input-wrapper"><i class="fas fa-map-pin icon-left"></i><input type="text" id="endRef"></div>
                                     <div style="margin-top:6px; display: flex; gap: 8px;">
-    <button type="button" class="btn btn-sm btn-outline" style="max-width:220px;" onclick="adicionarSemPontoReferencia()">+ SEM REFERÊNCIA</button>
+    <button type="button" class="btn btn-sm btn-outline" style="max-width:220px;" onclick="adicionarSemPontoReferencia()">SEM REFERÊNCIA</button>
     <button type="button" class="btn btn-sm btn-outline" title="Verificar no Mapa" style="width: auto; padding: 6px 15px;" onclick="abrirMapaAtendimento()">
         <i class="fas fa-map-marked-alt" style="font-size:14px;"></i>
     </button>
@@ -267,7 +267,7 @@
                             </div>
                             <div class="section-box">
                                 <div class="section-title"><i class="fas fa-tags"></i> Classificação</div>
-                                <div class="classif-group"><span class="classif-label">PERIGO IMEDIATO (Múltiplo)</span>
+                                <div class="classif-group"><span class="classif-label">PERIGO IMEDIATO</span>
                                     <div class="check-grid">
                                         <div class="option-box"><input type="checkbox" id="p1" class="tag-check" value="ARMA DE FOGO"><label for="p1">ARMA DE FOGO</label></div>
                                         <div class="option-box"><input type="checkbox" id="p2" class="tag-check" value="ARMA BRANCA"><label for="p2">ARMA BRANCA</label></div>
@@ -677,7 +677,7 @@
                 <i class="fas fa-times" onclick="fecharModal('modalFinalizacao')" style="cursor:pointer; font-size:18px; color:var(--text-muted);"></i>
             </div>
             <div class="modal-body">
-                <div class="input-wrapper">
+                <div class="input-wrapper" id="wrapper-mf-bo">
                     <label>Nº BO / Protocolo</label>
                     <input type="text" id="mf-bo" placeholder="Ex: 12345/2026">
                 </div>
@@ -740,6 +740,19 @@
             
             // Loop de atualização automática do monitoramento a cada 60 segundos
             setInterval(() => { const vm = document.getElementById('view-monitoramento'); if(vm && !vm.classList.contains('hidden')) carregarMonitoramento(); }, 60000);
+
+            // Permite desmarcar rádios com duplo clique (ou clique sobre já selecionado)
+            document.querySelectorAll('.tag-radio').forEach(radio => {
+                radio.addEventListener('click', function(e) {
+                    if (this.getAttribute('data-checked') === 'true') {
+                        this.checked = false;
+                        this.setAttribute('data-checked', 'false');
+                    } else {
+                        document.querySelectorAll(`input[name="${this.name}"]`).forEach(r => r.setAttribute('data-checked', 'false'));
+                        this.setAttribute('data-checked', 'true');
+                    }
+                });
+            });
         }
 
         async function api(tabela, query, method='GET', body=null) {
@@ -1072,12 +1085,12 @@
                     el.style.backgroundColor = 'rgba(16, 185, 129, 0.15)';
                 } else {
                     el.style.backgroundColor = 'rgba(239, 68, 68, 0.15)';
-                    document.getElementById('vDesc').value = 'PLACA NÃO ENCONTRADA';
+                    document.getElementById('vDesc').value = '';
                 }
             } catch(e) {
                 el.style.backgroundColor = 'rgba(239, 68, 68, 0.15)';
-                document.getElementById('vDesc').value = 'ERRO DE CONEXÃO';
-                console.error('Erro CORS/Rede na API de Placas:', e);
+                document.getElementById('vDesc').value = '';
+                console.error('Erro na API de Placas:', e);
             }
         }
 
@@ -1103,7 +1116,10 @@
         }
         function renderList(id, arr) { document.getElementById(id).innerHTML=arr.map((x,i)=>`<div class="list-entry"><span>${x.placa?`[${x.placa}] ${x.desc}`:x}</span><i class="fas fa-times remove-btn" onclick="removeItem('${id}',${i})"></i></div>`).join(''); }
         function removeItem(id,i) { if(id==='listaVeiculos')veiculosArray.splice(i,1); else suspeitosArray.splice(i,1); renderList(id,id==='listaVeiculos'?veiculosArray:suspeitosArray); }
-        function toggleAnonimo(chk) { document.getElementById('solNome').value=chk.checked?'ANÔNIMO':''; }
+        function toggleAnonimoBtn() { 
+            const el = document.getElementById('solNome'); 
+            el.value = (el.value === 'ANÔNIMO') ? '' : 'ANÔNIMO'; 
+        }
         function limparAtendimento() { document.forms[1].reset(); veiculosArray=[]; suspeitosArray=[]; renderList('listaVeiculos',[]); renderList('listaSuspeitos',[]); idEmEdicao=null; }
         
         function calcularRisco(tags) {
@@ -1895,50 +1911,55 @@
         }
 
         // Função para finalizar (abre modal de finalização)
-        function finalizarOcorrenciaModal(id) {
+        async function finalizarOcorrenciaModal(id) {
             idParaFinalizar = id;
             document.getElementById('mf-bo').value = '';
             document.getElementById('mf-observacoes').value = '';
+            document.getElementById('wrapper-mf-bo').style.display = 'block';
+            
+            try {
+                // Verifica se a ocorrência está apenas aguardando na fila
+                const dados = await api('tb_triagem', `id=eq.${id}&select=status`);
+                if(dados && dados.length > 0 && dados[0].status === 'AGUARDANDO') {
+                    document.getElementById('wrapper-mf-bo').style.display = 'none';
+                }
+            } catch(e) {}
+            
             document.getElementById('modalFinalizacao').style.display = 'flex';
         }
 
-        // Confirmar finalização
         async function confirmarFinalizacao() {
             const bo = document.getElementById('mf-bo').value.trim();
             const obs = document.getElementById('mf-observacoes').value.trim();
+            const isAguardando = document.getElementById('wrapper-mf-bo').style.display === 'none';
             
-            if(!bo || !obs) return alert('Preencha BO e Observações');
+            if(!isAguardando && (!bo || !obs)) return alert('Preencha o Nº BO e as Observações.');
             
             try {
                 const ocoDados = await api('tb_triagem', `id=eq.${idParaFinalizar}&select=*`);
                 if(!ocoDados.length) return;
                 const ocoAtual = ocoDados[0];
                 
-                // Criar nova observação
-                const novaObs = `${ocoAtual.resumo_texto || ''}\n[FINALIZAÇÃO ${new Date().toLocaleString()}] BO: ${bo} | Obs: ${obs}`;
-                
-                // Liberar viaturas
-                const viaturas = ocoAtual.viaturas_empenhadas || [];
-                for(const vtr of viaturas) {
-                    await api('tb_viaturas', `prefixo=eq.${vtr.prefixo}`, 'PATCH', {
-                        status_viatura: 'Disponível'
-                    });
+                let novaObs = ocoAtual.resumo_texto || '';
+                if(isAguardando) {
+                    if(obs) novaObs += `\n[FINALIZADA SEM DESPACHO - ${new Date().toLocaleString()}] Obs: ${obs}`;
+                    else novaObs += `\n[FINALIZADA SEM DESPACHO - ${new Date().toLocaleString()}]`;
+                } else {
+                    novaObs += `\n[FINALIZAÇÃO - ${new Date().toLocaleString()}] BO: ${bo} | Obs: ${obs}`;
                 }
                 
-                // Finalizar ocorrência
-                await api('tb_triagem', `id=eq.${idParaFinalizar}`, 'PATCH', {
-                    status: 'FINALIZADA',
-                    resumo_texto: novaObs
-                });
+                const viaturas = ocoAtual.viaturas_empenhadas || [];
+                for(const vtr of viaturas) {
+                    await api('tb_viaturas', `prefixo=eq.${vtr.prefixo}`, 'PATCH', { status_viatura: 'Disponível' });
+                }
                 
-                alert('Ocorrência finalizada com sucesso!');
+                await api('tb_triagem', `id=eq.${idParaFinalizar}`, 'PATCH', { status: 'FINALIZADA', resumo_texto: novaObs });
+                
+                alert('Ocorrência finalizada!');
                 fecharModal('modalFinalizacao');
                 fecharModal('modalOcorrencia');
                 carregarMonitoramento();
-            } catch(e) {
-                console.error('Erro ao finalizar:', e);
-                alert('Erro ao finalizar ocorrência');
-            }
+            } catch(e) { alert('Erro ao finalizar'); }
         }
 
         // Abrir seleção de frota em modal
