@@ -1063,8 +1063,8 @@
             }
             
             try {
-                // Utiliza o corsproxy.io como ponte para evitar o bloqueio CORS do navegador
-                const res = await fetch(`https://corsproxy.io/?https://api.placas.app.br/v2/placas/${p}`);
+                // Utiliza o proxy nativo do Netlify
+                const res = await fetch(`/api-placa/${p}`);
                 
                 if(res.ok) {
                     const data = await res.json();
