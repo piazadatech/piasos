@@ -786,7 +786,7 @@ function switchTabClassif(aba) {
 let txtOrigPui = '';
 function configurarGroq() {
     document.getElementById('puiApiKey').value = localStorage.getItem('gk') || '';
-    document.getElementById('puiPrompt').value = localStorage.getItem('gp') || 'Aja como revisor de COPOM. Corrija a gramática, deixe o texto direto, militar e em CAIXA ALTA. Não invente dados. Mantenha tags {{D_X}} e {{P_X}}.';
+    document.getElementById('puiPrompt').value = localStorage.getItem('gp') || 'Aja como um sistema de correção de texto para despachos policiais (190). Sua única função é reescrever o relato fornecido para torná-lo formal, impessoal e técnico, seguindo o padrão culto da língua portuguesa.\n\nRegras Rígidas:\n1 - SEM TÍTULOS OU INTRODUÇÕES: Não coloque cabeçalhos como "Relatório de Ocorrência". Comece o texto diretamente pela narrativa.\n2 - CONCORDÂNCIA DE GÊNERO: Identifique se o relato original se refere a uma solicitante (feminino) ou um solicitante (masculino). Mantenha rigorosamente o gênero original. Se o texto mencionar "A solicitante", o texto corrigido deve manter "A solicitante" e todas as concordâncias femininas.\n3 - TERMOS TÉCNICOS: Substitua termos informais por técnicos (ex: "perturbando" por "perturbação do sossego alheio", "solicitante informa" por "Relata o/a solicitante").\n4 - FIDELIDADE AOS FATOS: Mantenha os fatos estritamente como narrados, sem inventar informações.\n5 - EVITE PLEONASMOS: Jamais utilize "O/A solicitante solicita". Prefira "Relata o/a solicitante", "Informa a parte solicitante" ou "Solicita a presença da viatura".\n6 - SAÍDA EXCLUSIVA: Retorne APENAS o texto corrigido, sem comentários adicionais.';
     document.getElementById('modalConfigPui').style.display = 'flex';
 }
 
@@ -799,7 +799,7 @@ function desfazerPui() { if(txtOrigPui) { document.getElementById('ocRelato').va
 
 async function aplicarPui() {
     const k = localStorage.getItem('gk'); if(!k) return alert('Configure API Key Groq');
-    const promptSys = localStorage.getItem('gp') || 'Aja como revisor de COPOM. Corrija a gramática, deixe o texto direto, militar e em CAIXA ALTA. Não invente dados. Mantenha tags {{D_X}} e {{P_X}}.';
+    const promptSys = localStorage.getItem('gp') || 'Aja como um sistema de correção de texto para despachos policiais (190). Sua única função é reescrever o relato fornecido para torná-lo formal, impessoal e técnico, seguindo o padrão culto da língua portuguesa.\n\nRegras Rígidas:\n1 - SEM TÍTULOS OU INTRODUÇÕES: Não coloque cabeçalhos como "Relatório de Ocorrência". Comece o texto diretamente pela narrativa.\n2 - CONCORDÂNCIA DE GÊNERO: Identifique se o relato original se refere a uma solicitante (feminino) ou um solicitante (masculino). Mantenha rigorosamente o gênero original. Se o texto mencionar "A solicitante", o texto corrigido deve manter "A solicitante" e todas as concordâncias femininas.\n3 - TERMOS TÉCNICOS: Substitua termos informais por técnicos (ex: "perturbando" por "perturbação do sossego alheio", "solicitante informa" por "Relata o/a solicitante").\n4 - FIDELIDADE AOS FATOS: Mantenha os fatos estritamente como narrados, sem inventar informações.\n5 - EVITE PLEONASMOS: Jamais utilize "O/A solicitante solicita". Prefira "Relata o/a solicitante", "Informa a parte solicitante" ou "Solicita a presença da viatura".\n6 - SAÍDA EXCLUSIVA: Retorne APENAS o texto corrigido, sem comentários adicionais.';
     const ta = document.getElementById('ocRelato'); const txt = ta.value; if(!txt.trim()) return;
     
     let mask = txt; const map = { d: [], p: [] };
@@ -808,7 +808,7 @@ async function aplicarPui() {
     
     txtOrigPui = txt; ta.value = 'IA PROCESSANDO...';
     try {
-        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', { method: 'POST', headers: { 'Authorization': `Bearer ${k}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ model: "llama3-8b-8192", messages: [{role: "system", content: promptSys}, {role: "user", content: mask}], temperature: 0.2 }) });
+        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', { method: 'POST', headers: { 'Authorization': `Bearer ${k}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ model: "llama-3.1-8b-instant", messages: [{role: "system", content: promptSys}, {role: "user", content: mask}], temperature: 0.2, max_tokens: 1000 }) });
         let fim = (await res.json()).choices[0].message.content.toUpperCase();
         map.d.forEach((v,i)=> fim = fim.replace(`{{D_${i}}}`, v)); map.p.forEach((v,i)=> fim = fim.replace(`{{P_${i}}}`, v.toUpperCase()));
         ta.value = fim; document.getElementById('btnDesfazerPui').disabled = false;
@@ -2419,11 +2419,19 @@ async function copiarParaSade(id) {
 
 async function compartilharWhatsApp(id) {
     try {
-        const d = await api('tb_triagem', `id=eq.${id}&select=*`); const i = d[0].dados_preenchidos;
-        const txt = `🚨 *OCORRÊNCIA:* ${i.natureza}\n📍 *LOCAL:* ${i.endereco.logradouro}, ${i.endereco.numero} - ${i.endereco.bairro}\n👤 *SOLICITANTE:* ${i.solicitante.nome} - ${i.solicitante.telefone}\n📝 *RELATO:*\n${d[0].resumo_texto || 'Sem relato'}`;
+        const d = await api('tb_triagem', `id=eq.${id}&select=*`); 
+        const i = d[0].dados_preenchidos;
+        
+        const relatoSujo = d[0].resumo_texto || 'Sem relato';
+        const relatoLimpo = relatoSujo.replace(/\n\s*\n/g, '\n');
+        
+        const txt = `🚨 *OCORRÊNCIA:* ${i.natureza}\n📍 *LOCAL:* ${i.endereco.logradouro}, ${i.endereco.numero} - ${i.endereco.bairro}\n👤 *SOLICITANTE:* ${i.solicitante.nome} - ${i.solicitante.telefone}\n📝 *RELATO:* ${relatoLimpo}`;
+        
         await navigator.clipboard.writeText(txt);
         window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
-    } catch(e) { alert('Erro no WPP'); }
+    } catch(e) { 
+        alert('Erro no WPP'); 
+    }
 }
 
 async function editarEndereco() {
