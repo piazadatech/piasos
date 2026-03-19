@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PIASOS</title>
+    <title>PiaSOS</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -207,8 +207,8 @@
     <div id="login-wrapper">
         <div class="login-card">
             <div style="text-align: center; margin-bottom: 20px;">
-                <i class="fas fa-shield-alt" style="font-size: 40px; color: white;"></i>
-                <h2 style="margin-top: 10px;">Piabi<span style="color: var(--accent);">tech</span></h2>
+                <img src="brasao.png" alt="Brasão" style="height: 60px; width: auto; margin-bottom: 15px; object-fit: contain;">
+                <h2 style="margin-top: 10px;">Pia<span style="color: var(--accent);">SOS</span></h2>
             </div>
             <form onsubmit="handleLogin(event)">
                 <div style="margin-bottom: 10px;"><label>CPF</label><input type="tel" id="loginUser" required placeholder="000.000.000-00"></div>
@@ -234,7 +234,7 @@
 
     <div id="app-wrapper" class="hidden">
         <div class="navbar">
-            <div class="nav-brand"><i class="fas fa-shield-alt"></i><h2>Piabi<span>tech</span></h2></div>
+            <div class="nav-brand"><img src="brasao.png" alt="Brasão" style="height: 26px; width: auto; margin-right: 8px; object-fit: contain;"><h2>Pia<span>SOS</span></h2></div>
             <div class="nav-menu">
                 <div class="nav-item active" id="nav-atendimento" onclick="navegar('atendimento')"><i class="fas fa-phone-alt"></i> <span class="nav-text">ATENDIMENTO</span></div>
                 <div class="nav-item" id="nav-triagem" onclick="navegar('triagem')"><i class="fas fa-list-alt"></i> <span class="nav-text">TRIAGEM</span></div>
@@ -727,7 +727,7 @@
                             <div id="mo-nome" style="font-size:12px;">Nome: --</div>
                             <div id="mo-telefone" style="font-size:12px;">Tel: --</div>
                         </div>
-                        <button class="btn btn-sm btn-success" id="mo-btn-ligar" title="Ligar" style="padding:10px;"><i class="fas fa-phone" style="font-size:16px;"></i></button>
+                        <a href="tel:+55${info.solicitante.telefone}" title="Ligar" style="color: var(--text-muted); font-size: 16px; margin-left: 8px; text-decoration: none; transition: 0.2s;"><i class="fas fa-phone"></i></a>
                     </div>
                 </div>
                 </div>
@@ -1544,6 +1544,7 @@ async function aplicarPui() {
         <div style="font-size:11px;color:#aaa;margin-bottom:5px;">${info.endereco.formatado}</div>
         <div style="display:flex;gap:5px;">
             ${isCrit ? `<span class="card-tag" style="background:var(--danger);color:white">CRÍTICO</span>` : ''}
+            <a href="tel:+55${info.solicitante.telefone}" title="Ligar" style="color: var(--text-muted); font-size: 16px; margin-left: 10px; transition: 0.2s;"><i class="fas fa-phone"></i></a>
         </div>
     </div>`;
                         
@@ -1918,8 +1919,6 @@ async function aplicarPui() {
 
                 // Ações dos novos botões (Mapa e Ligar)
                 document.getElementById('mo-btn-mapa').onclick = () => window.open(`https://maps.google.com/?q=${encodeURIComponent(info.endereco.formatado)}`, '_blank');
-                const numTelefone = info.solicitante.telefone ? info.solicitante.telefone.replace(/\D/g, '') : '';
-                document.getElementById('mo-btn-ligar').onclick = () => { if(numTelefone) window.location.href = `tel:+55${numTelefone}`; else alert('Sem número válido'); };
 
                 // Solicitante
                 document.getElementById('mo-nome').innerText = `Nome: ${info.solicitante.nome || 'Anônimo'}`;
@@ -2451,7 +2450,7 @@ async function compartilharWhatsApp(id) {
         const relatoSujo = d[0].resumo_texto || 'Sem relato';
         const relatoLimpo = relatoSujo.replace(/\n\s*\n/g, '\n');
         
-        const txt = `🚨 *OCORRÊNCIA:* ${i.natureza}\n📍 *LOCAL:* ${i.endereco.logradouro}, ${i.endereco.numero} - ${i.endereco.bairro}\n👤 *SOLICITANTE:* ${i.solicitante.nome} - ${i.solicitante.telefone}\n📝 *RELATO:* ${relatoLimpo}`;
+        const txt = `🚨 *OCORRÊNCIA:* ${i.natureza}\n📍 *LOCAL:* ${i.endereco.logradouro}, ${i.endereco.numero} - ${i.endereco.bairro}, ${i.endereco.cidade}\n📌 *REFERÊNCIA:* ${i.endereco.referencia || 'Sem ponto de referência'}\n👤 *SOLICITANTE:* ${i.solicitante.nome} - ${i.solicitante.telefone}\n📝 *RELATO:* ${relatoLimpo}`;
         
         await navigator.clipboard.writeText(txt);
         window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
