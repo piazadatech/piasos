@@ -85,6 +85,10 @@
             #modalOcorrencia .modal-footer { gap: 5px !important; justify-content: space-between; }
             #modalOcorrencia .modal-footer .btn { font-size: 9px !important; padding: 8px 4px !important; letter-spacing: -0.3px; flex: 1; text-align: center; }
             #modalOcorrencia .modal-footer .btn i { margin-right: 2px; }
+            
+            #modalAlerta .modal-footer { gap: 5px !important; justify-content: space-between; }
+            #modalAlerta .modal-footer .btn { font-size: 9px !important; padding: 8px 4px !important; letter-spacing: -0.3px; flex: 1; text-align: center; }
+            #modalAlerta .modal-footer .btn i { margin-right: 2px; }
         }
 
         /* CONTEÚDO PRINCIPAL */
@@ -124,12 +128,18 @@
         .panel-expanded { flex-basis: 90%; } /* Ajuste mobile */
         .panel-collapsed { flex-basis: 10%; background: var(--bg-header); cursor: pointer; }
         .panel-collapsed .monitor-body { display: none; }
-        .panel-collapsed .monitor-header { writing-mode: vertical-rl; text-orientation: mixed; height: 100%; justify-content: center; padding: 0; font-size: 14px; letter-spacing: 2px; }
+        .panel-collapsed .monitor-header { writing-mode: vertical-rl; text-orientation: mixed; height: 100%; justify-content: center; padding: 0; font-size: 14px; letter-spacing: 2px; display: flex; align-items: center; justify-content: center; }
+        .panel-collapsed .monitor-header i { writing-mode: horizontalr-tb; margin: 0 5px; transform: rotate(180deg); }
 
         /* MEDIA QUERIES (A Mágica) */
         @media (max-width: 1023px) {
             .desktop-monitor { display: none; }
             .mobile-monitor { display: flex; }
+            
+            /* Alertas - sem barra lateral */
+            #view-alertas .desktop-monitor { display: none; }
+            #view-alertas .mobile-monitor { display: none; }
+            #view-alertas #mobile-alertas { display: flex !important; }
         }
 
         /* Card Mobile */
@@ -240,6 +250,7 @@
                 <div class="nav-item active" id="nav-atendimento" onclick="navegar('atendimento')"><i class="fas fa-phone-alt"></i> <span class="nav-text">ATENDIMENTO</span></div>
                 <div class="nav-item" id="nav-triagem" onclick="navegar('triagem')"><i class="fas fa-list-alt"></i> <span class="nav-text">TRIAGEM</span></div>
                 <div class="nav-item" id="nav-monitoramento" onclick="navegar('monitoramento')"><i class="fas fa-broadcast-tower"></i> <span class="nav-text">MONITORAMENTO</span></div>
+                <div class="nav-item" id="nav-alertas" onclick="navegar('alertas')"><i class="fas fa-bullhorn"></i> <span class="nav-text">ALERTAS</span></div>
                 <div class="nav-item" id="nav-frota" onclick="navegar('frota')"><i class="fas fa-car"></i> <span class="nav-text">FROTA</span></div>
                 <div class="nav-item" id="nav-admin" onclick="navegar('admin')"><i class="fas fa-users-cog"></i> <span class="nav-text">ADMIN</span></div>
             </div>
@@ -259,34 +270,34 @@
                             <div class="section-box">
                                 <div class="section-title"><i class="fas fa-user"></i> Solicitante</div>
                                 <div style="display:flex; gap: 10px;">
-                                    <div style="flex:1"><label>Telefone</label><div class="input-wrapper"><i class="fas fa-phone icon-left"></i><input type="tel" id="solTel" maxlength="15" oninput="mascaraTelefone(this)"></div></div>
+                                    <div style="flex:1"><label>Telefone</label><div class="input-wrapper"><i class="fas fa-phone icon-left"></i><input type="tel" id="solTel" maxlength="15" oninput="mascaraTelefone(this)" tabindex="1"></div></div>
                                     <div style="flex:2">
                                         <label>Nome</label>
-                                        <div class="input-wrapper"><i class="fas fa-user icon-left"></i><input type="text" id="solNome"></div>
-                                        <div style="margin-top:6px; max-width:120px;"><button type="button" class="btn btn-sm btn-outline" onclick="toggleAnonimoBtn()">ANÔNIMO</button></div>
+                                        <div class="input-wrapper"><i class="fas fa-user icon-left"></i><input type="text" id="solNome" tabindex="2"></div>
+                                        <div style="margin-top:6px; max-width:120px;"><button type="button" class="btn btn-sm btn-outline" onclick="toggleAnonimoBtn()" tabindex="3">ANÔNIMO</button></div>
                                     </div>
                                 </div>
                             </div>
                             <div class="section-box">
                                 <div class="section-title"><i class="fas fa-map-marker-alt"></i> Local</div>
                                 <div style="display: flex; gap: 10px;">
-                                    <div style="width: 130px;"><label>CEP</label><div class="input-wrapper"><i class="fas fa-search icon-left"></i><input type="tel" id="endCep" onblur="buscarCep(this.value)" maxlength="9"></div></div>
-                                    <div style="flex: 1;"><label>Cidade</label><div class="input-wrapper"><i class="fas fa-city icon-left"></i><input type="text" id="endCidade"></div></div>
+                                    <div style="width: 130px;"><label>CEP</label><div class="input-wrapper"><i class="fas fa-search icon-left"></i><input type="tel" id="endCep" onblur="buscarCep(this.value)" maxlength="9" tabindex="4"></div></div>
+                                    <div style="flex: 1;"><label>Cidade</label><div class="input-wrapper"><i class="fas fa-city icon-left"></i><input type="text" id="endCidade" tabindex="5"></div></div>
                                 </div>
                                 <div style="position: relative;">
-                                    <label>Logradouro</label><div class="input-wrapper"><i class="fas fa-road icon-left"></i><input type="text" id="endLog" oninput="sugerirLogradouro(this.value)" autocomplete="off"></div>
+                                    <label>Logradouro</label><div class="input-wrapper"><i class="fas fa-road icon-left"></i><input type="text" id="endLog" oninput="sugerirLogradouro(this.value)" autocomplete="off" tabindex="6"></div>
                                     <div id="sugestoesLog" class="suggestions hidden"></div>
                                 </div>
                                 <div style="display: flex; gap: 10px;">
-                                    <div style="width: 130px;"><label>Nº</label><div class="input-wrapper"><i class="fas fa-hashtag icon-left"></i><input type="text" id="endNum"></div></div>
-                                    <div style="flex: 1;"><label>Bairro</label><div class="input-wrapper"><i class="fas fa-map icon-left"></i><input type="text" id="endBairro"></div></div>
+                                    <div style="width: 130px;"><label>Nº</label><div class="input-wrapper"><i class="fas fa-hashtag icon-left"></i><input type="text" id="endNum" tabindex="7"></div></div>
+                                    <div style="flex: 1;"><label>Bairro</label><div class="input-wrapper"><i class="fas fa-map icon-left"></i><input type="text" id="endBairro" tabindex="8"></div></div>
                                 </div>
                                 <div>
                                     <label>Referência</label>
-                                    <div class="input-wrapper"><i class="fas fa-map-pin icon-left"></i><input type="text" id="endRef"></div>
+                                    <div class="input-wrapper"><i class="fas fa-map-pin icon-left"></i><input type="text" id="endRef" tabindex="9"></div>
                                     <div style="margin-top:6px; display: flex; gap: 8px;">
-    <button type="button" class="btn btn-sm btn-outline" style="max-width:220px;" onclick="adicionarSemPontoReferencia()">SEM REFERÊNCIA</button>
-    <button type="button" class="btn btn-sm btn-outline" title="Verificar no Mapa" style="width: auto; padding: 6px 15px;" onclick="abrirMapaAtendimento()">
+    <button type="button" class="btn btn-sm btn-outline" style="max-width:220px;" onclick="adicionarSemPontoReferencia()" tabindex="10">SEM REFERÊNCIA</button>
+    <button type="button" class="btn btn-sm btn-outline" title="Verificar no Mapa" style="width: auto; padding: 6px 15px;" onclick="abrirMapaAtendimento()" tabindex="-1">
         <i class="fas fa-map-marked-alt" style="font-size:14px;"></i>
     </button>
 </div>
@@ -296,16 +307,16 @@
                                 <div class="section-title" style="display:flex; justify-content:space-between;">
                                     <span><i class="fas fa-tags"></i> Classificação</span>
                                     <div style="display:flex; gap:5px;">
-                                        <button type="button" class="btn btn-sm btn-info" id="tabPiasos" onclick="switchTabClassif('PIASOS')">PIASOS</button>
-                                        <button type="button" class="btn btn-sm btn-outline" id="tabSade" onclick="switchTabClassif('SADE')">SADE</button>
+                                        <button type="button" class="btn btn-sm btn-info" id="tabPiasos" onclick="switchTabClassif('PIASOS')" tabindex="-1">PIASOS</button>
+                                        <button type="button" class="btn btn-sm btn-outline" id="tabSade" onclick="switchTabClassif('SADE')" tabindex="-1">SADE</button>
                                     </div>
                                 </div>
                                 <div id="boxPiasos">
                                 <div class="classif-group"><span class="classif-label">PERIGO IMEDIATO</span>
                                     <div class="check-grid">
-                                        <div class="option-box"><input type="checkbox" id="p1" class="tag-check" value="ARMA DE FOGO"><label for="p1">ARMA DE FOGO</label></div>
-                                        <div class="option-box"><input type="checkbox" id="p2" class="tag-check" value="ARMA BRANCA"><label for="p2">ARMA BRANCA</label></div>
-                                        <div class="option-box"><input type="checkbox" id="p3" class="tag-check" value="EXPLOSIVO"><label for="p3">EXPLOSIVO</label></div>
+                                        <div class="option-box"><input type="checkbox" id="p1" class="tag-check" value="ARMA DE FOGO" tabindex="-1"><label for="p1" tabindex="-1">ARMA DE FOGO</label></div>
+                                        <div class="option-box"><input type="checkbox" id="p2" class="tag-check" value="ARMA BRANCA" tabindex="-1"><label for="p2" tabindex="-1">ARMA BRANCA</label></div>
+                                        <div class="option-box"><input type="checkbox" id="p3" class="tag-check" value="EXPLOSIVO" tabindex="-1"><label for="p3" tabindex="-1">EXPLOSIVO</label></div>
                                     </div>
                                 </div>
                                 <div class="classif-group"><span class="classif-label">LOCALIZAÇÃO AUTOR</span>
@@ -327,33 +338,33 @@
     <div class="classif-group">
         <span class="classif-label">HÁ PESSOAS FERIDAS EM RISCO DE MORTE?</span>
         <div class="check-grid">
-            <div class="option-box"><input type="radio" name="sdFeri" id="sdF2" class="sade-radio" value="FERIDOS (NÃO)"><label for="sdF2">NÃO</label></div>
-            <div class="option-box"><input type="radio" name="sdFeri" id="sdF1" class="sade-radio" value="FERIDOS (SIM)"><label for="sdF1">SIM</label></div>
-            <div class="option-box"><input type="radio" name="sdFeri" id="sdF3" class="sade-radio" value="FERIDOS (SUSPEITA)"><label for="sdF3">HÁ SUSPEITA</label></div>
+            <div class="option-box"><input type="radio" name="sdFeri" id="sdF2" class="sade-radio" value="FERIDOS (NÃO)" tabindex="-1"><label for="sdF2" tabindex="-1">NÃO</label></div>
+            <div class="option-box"><input type="radio" name="sdFeri" id="sdF1" class="sade-radio" value="FERIDOS (SIM)" tabindex="-1"><label for="sdF1" tabindex="-1">SIM</label></div>
+            <div class="option-box"><input type="radio" name="sdFeri" id="sdF3" class="sade-radio" value="FERIDOS (SUSPEITA)" tabindex="-1"><label for="sdF3" tabindex="-1">HÁ SUSPEITA</label></div>
         </div>
     </div>
     <div class="classif-group">
         <span class="classif-label">AUTOR DO FATO ESTÁ NO LOCAL?</span>
         <div class="check-grid">
-            <div class="option-box"><input type="radio" name="sdAutor" id="sdA2" class="sade-radio" value="AUTOR (NÃO)"><label for="sdA2">NÃO</label></div>
-            <div class="option-box"><input type="radio" name="sdAutor" id="sdA1" class="sade-radio" value="AUTOR (SIM)"><label for="sdA1">SIM</label></div>
-            <div class="option-box"><input type="radio" name="sdAutor" id="sdA3" class="sade-radio" value="AUTOR (SUSPEITA)"><label for="sdA3">HÁ SUSPEITA</label></div>
+            <div class="option-box"><input type="radio" name="sdAutor" id="sdA2" class="sade-radio" value="AUTOR (NÃO)" tabindex="-1"><label for="sdA2" tabindex="-1">NÃO</label></div>
+            <div class="option-box"><input type="radio" name="sdAutor" id="sdA1" class="sade-radio" value="AUTOR (SIM)" tabindex="-1"><label for="sdA1" tabindex="-1">SIM</label></div>
+            <div class="option-box"><input type="radio" name="sdAutor" id="sdA3" class="sade-radio" value="AUTOR (SUSPEITA)" tabindex="-1"><label for="sdA3" tabindex="-1">HÁ SUSPEITA</label></div>
         </div>
     </div>
     <div class="classif-group">
         <span class="classif-label">AUTOR DO FATO ESTÁ ARMADO?</span>
         <div class="check-grid">
-            <div class="option-box"><input type="radio" name="sdArma" id="sdAr2" class="sade-radio" value="ARMADO (NÃO)"><label for="sdAr2">NÃO</label></div>
-            <div class="option-box"><input type="radio" name="sdArma" id="sdAr1" class="sade-radio" value="ARMADO (SIM)"><label for="sdAr1">SIM</label></div>
-            <div class="option-box"><input type="radio" name="sdArma" id="sdAr3" class="sade-radio" value="ARMADO (SUSPEITA)"><label for="sdAr3">HÁ SUSPEITA</label></div>
+            <div class="option-box"><input type="radio" name="sdArma" id="sdAr2" class="sade-radio" value="ARMADO (NÃO)" tabindex="-1"><label for="sdAr2" tabindex="-1">NÃO</label></div>
+            <div class="option-box"><input type="radio" name="sdArma" id="sdAr1" class="sade-radio" value="ARMADO (SIM)" tabindex="-1"><label for="sdAr1" tabindex="-1">SIM</label></div>
+            <div class="option-box"><input type="radio" name="sdArma" id="sdAr3" class="sade-radio" value="ARMADO (SUSPEITA)" tabindex="-1"><label for="sdAr3" tabindex="-1">HÁ SUSPEITA</label></div>
         </div>
     </div>
     <div class="classif-group">
         <span class="classif-label">HÁ RISCO DE TUMULTO NO LOCAL?</span>
         <div class="check-grid">
-            <div class="option-box"><input type="radio" name="sdTum" id="sdT2" class="sade-radio" value="TUMULTO (NÃO)"><label for="sdT2">NÃO</label></div>
-            <div class="option-box"><input type="radio" name="sdTum" id="sdT1" class="sade-radio" value="TUMULTO (SIM)"><label for="sdT1">SIM</label></div>
-            <div class="option-box"><input type="radio" name="sdTum" id="sdT3" class="sade-radio" value="TUMULTO (SUSPEITA)"><label for="sdT3">HÁ SUSPEITA</label></div>
+            <div class="option-box"><input type="radio" name="sdTum" id="sdT2" class="sade-radio" value="TUMULTO (NÃO)" tabindex="-1"><label for="sdT2" tabindex="-1">NÃO</label></div>
+            <div class="option-box"><input type="radio" name="sdTum" id="sdT1" class="sade-radio" value="TUMULTO (SIM)" tabindex="-1"><label for="sdT1" tabindex="-1">SIM</label></div>
+            <div class="option-box"><input type="radio" name="sdTum" id="sdT3" class="sade-radio" value="TUMULTO (SUSPEITA)" tabindex="-1"><label for="sdT3" tabindex="-1">HÁ SUSPEITA</label></div>
         </div>
     </div>
 </div>
@@ -366,30 +377,30 @@
     <label>Natureza</label>
     <div class="input-wrapper">
         <i class="fas fa-exclamation-circle icon-left"></i>
-        <input type="text" id="ocNatureza" placeholder="" autocomplete="off" oninput="sugerirNatureza(this.value)">
+        <input type="text" id="ocNatureza" placeholder="" autocomplete="off" oninput="sugerirNatureza(this.value)" tabindex="11">
     </div>
     <div id="sugestoesNatureza" class="suggestions hidden"></div>
 </div>
                                 <div class="input-wrapper"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
     <label style="margin:0;">Descrição</label>
     <div style="display:flex; gap:5px;">
-        <button type="button" class="btn-copy" onclick="configurarGroq()" title="Config API Groq"><i class="fas fa-cog"></i></button>
-        <button type="button" class="btn-copy" id="btnDesfazerPui" onclick="desfazerPui()" disabled title="Desfazer"><i class="fas fa-undo"></i></button>
-        <button type="button" class="btn btn-sm btn-info" onclick="aplicarPui()" style="padding:2px 8px; font-size:10px;"><i class="fas fa-magic"></i> PUI</button>
+        <button type="button" class="btn-copy" onclick="configurarGroq()" title="Config API Groq" tabindex="-1"><i class="fas fa-cog"></i></button>
+        <button type="button" class="btn-copy" id="btnDesfazerPui" onclick="desfazerPui()" disabled title="Desfazer" tabindex="-1"><i class="fas fa-undo"></i></button>
+        <button type="button" class="btn btn-sm btn-info" onclick="aplicarPui()" style="padding:2px 8px; font-size:10px;" tabindex="-1"><i class="fas fa-magic"></i> PUI</button>
     </div>
-</div><textarea id="ocRelato" style="height: 100px; padding-left:10px; resize:none;"></textarea></div>
+</div><textarea id="ocRelato" style="height: 100px; padding-left:10px; resize:none;" tabindex="12"></textarea></div>
                             </div>
                             <div class="section-box">
                                 <div class="section-title"><i class="fas fa-car"></i> Veículos / Suspeitos</div>
-                                <div style="margin-bottom: 15px;"><label>Veículo</label><div style="display: flex; gap: 5px;"><input type="text" id="vPlaca" placeholder="PLACA" style="width: 100px; text-transform: uppercase; transition: 0.3s background-color;" onblur="consultarPlacaApi()"><input type="text" id="vDesc" placeholder="Descrição"><button type="button" class="btn btn-sm" onclick="addVeiculo()" style="background:var(--input-bg); color:var(--text-light); border:1px solid var(--border);"><i class="fas fa-plus"></i></button></div><div id="listaVeiculos" class="dynamic-list"></div></div>
-                                <div><label>Suspeito</label><div style="display: flex; gap: 5px;"><input type="text" id="sNome" placeholder="Características..."><button type="button" class="btn btn-sm" onclick="addSuspeito()" style="background:var(--input-bg); color:var(--text-light); border:1px solid var(--border);"><i class="fas fa-plus"></i></button></div><div id="listaSuspeitos" class="dynamic-list"></div></div>
+                                <div style="margin-bottom: 15px;"><label>Veículo</label><div style="display: flex; gap: 5px;"><input type="text" id="vPlaca" placeholder="PLACA" style="width: 100px; text-transform: uppercase; transition: 0.3s background-color;" onblur="consultarPlacaApi()" tabindex="-1"><input type="text" id="vDesc" placeholder="Descrição" tabindex="-1"><button type="button" class="btn btn-sm" onclick="addVeiculo()" style="background:var(--input-bg); color:var(--text-light); border:1px solid var(--border);" tabindex="-1"><i class="fas fa-plus"></i></button></div><div id="listaVeiculos" class="dynamic-list"></div></div>
+                                <div><label>Suspeito</label><div style="display: flex; gap: 5px;"><input type="text" id="sNome" placeholder="Características..." tabindex="-1"><button type="button" class="btn btn-sm" onclick="addSuspeito()" style="background:var(--input-bg); color:var(--text-light); border:1px solid var(--border);" tabindex="-1"><i class="fas fa-plus"></i></button></div><div id="listaSuspeitos" class="dynamic-list"></div></div>
                             </div>
                             <div class="action-btns-wrapper" style="display: flex; gap: 10px; flex-wrap: wrap;">
                                 <button type="button" class="btn btn-danger" id="btnGerar" onclick="salvar('DESPACHO')" style="flex: 1; min-width: 150px;">GERAR OCORRÊNCIA</button>
-                                <button type="button" class="btn btn-success" id="btnGerarComplementar" onclick="salvarComplementar()" style="flex: 1; min-width: 150px;">GERAR E COMPLEMENTAR</button>
-                                <button type="button" class="btn btn-info" id="btnTriagem" onclick="salvar('TRIAGEM')" style="flex: 1; min-width: 150px;">TRIAGEM</button>
-                                <button type="button" class="btn" onclick="alert('Módulo de Informativos em desenvolvimento.')" style="flex: 1; min-width: 150px; background: var(--warning); color: white;"><i class="fas fa-bullhorn"></i> INFORMATIVO</button>
-                                <button type="button" class="btn" onclick="limparAtendimento()" style="flex: 1; min-width: 150px; background: var(--input-bg); color: var(--text-light); border: 1px solid var(--border);"><i class="fas fa-broom"></i> LIMPAR</button>
+                                <button type="button" class="btn btn-success" id="btnGerarComplementar" onclick="salvarComplementar()" style="flex: 1; min-width: 150px;" tabindex="-1">GERAR E COMPLEMENTAR</button>
+                                <button type="button" class="btn btn-info" id="btnTriagem" onclick="salvar('TRIAGEM')" style="flex: 1; min-width: 150px;" tabindex="-1">TRIAGEM</button>
+                                <button type="button" class="btn btn-warning" onclick="salvarComoAlerta()" style="flex: 1; min-width: 150px;" tabindex="-1"><i class="fas fa-bullhorn"></i> ALERTA</button>
+                                <button type="button" class="btn" onclick="limparAtendimento()" style="flex: 1; min-width: 150px; background: var(--input-bg); color: var(--text-light); border: 1px solid var(--border);" tabindex="-1"><i class="fas fa-broom"></i> LIMPAR</button>
                             </div>
                         </div>
                     </div>
@@ -614,6 +625,39 @@
                         <div class="modal-footer"><button class="btn btn-sm" onclick="criarViatura()">Criar</button><button class="btn btn-sm btn-outline" onclick="fecharModal('modalNovaViatura')">Cancelar</button></div>
                     </div>
                 </div>
+
+            </div>
+
+            <div id="view-alertas" class="hidden" style="height:100%; display:flex; flex-direction:column;">
+                
+                <div class="desktop-monitor">
+                    <div class="monitor-col" style="border-top: 3px solid #8b5cf6;">
+                        <div class="monitor-header">
+                            <span><i class="fas fa-bullhorn"></i> Alertas</span>
+                            <span id="deskCountAlertas">0</span>
+                        </div>
+                        <div class="monitor-body">
+                            <table class="monitor-table">
+                                <thead><tr><th style="width:10%;">RISCO</th><th style="width:25%;">NATUREZA</th><th style="width:15%;">CIDADE</th><th style="width:20%;">LOGRADOURO</th><th style="width:15%;">BAIRRO</th><th style="width:15%;">DATA/HORA/TIMER</th></tr></thead>
+                                <tbody id="tableAlertas"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="mobile-alertas" style="display:none; flex:1; flex-direction:column; overflow:hidden;">
+                    <div style="padding:15px; background:var(--card-bg); border-bottom:2px solid #8b5cf6; flex-shrink:0;">
+                        <h3 style="margin:0; font-size:16px;"><i class="fas fa-bullhorn"></i> Alertas</h3>
+                    </div>
+                    <div id="mobAletasBody" style="flex:1; overflow-y:auto; padding:10px; display:flex; flex-direction:column; gap:10px;"></div>
+                </div>
+
+                <div style="padding:10px; background:var(--card-bg); border-top:1px solid var(--border); flex-shrink:0;">
+                    <input type="text" id="filtroAlertas" placeholder="🔍 Buscar por natureza, área, solicitante..." 
+                        style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--border); border-radius:6px; color:var(--text-light); font-size:13px;"
+                        oninput="filtrarAlertas(this.value)">
+                </div>
+
             </div>
         </div>
         
@@ -644,7 +688,7 @@
     </div>
 
     <!-- MODAL DE COMPLEMENTAÇÃO -->
-    <div id="modalComplementacao" class="modal-overlay" style="z-index: 220;">
+    <div id="modalComplementacao" class="modal-overlay" style="z-index: 260;">
         <div class="modal-content" style="max-width:500px;">
             <div class="modal-header">
                 <h3>Complementar Ocorrência</h3>
@@ -663,7 +707,7 @@
         </div>
     </div>
 
-<div id="modalEditarEndereco" class="modal-overlay" style="z-index: 230;">
+<div id="modalEditarEndereco" class="modal-overlay" style="z-index: 260;">
         <div class="modal-content" style="max-width:600px;">
             <div class="modal-header">
                 <h3>Editar Endereço</h3>
@@ -695,11 +739,14 @@
 
     <!-- DRAWERS MONITORAMENTO -->
     <!-- MODAIS MONITORAMENTO -->
-    <div id="modalOcorrencia" class="modal-overlay">
+    <div id="modalOcorrencia" class="modal-overlay" style="z-index:250;">
         <div class="modal-content" style="max-width:700px; max-height:85vh;">
             <div class="modal-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
                 <div>
-                    <h3 id="mo-natureza" style="margin:0 0 8px 0; font-size:18px;">Ocorrência</h3>
+                    <div style="display:flex; align-items:baseline; gap:15px; margin-bottom:8px;">
+                        <h3 id="mo-natureza" style="margin:0; font-size:18px;">Ocorrência</h3>
+                        <div id="mo-criado-em" style="font-size:12px; color:var(--text-muted); font-weight:500;">Gerado em: --</div>
+                    </div>
                     <div style="display:flex; gap:15px; font-size:11px; color:var(--text-muted);">
                         <span id="mo-id">ID: --</span>
                         <span id="mo-timer">00:00</span>
@@ -750,7 +797,64 @@
         </div>
     </div>
 
-    <div id="modalFinalizacao" class="modal-overlay">
+    <div id="modalAlerta" class="modal-overlay" style="z-index:250;">
+        <div class="modal-content" style="max-width:700px; max-height:85vh;">
+            <div class="modal-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div>
+                    <div style="display: flex; align-items: center; gap:15px; margin-bottom:8px;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <h3 id="ma-natureza" style="margin:0; font-size:18px;">Alerta</h3>
+                            <span style="background:#8b5cf6; color:white; padding:2px 8px; border-radius:12px; font-size:12px;">ALERTA</span>
+                        </div>
+                        <div id="ma-criado-em" style="font-size:12px; color:var(--text-muted); font-weight:500;">Gerado em: --</div>
+                    </div>
+                    <div style="display:flex; gap:15px; font-size:11px; color:var(--text-muted);">
+                        <span id="ma-id">ID: --</span>
+                        <span id="ma-timer">00:00</span>
+                    </div>
+                    <div id="ma-tags" style="display:flex; gap:4px; flex-wrap:wrap; margin-top:8px;"></div>
+                </div>
+                <div style="display:flex; gap:15px; align-items:center;">
+                    <i class="fas fa-copy" id="ma-iconeCopiarSade" title="Copiar p/ SADE" style="cursor:pointer; font-size:18px; color:var(--text-muted); transition:0.2s;"></i>
+                    <i class="fab fa-whatsapp" onclick="compartilharWhatsApp(idAlertaAberto)" title="Compartilhar WhatsApp" style="cursor:pointer; font-size:18px; color:var(--text-muted); transition:0.2s;"></i>
+                    <i class="fas fa-times" onclick="fecharModal('modalAlerta')" style="cursor:pointer; font-size:20px; color:var(--text-muted);"></i>
+                </div>
+            </div>
+            <div class="modal-body" style="display:flex; flex-direction:column; gap:15px;">
+                <div class="modal-grid-responsive" style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                <div style="padding:12px; background:var(--bg-header); border:1px solid var(--border); border-radius:6px;">
+                    <div class="drawer-section-title"><i class="fas fa-map-pin"></i> Local</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                        <div id="ma-endereco" style="font-size:12px; line-height:1.4;">Endereço</div>
+                        <button class="btn btn-sm btn-outline" id="ma-btn-mapa" title="Abrir no Mapa" style="padding:10px;"><i class="fas fa-map-marked-alt" style="font-size:16px;"></i></button>
+                    </div>
+                </div>
+                <div style="padding:12px; background:var(--bg-header); border:1px solid var(--border); border-radius:6px;">
+                    <div class="drawer-section-title"><i class="fas fa-user"></i> Solicitante</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                        <div>
+                            <div id="ma-nome" style="font-size:12px;">Nome: --</div>
+                            <div id="ma-telefone" style="font-size:12px;">Tel: --</div>
+                        </div>
+                        <a href="#" id="ma-btn-ligar" title="Ligar" style="color: var(--text-muted); font-size: 16px; margin-left: 8px; text-decoration: none; transition: 0.2s;"><i class="fas fa-phone"></i></a>
+                    </div>
+                </div>
+                </div>
+                <div style="padding:12px; background:var(--bg-header); border:1px solid var(--border); border-radius:6px;">
+                    <div class="drawer-section-title"><i class="fas fa-history"></i> Descrição</div>
+                    <div id="ma-historico" style="font-size:12px; line-height:1.5; color:var(--text-light);">Nenhuma informação</div>
+                </div>
+            </div>
+            <div class="modal-footer" style="display:flex; gap:10px;">
+                <button class="btn" onclick="abrirComplementoMonitoramento()" style="width: auto; background: var(--secondary); color: white;">COMPLEMENTAR</button>
+                <button class="btn btn-info" onclick="editarEndereco()"><i class="fas fa-pen"></i> Editar Endereço</button>
+                <button class="btn btn-success" onclick="promoverAlertaFromModal(idAlertaAberto)"><i class="fas fa-level-up-alt"></i> PROMOVER</button>
+                <button class="btn btn-danger" onclick="finalizarOcorrenciaModal(idAlertaAberto)"><i class="fas fa-flag"></i> Finalizar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalFinalizacao" class="modal-overlay" style="z-index: 260;">
         <div class="modal-content" style="max-width:400px;">
             <div class="modal-header">
                 <h3 style="margin:0;">Finalizar Ocorrência</h3>
@@ -773,7 +877,7 @@
         </div>
     </div>
 
-    <div id="modalSelecaoFrota" class="modal-overlay" style="z-index:210;">
+    <div id="modalSelecaoFrota" class="modal-overlay" style="z-index:260;">
         <div class="modal-content" style="max-width:500px;">
             <div class="modal-header">
                 <h3 style="margin:0;">Selecionar Viatura</h3>
@@ -857,8 +961,14 @@ async function aplicarPui() {
             if(sessao) { usuarioAtual = JSON.parse(sessao); mostrarApp(); } 
             else { document.getElementById('login-wrapper').style.display = 'flex'; }
             
-            // Loop de atualização automática do monitoramento a cada 60 segundos
+            // Loop de atualização de dados do monitoramento a cada 60 segundos (busca no banco)
             setInterval(() => { const vm = document.getElementById('view-monitoramento'); if(vm && !vm.classList.contains('hidden')) carregarMonitoramento(); }, 60000);
+            
+            // Loop de atualização visual dos timers a cada 1 segundo (sem piscagem)
+            setInterval(() => { const vm = document.getElementById('view-monitoramento'); if(vm && !vm.classList.contains('hidden')) atualizarTimersMonitoramento(); }, 1000);
+            
+            // Loop de atualização automática dos alertas a cada 60 segundos
+            setInterval(() => { const va = document.getElementById('view-alertas'); if(va && !va.classList.contains('hidden')) carregarAlertas(); }, 60000);
 
             // Permite desmarcar rádios com duplo clique (ou clique sobre já selecionado)
             document.querySelectorAll('.tag-radio').forEach(radio => {
@@ -887,8 +997,55 @@ async function aplicarPui() {
             return await res.json();
         }
 
+        function obterCodigoStatusOcorrencia(oc) {
+            // Retorna APENAS o código de status (C/D/L/S) - para futuras implementações
+            // C = CRIADA | D = DESPACHADA | L = NO LOCAL | S = SAIU
+            
+            if (oc.hora_saida) return 'S';
+            if (oc.hora_local) return 'L';
+            if (oc.hora_despacho) return 'D';
+            return 'C';
+        }
+
+        function calcularTimerTatico(oc) {
+            // Calcula timer baseado na última atualização de status
+            // Hierarquia: S > L > D > C (usa a mais recente)
+            
+            let baseTimeStr = oc.criado_em; // Padrão: Hora de criação
+
+            if (oc.hora_saida) {
+                baseTimeStr = oc.hora_saida;
+            } else if (oc.hora_local) {
+                baseTimeStr = oc.hora_local;
+            } else if (oc.hora_despacho) {
+                baseTimeStr = oc.hora_despacho;
+            }
+
+            if (!baseTimeStr) return '--/-- --:--';
+
+            const baseTime = new Date(baseTimeStr);
+            const agora = new Date();
+            const diffMs = agora - baseTime;
+            const diffMinutes = Math.floor(diffMs / 60000);
+
+            const dia = String(baseTime.getDate()).padStart(2, '0');
+            const mes = String(baseTime.getMonth() + 1).padStart(2, '0');
+            const hora = String(baseTime.getHours()).padStart(2, '0');
+            const min = String(baseTime.getMinutes()).padStart(2, '0');
+            const dataHoraFmt = `${dia}/${mes} ${hora}:${min}`;
+
+            let duracaoFmt = `${diffMinutes}m`;
+            if (diffMinutes >= 60) {
+                const h = Math.floor(diffMinutes / 60);
+                const m = diffMinutes % 60;
+                duracaoFmt = `${h}h ${m}m`;
+            }
+
+            return `${dataHoraFmt} (${duracaoFmt})`;
+        }
+
         function navegar(tela) {
-            ['atendimento', 'triagem', 'monitoramento', 'frota', 'admin'].forEach(t => {
+            ['atendimento', 'triagem', 'monitoramento', 'frota', 'alertas', 'admin'].forEach(t => {
                 const el = document.getElementById('view-'+t);
                 const nav = document.getElementById('nav-'+t);
                 if(el) el.classList.add('hidden');
@@ -905,6 +1062,7 @@ async function aplicarPui() {
             if(tela === 'triagem') carregarTriagem();
             if(tela === 'monitoramento') { carregarMonitoramento(); expandMob('wait'); }
             if(tela === 'frota') carregarFrota();
+            if(tela === 'alertas') { carregarAlertas(); }
             if(tela === 'admin') {
                 // Abre aba usuários por padrão se nenhuma estiver ativa
                 if(document.getElementById('admin-usuarios').classList.contains('hidden')) adminSwitch('usuarios');
@@ -1224,7 +1382,14 @@ async function aplicarPui() {
                 document.getElementById('vPlaca').style.backgroundColor = 'var(--input-bg)';
             }
         }
-        function fecharModal(id) { document.getElementById(id).style.display='none'; }
+        function fecharModal(id) { 
+            document.getElementById(id).style.display='none'; 
+            // Limpar timers ativos
+            if(id === 'modalOcorrencia' && timerIntervalOcorrencia) {
+                clearInterval(timerIntervalOcorrencia);
+                timerIntervalOcorrencia = null;
+            }
+        }
         function addSuspeito() { 
             const v = document.getElementById('sNome').value.toUpperCase(); 
             if(v) { 
@@ -1345,7 +1510,13 @@ async function aplicarPui() {
         }
 
         function abrirComplementoMonitoramento() {
-            ultimaOcorrenciaGerada = idOcorrenciaAberta;
+            // Funciona para alertas e ocorrências (em monitoramento)
+            const id = idAlertaAberto || idOcorrenciaAberta;
+            if(!id) {
+                alert('Nenhuma ocorrência aberta para complementar.');
+                return;
+            }
+            ultimaOcorrenciaGerada = id;
             document.getElementById('comp_relato').value = '';
             document.getElementById('modalComplementacao').style.display = 'flex';
         }
@@ -1374,6 +1545,14 @@ async function aplicarPui() {
                 const horaFormatada = horaAtual.getHours().toString().padStart(2, '0') + ':' + horaAtual.getMinutes().toString().padStart(2, '0');
                 const novoResumo = oc.resumo_texto + (relato ? `\n\n[COMPLEMENTO - ${horaFormatada}]: ${relato}` : '');
                 
+                // TODO: Quando tb_ocorrencias_complementos existir, inserir registro lá também:
+                // await api('tb_ocorrencias_complementos', '', 'POST', {
+                //     ocorrencia_id: ultimaOcorrenciaGerada,
+                //     tipo: 'COMPLEMENTO',
+                //     texto: relato,
+                //     criado_em: horaAtual
+                // });
+                
                 await api('tb_triagem', `id=eq.${ultimaOcorrenciaGerada}`, 'PATCH', {
                     resumo_texto: novoResumo,
                     dados_preenchidos: dados
@@ -1384,7 +1563,130 @@ async function aplicarPui() {
                 if(document.getElementById('modalOcorrencia').style.display === 'flex') { abrirModalOcorrencia(ultimaOcorrenciaGerada); carregarMonitoramento(); }
                 ultimaOcorrenciaGerada = null;
             } catch(e) {
+                console.error('Erro ao salvar complementação:', e);
                 alert('Erro ao salvar: '+e.message);
+            }
+        }
+
+        async function salvarComoAlerta() {
+            if(document.getElementById('vPlaca').value || document.getElementById('vDesc').value) addVeiculo();
+            if(document.getElementById('sNome').value) addSuspeito();
+            const checks = Array.from(document.querySelectorAll('.tag-check:checked')).map(c=>c.value);
+            const radios = Array.from(document.querySelectorAll('.tag-radio:checked, .sade-radio:checked')).map(c=>c.value);
+            const tags = [...checks, ...radios];
+            
+            const dados = {
+                solicitante: {
+                    nome: document.getElementById('solNome').value.toUpperCase(),
+                    telefone: document.getElementById('solTel').value
+                },
+                endereco: {
+                    cep: document.getElementById('endCep').value,
+                    cidade: document.getElementById('endCidade').value.toUpperCase(),
+                    logradouro: document.getElementById('endLog').value.toUpperCase(),
+                    numero: document.getElementById('endNum').value.toUpperCase(),
+                    bairro: document.getElementById('endBairro').value.toUpperCase(),
+                    referencia: document.getElementById('endRef').value.toUpperCase(),
+                    formatado: `${document.getElementById('endLog').value.toUpperCase()}, ${document.getElementById('endNum').value.toUpperCase()} - ${document.getElementById('endBairro').value.toUpperCase()}, ${document.getElementById('endCidade').value.toUpperCase()}`
+                },
+                classificacoes: tags,
+                veiculos: veiculosArray.map(v => ({ placa: v.placa ? v.placa.toUpperCase() : v.placa, desc: v.desc ? v.desc.toUpperCase() : v.desc })),
+                suspeitos: suspeitosArray.map(s => s ? s.toUpperCase() : s),
+                natureza: document.getElementById('ocNatureza').value.toUpperCase(),
+                prioridade: calcularRisco(tags)
+            };
+            const payload = {
+                atendente_origem_id: usuarioAtual.id,
+                status: 'ALERTA',
+                resumo_texto: document.getElementById('ocRelato').value.toUpperCase(),
+                dados_preenchidos: dados
+            };
+            try {
+                if(idEmEdicao) await api('tb_triagem', `id=eq.${idEmEdicao}`, 'PATCH', payload);
+                else await api('tb_triagem', '', 'POST', payload);
+                alert('Alerta salvo!'); limparAtendimento(); navegar('atendimento');
+            } catch(e){ alert(e.message); }
+        }
+
+        async function carregarAlertas() {
+            const tbAlertas = document.getElementById('tableAlertas');
+            const mobAlertas = document.getElementById('mobAletasBody');
+            
+            if(!tbAlertas || !mobAlertas) return;
+            tbAlertas.innerHTML=''; mobAlertas.innerHTML='';
+            
+            try {
+                const data = await api('tb_triagem', 'status=eq.ALERTA&order=criado_em.desc');
+                let ca=0;
+
+                data.forEach(d => {
+                    const info = d.dados_preenchidos;
+                    const isCrit = info.prioridade==='CRITICA';
+                    const icon = isCrit ? '🚨' : '⚠️';
+                    
+                    // Monta string de busca para filtro
+                    const textoBusca = [
+                        info.natureza, 
+                        info.endereco.logradouro, 
+                        info.endereco.bairro, 
+                        info.solicitante.nome, 
+                        info.solicitante.telefone
+                    ].join(' ').toLowerCase().replace(/"/g, '');
+
+                    const atributoBusca = `data-busca="${textoBusca}"`;
+
+                    // ===== TABELA DESKTOP (ALERTAS) =====
+                    const enderecoDicaCurtaAddress = `${info.endereco.logradouro}, ${info.endereco.numero}`;
+                    
+                    const tr = `<tr onclick="abrirModalAlerta('${d.id}')" style="cursor:pointer; ${isCrit?'color:#ff6b6b':''}" ${atributoBusca}>
+        <td style="width:10%;">${icon}</td>
+        <td style="width:25%;">${info.natureza}</td>
+        <td style="width:15%;">${info.endereco.cidade}</td>
+        <td style="width:20%;">${enderecoDicaCurtaAddress}</td>
+        <td style="width:15%;">${info.endereco.bairro}</td>
+        <td style="width:15%; font-weight:600; color:#8b5cf6;">${calcularTimerTatico(d)}</td>
+    </tr>`;
+                    
+                    const card = `<div class="card-mobile" style="border-left-color:#8b5cf6" onclick="abrirModalAlerta('${d.id}')" ${atributoBusca}>
+        <div style="display:flex;justify-content:space-between;font-weight:bold;font-size:13px;margin-bottom:5px;"><span>${info.natureza}</span><span>${calcularTimerTatico(d)}</span></div>
+        <div style="font-size:11px;color:#aaa;margin-bottom:5px;">${info.endereco.formatado}</div>
+        <div style="display:flex;gap:5px;">
+            ${isCrit ? `<span class="card-tag" style="background:var(--danger);color:white">CRÍTICO</span>` : ''}
+            <a href="tel:+55${info.solicitante.telefone}" title="Ligar" style="color: var(--text-muted); font-size: 16px; margin-left: 10px; transition: 0.2s;"><i class="fas fa-phone"></i></a>
+        </div>
+    </div>`;
+                    
+                    tbAlertas.innerHTML+=tr; 
+                    mobAlertas.innerHTML+=card; 
+                    ca++;
+                });
+                
+                document.getElementById('deskCountAlertas').innerText = ca;
+
+            } catch(e) { console.log(e); }
+        }
+
+        function filtrarAlertas(termo) {
+            const termo_lower = termo.toLowerCase();
+            const linhas = document.querySelectorAll('#tableAlertas tr, #mobAletasBody .card-mobile');
+            linhas.forEach(linha => {
+                const busca = linha.getAttribute('data-busca') || '';
+                linha.style.display = busca.includes(termo_lower) ? '' : 'none';
+            });
+        }
+
+        async function promoverAlerta(id) {
+            if(!confirm('Tem a certeza que deseja promover este Alerta a Ocorrência?')) return;
+            try {
+                // Atualiza o status para pendente e renova o horário para o momento da promoção
+                await api('tb_triagem', `id=eq.${id}`, 'PATCH', { 
+                    status: 'pendente',
+                    data: new Date().toISOString() // Faz a ocorrência "nascer" agora no monitoramento
+                });
+                fecharModal('modalOcorrencia');
+                navegar('monitoramento');
+            } catch(e) {
+                alert('Erro ao promover o alerta.');
             }
         }
 
@@ -1488,6 +1790,36 @@ async function aplicarPui() {
             }
         }
 
+        function atualizarTimersMonitoramento() {
+            // Atualiza APENAS os timers visualmente (sem redesenhar tabela/recarregar dados)
+            // Procura por todas as células de timer e recalcula baseado no timestamp armazenado
+            
+            document.querySelectorAll('[data-timestamp]').forEach(cell => {
+                const baseTimeStr = cell.getAttribute('data-timestamp');
+                if (!baseTimeStr) return;
+                
+                const baseTime = new Date(baseTimeStr);
+                const agora = new Date();
+                const diffMs = agora - baseTime;
+                const diffMinutes = Math.floor(diffMs / 60000);
+                
+                const dia = String(baseTime.getDate()).padStart(2, '0');
+                const mes = String(baseTime.getMonth() + 1).padStart(2, '0');
+                const hora = String(baseTime.getHours()).padStart(2, '0');
+                const min = String(baseTime.getMinutes()).padStart(2, '0');
+                const dataHoraFmt = `${dia}/${mes} ${hora}:${min}`;
+                
+                let duracaoFmt = `${diffMinutes}m`;
+                if (diffMinutes >= 60) {
+                    const h = Math.floor(diffMinutes / 60);
+                    const m = diffMinutes % 60;
+                    duracaoFmt = `${h}h ${m}m`;
+                }
+                
+                cell.innerText = `${dataHoraFmt} (${duracaoFmt})`;
+            });
+        }
+
         // --- MONITORAMENTO ---
         async function carregarMonitoramento() {
             const tbWait = document.getElementById('tableWait');
@@ -1537,11 +1869,11 @@ async function aplicarPui() {
         <td style="width:30%;">${info.natureza}</td>
         <td style="width:15%;" title="${enderecoDicaCurtaAddress}">${info.endereco.cidade}</td>
         <td style="width:20%;" title="${enderecoDicaCurtaAddress}">${info.endereco.bairro}</td>
-        <td style="width:25%; font-weight:600; color:var(--warning);">${dhTxtW} ${timerTxtW}</td>
+        <td style="width:25%; font-weight:600; color:var(--warning);">${calcularTimerTatico(d)}</td>
     </tr>`;
                         
                         const card = `<div class="card-mobile" style="border-left-color:${isCrit?'var(--danger)':'var(--warning)'}" onclick="abrirModalOcorrencia('${d.id}')" ${atributoBusca}>
-        <div style="display:flex;justify-content:space-between;font-weight:bold;font-size:13px;margin-bottom:5px;"><span>${info.natureza}</span><span>${dhTxtW} ${timerTxtW}</span></div>
+        <div style="display:flex;justify-content:space-between;font-weight:bold;font-size:13px;margin-bottom:5px;"><span>${info.natureza}</span><span>${calcularTimerTatico(d)}</span></div>
         <div style="font-size:11px;color:#aaa;margin-bottom:5px;">${info.endereco.formatado}</div>
         <div style="display:flex;gap:5px;">
             ${isCrit ? `<span class="card-tag" style="background:var(--danger);color:white">CRÍTICO</span>` : ''}
@@ -1564,8 +1896,13 @@ async function aplicarPui() {
                         const enderecoDicaCurtaAddress = `${info.endereco.logradouro}, ${info.endereco.numero}`;
                         
                         const statusTatico = principal ? (principal.status_deslocamento || 'DESPACHADA') : 'DESPACHADA';
-                        const horaRef = principal ? (principal.hora_status || d.criado_em) : d.criado_em;
-                        const hData = new Date(horaRef);
+                        // Determinar baseTimeRef para EM_ANDAMENTO (última atualização)
+                        let baseTimeRef = d.criado_em;
+                        if (d.hora_saida) baseTimeRef = d.hora_saida;
+                        else if (d.hora_local) baseTimeRef = d.hora_local;
+                        else if (d.hora_despacho) baseTimeRef = d.hora_despacho;
+                        
+                        const hData = new Date(baseTimeRef);
                         const diffM = Math.floor((new Date() - hData)/60000);
                         const timerTxt = diffM >= 0 ? `(${diffM.toString().padStart(2,'0')}m)` : '(00m)';
                         const dhTxt = `${hData.getDate().toString().padStart(2,'0')}/${(hData.getMonth()+1).toString().padStart(2,'0')} ${hData.getHours().toString().padStart(2,'0')}:${hData.getMinutes().toString().padStart(2,'0')}`;
@@ -1575,7 +1912,7 @@ async function aplicarPui() {
                             <td style="width:20%;">${info.natureza}</td>
                             <td style="width:15%;" title="${enderecoDicaCurtaAddress}">${info.endereco.cidade}</td>
                             <td style="width:15%;" title="${enderecoDicaCurtaAddress}">${info.endereco.bairro}</td>
-                            <td style="width:23%; font-weight:600; color:var(--info);">${dhTxt} ${timerTxt}</td>
+                            <td style="width:23%; font-weight:600; color:var(--info);" data-timestamp="${baseTimeRef}">${calcularTimerTatico(d)}</td>
                             <td style="width:15%; font-weight:bold;">${statusTatico}</td>
                         </tr>`;
                         tbAct.innerHTML+=trPrincipal;
@@ -1593,7 +1930,7 @@ async function aplicarPui() {
                         
                         // Card Mobile (só principal)
                         const card = `<div class="card-mobile" style="border-left-color:var(--success)" onclick="abrirModalOcorrencia('${d.id}')" ${atributoBusca}>
-                            <div style="display:flex;justify-content:space-between;font-weight:bold;font-size:13px;margin-bottom:5px;"><span>${info.natureza}</span><span>${hora}</span></div>
+                            <div style="display:flex;justify-content:space-between;font-weight:bold;font-size:13px;margin-bottom:5px;"><span>${info.natureza}</span><span>${calcularTimerTatico(d)}</span></div>
                             <div style="font-size:11px;color:#aaa;margin-bottom:5px;">${info.endereco.formatado}</div>
                             <div style="display:flex;gap:5px; flex-wrap:wrap;">
                                 <span class="card-tag" style="background:var(--success);color:black">🚔 ${prefixoPrincipal}</span>
@@ -1882,24 +2219,187 @@ async function aplicarPui() {
         // Funções dos Drawers
         // VARIÁVEIS GLOBAIS MODAIS - já declaradas no topo
 
+        // ========== NOVO SISTEMA DE MODAL DE ALERTAS ==========
+        let idAlertaAberto = null;
+
+        async function abrirModalAlerta(id) {
+            // Garantir que id é string
+            if (!id) {
+                alert('ID de alerta inválido');
+                return;
+            }
+            id = String(id).trim();
+            
+            idAlertaAberto = id;
+            try {
+                const dados = await api('tb_triagem', `id=eq.${id}&select=*`);
+                if(!dados || !dados.length) {
+                    console.error('Nenhum dado encontrado para alerta:', id);
+                    return;
+                }
+                
+                const d = dados[0];
+                const info = d.dados_preenchidos;
+                
+                // Verificar se info existe
+                if(!info) {
+                    console.error('dados_preenchidos não existe:', d);
+                    return;
+                }
+                
+                document.getElementById('ma-natureza').innerText = info.natureza || 'Sem informação';
+                document.getElementById('ma-id').innerText = `ID: ${String(id).substring(0,8)}...`;
+                
+                // Preencher data/hora de criação
+                const dataAleCreacao = new Date(d.criado_em);
+                const diaAle = String(dataAleCreacao.getDate()).padStart(2, '0');
+                const mesAle = String(dataAleCreacao.getMonth() + 1).padStart(2, '0');
+                const horaAle = String(dataAleCreacao.getHours()).padStart(2, '0');
+                const minAle = String(dataAleCreacao.getMinutes()).padStart(2, '0');
+                document.getElementById('ma-criado-em').innerText = `Gerado em: ${diaAle}/${mesAle} ${horaAle}:${minAle}`;
+                
+                // Timer (utilizando timer tático se existir, senão fallback básico)
+                if (typeof calcularTimerTatico === 'function') {
+                    document.getElementById('ma-timer').innerText = calcularTimerTatico(d);
+                } else {
+                    const createdTime = new Date(d.criado_em || d.data);
+                    const nowTime = new Date();
+                    const diffMinutes = Math.floor((nowTime - createdTime) / 60000);
+                    document.getElementById('ma-timer').innerText = `${Math.floor(diffMinutes / 60).toString().padStart(2,'0')}:${(diffMinutes % 60).toString().padStart(2,'0')}`;
+                }
+                
+                // Tags
+                const tagsDiv = document.getElementById('ma-tags');
+                tagsDiv.innerHTML = '';
+                (info.classificacoes || []).forEach(tg => {
+                    let bg = 'var(--border)'; let tc = 'var(--text-muted)';
+                    if(["ARMA DE FOGO", "ARMA BRANCA", "EXPLOSIVO", "FERIDOS (SIM)", "ARMADO (SIM)"].includes(tg)) { bg = 'var(--danger)'; tc = 'white'; }
+                    else if(["EM ANDAMENTO", "ARMADO (SUSPEITA)", "TUMULTO (SIM)"].includes(tg)) { bg = 'var(--warning)'; tc = 'black'; }
+                    else { bg = 'var(--bg-hover)'; tc = 'var(--text-light)'; }
+                    const el = document.createElement('span');
+                    el.style.cssText = `font-size:9px; padding:3px 6px; background:${bg}; color:${tc}; border-radius:3px; font-weight:700;`;
+                    el.innerText = tg; tagsDiv.appendChild(el);
+                });
+                
+                // Endereço
+                if(info.endereco) {
+                    const refText = info.endereco.referencia ? `<br><span style="color:var(--warning);">Ref: ${info.endereco.referencia}</span>` : '';
+                    document.getElementById('ma-endereco').innerHTML = `<strong>${info.endereco.logradouro}, ${info.endereco.numero}</strong><br>${info.endereco.bairro}, ${info.endereco.cidade}${refText}`;
+                    document.getElementById('ma-btn-mapa').onclick = () => window.open(`https://maps.google.com/?q=${encodeURIComponent(info.endereco.formatado)}`, '_blank');
+                }
+
+                // Ações Auxiliares
+                document.getElementById('ma-iconeCopiarSade').onclick = () => copiarParaSade(id);
+                if(info.solicitante && info.solicitante.telefone) {
+                    document.getElementById('ma-btn-ligar').href = `tel:+55${info.solicitante.telefone}`;
+                }
+
+                // Solicitante
+                document.getElementById('ma-nome').innerText = `Nome: ${info.solicitante?.nome || 'Anônimo'}`;
+                document.getElementById('ma-telefone').innerText = `Tel: ${info.solicitante?.telefone || 'Não informado'}`;
+
+                // Descrição e Envolvidos
+                let histHTML = d.resumo_texto ? d.resumo_texto.replace(/\n/g, '<br>') : '<span style="color:var(--text-muted);">Nenhuma informação principal</span>';
+                if (info.veiculos && info.veiculos.length > 0) {
+                    histHTML += '<br><br><strong>Veículo(s):</strong><br>' + info.veiculos.map(v => `[${v.placa || 'S/P'}] ${v.desc}`).join('<br>');
+                }
+                if (info.suspeitos && info.suspeitos.length > 0) {
+                    histHTML += '<br><br><strong>Suspeito/Autor:</strong><br>' + info.suspeitos.join('<br>');
+                }
+                document.getElementById('ma-historico').innerHTML = histHTML;
+                
+                // Exibir modal com force do CSS
+                const modal = document.getElementById('modalAlerta');
+                modal.style.display = 'flex';
+                modal.style.zIndex = '250';
+                console.log('Modal aberto com sucesso!', modal);
+            } catch(e) { 
+                console.error('Erro ao abrir modal alerta:', e);
+                alert('Erro ao abrir alerta: ' + e.message);
+            }
+        }
+
+        async function promoverAlertaFromModal(id) {
+            if(!id) {
+                alert('ID de alerta inválido');
+                return;
+            }
+            
+            if(!confirm('Tem a certeza que deseja promover este Alerta a Ocorrência? Ele passará a aguardar despacho.')) return;
+            
+            try {
+                // Garantir que id é string
+                id = String(id).trim();
+                console.log('Promovendo alerta:', id);
+                
+                // Fazer update no banco - APENAS status
+                const result = await api('tb_triagem', `id=eq.${id}`, 'PATCH', { 
+                    status: 'AGUARDANDO'
+                });
+                
+                console.log('Resposta da promoção:', result);
+                
+                alert('Alerta promovido com sucesso! Agora aguarda despacho.');
+                fecharModal('modalAlerta');
+                
+                // Recarregar dados
+                if (typeof carregarAlertas === 'function') {
+                    await carregarAlertas();
+                }
+                
+                // Navegar para monitoramento
+                navegar('monitoramento');
+                
+                // Recarregar monitoramento para mostrar a nova ocorrência
+                if (typeof carregarMonitoramento === 'function') {
+                    await carregarMonitoramento();
+                }
+            } catch(e) {
+                console.error('Erro ao promover alerta:', e);
+                console.error('Detalhes do erro:', e.message, e.stack);
+                alert('Erro ao promover o alerta: ' + e.message);
+            }
+        }
+        // ========== FIM DO SISTEMA DE MODAL DE ALERTAS ==========
+
         // Função para abrir Modal de Ocorrência
+        let timerIntervalOcorrencia = null; // Armazenar interval para limpar depois
+        
         async function abrirModalOcorrencia(id) {
             idOcorrenciaAberta = id;
             try {
+                // Limpar timer anterior se existir
+                if (timerIntervalOcorrencia) {
+                    clearInterval(timerIntervalOcorrencia);
+                }
+                
                 const dados = await api('tb_triagem', `id=eq.${id}&select=*`);
                 if(!dados || !dados.length) return;
                 
                 const d = dados[0];
                 const info = d.dados_preenchidos;
-                const createdTime = new Date(d.criado_em);
-                const nowTime = new Date();
-                const diffMinutes = Math.floor((nowTime - createdTime) / 60000);
-                const timerText = `${Math.floor(diffMinutes / 60).toString().padStart(2,'0')}:${(diffMinutes % 60).toString().padStart(2,'0')}`;
                 
                 // Preencher modal
                 document.getElementById('mo-natureza').innerText = info.natureza || 'Sem informação';
                 document.getElementById('mo-id').innerText = `ID: ${id.substring(0,8)}...`;
-                document.getElementById('mo-timer').innerText = timerText;
+                document.getElementById('mo-timer').innerText = calcularTimerTatico(d);
+                
+                // Preencher data/hora de criação
+                const dataCriacao = new Date(d.criado_em);
+                const diaC = String(dataCriacao.getDate()).padStart(2, '0');
+                const mesC = String(dataCriacao.getMonth() + 1).padStart(2, '0');
+                const horaC = String(dataCriacao.getHours()).padStart(2, '0');
+                const minC = String(dataCriacao.getMinutes()).padStart(2, '0');
+                document.getElementById('mo-criado-em').innerText = `Gerado em: ${diaC}/${mesC} ${horaC}:${minC}`;
+                
+                // Atualizar timer a cada segundo
+                timerIntervalOcorrencia = setInterval(async () => {
+                    const dadosAtualizados = await api('tb_triagem', `id=eq.${id}&select=*`);
+                    if(dadosAtualizados && dadosAtualizados.length) {
+                        const dAtualizado = dadosAtualizados[0];
+                        document.getElementById('mo-timer').innerText = calcularTimerTatico(dAtualizado);
+                    }
+                }, 1000);
                 
                 // Tags
                 const tagsDiv = document.getElementById('mo-tags');
@@ -1936,10 +2436,10 @@ async function aplicarPui() {
                 }
                 document.getElementById('mo-historico').innerHTML = histHTML;
                 
-                // Lógica por Status
-                if(d.status === 'AGUARDANDO') {
+                // Renderizar recursos e botão da ação
+                if(d.status === 'AGUARDANDO' || d.status === 'pendente') {
                     document.getElementById('mo-recursos-container').style.display = 'none';
-                    document.getElementById('mo-btn-acao').innerText = 'Despachar Viatura';
+                    document.getElementById('mo-btn-acao').innerText = 'Despachar';
                     document.getElementById('mo-btn-acao').onclick = () => abrirSelecaoFrotaModal(id, 'PRINCIPAL');
                 } else if(d.status === 'EM_ANDAMENTO') {
                     // Renderizar recursos
@@ -1954,16 +2454,16 @@ async function aplicarPui() {
                                 itemDiv.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px; background:rgba(255,255,255,0.02); border-radius:4px; margin-bottom:6px;';
                                 // Status tático de deslocamento
                                 const st = vtr.status_deslocamento || 'DESPACHADA';
-                                let btnTatico = '';
-                                if(st === 'DESPACHADA') btnTatico = `<button class="btn btn-sm" style="background:var(--warning); color:black;" onclick="atualizarStatusTatico('${id}', ${idx}, 'NO LOCAL')">📍 NO LOCAL</button>`;
-                                else if(st === 'NO LOCAL') btnTatico = `<button class="btn btn-sm" style="background:#8b5cf6; color:white;" onclick="atualizarStatusTatico('${id}', ${idx}, 'SAIU')">💨 SAIU</button>`;
-                                else if(st === 'SAIU') btnTatico = `<button class="btn btn-sm btn-outline" style="cursor:not-allowed;" disabled>FINALIZANDO O ATENDIMENTO</button>`;
+                                let btnEstagio = '';
+                                if(st === 'DESPACHADA') btnEstagio = `<button class="btn btn-sm" style="background:var(--warning); color:black;" onclick="atualizarStatusTatico('${id}', ${idx}, 'NO LOCAL')">📍 NO LOCAL</button>`;
+                                else if(st === 'NO LOCAL') btnEstagio = `<button class="btn btn-sm" style="background:#8b5cf6; color:white;" onclick="atualizarStatusTatico('${id}', ${idx}, 'SAIU')">💨 SAIU</button>`;
+                                else if(st === 'SAIU') btnEstagio = `<button class="btn btn-sm btn-outline" style="cursor:not-allowed;" disabled>FINALIZANDO O ATENDIMENTO</button>`;
 
                                 let actions = `<button class="btn btn-sm btn-danger" onclick="retirarViatura('${id}', ${idx})">Retirar</button>`;
                                 if(vtr.funcao !== 'PRINCIPAL') {
                                     actions = `<button class="btn btn-sm btn-outline" onclick="promoverViatura('${id}', ${idx})">Promover</button>` + actions;
                                 }
-                                actions = btnTatico + actions;
+                                actions = btnEstagio + actions;
                                 itemDiv.innerHTML = `<span>${vtr.funcao==='PRINCIPAL' ? '⭐' : '📍'} ${vtr.prefixo}</span><div style="display:flex;gap:4px;">${actions}</div>`;
                                 recursosDiv.appendChild(itemDiv);
                             });
@@ -1982,17 +2482,30 @@ async function aplicarPui() {
         // Função para finalizar (abre modal de finalização)
         async function finalizarOcorrenciaModal(id) {
             idParaFinalizar = id;
+            
+            // Detectar se é alerta ou ocorrência
+            const esAlerta = id === idAlertaAberto;
+            
             document.getElementById('mf-bo').value = '';
             document.getElementById('mf-observacoes').value = '';
-            document.getElementById('wrapper-mf-bo').style.display = 'block';
             
             try {
-                // Verifica se a ocorrência está apenas aguardando na fila
                 const dados = await api('tb_triagem', `id=eq.${id}&select=status`);
-                if(dados && dados.length > 0 && dados[0].status === 'AGUARDANDO') {
+                
+                if(esAlerta) {
+                    // Alertas não precisam de BO
                     document.getElementById('wrapper-mf-bo').style.display = 'none';
+                } else if(dados && dados.length > 0 && dados[0].status === 'AGUARDANDO') {
+                    // Ocorrências em espera não precisam de BO
+                    document.getElementById('wrapper-mf-bo').style.display = 'none';
+                } else {
+                    // Ocorrências despachadas precisam de BO
+                    document.getElementById('wrapper-mf-bo').style.display = 'block';
                 }
-            } catch(e) {}
+            } catch(e) {
+                console.error('Erro ao verificar status:', e);
+                document.getElementById('wrapper-mf-bo').style.display = 'block';
+            }
             
             document.getElementById('modalFinalizacao').style.display = 'flex';
         }
@@ -2001,6 +2514,7 @@ async function aplicarPui() {
             const bo = document.getElementById('mf-bo').value.trim();
             const obs = document.getElementById('mf-observacoes').value.trim();
             const isAguardando = document.getElementById('wrapper-mf-bo').style.display === 'none';
+            const esAlerta = idParaFinalizar === idAlertaAberto;
             
             if(!isAguardando && (!bo || !obs)) return alert('Preencha o Nº BO e as Observações.');
             
@@ -2017,18 +2531,31 @@ async function aplicarPui() {
                     novaObs += `\n[FINALIZAÇÃO - ${new Date().toLocaleString()}] BO: ${bo} | Obs: ${obs}`;
                 }
                 
-                const viaturas = ocoAtual.viaturas_empenhadas || [];
-                for(const vtr of viaturas) {
-                    await api('tb_viaturas', `prefixo=eq.${vtr.prefixo}`, 'PATCH', { status_viatura: 'Disponível' });
+                // Atualizar status das viaturas se for ocorrência
+                if(!esAlerta) {
+                    const viaturas = ocoAtual.viaturas_empenhadas || [];
+                    for(const vtr of viaturas) {
+                        await api('tb_viaturas', `prefixo=eq.${vtr.prefixo}`, 'PATCH', { status_viatura: 'Disponível' });
+                    }
                 }
                 
                 await api('tb_triagem', `id=eq.${idParaFinalizar}`, 'PATCH', { status: 'FINALIZADA', resumo_texto: novaObs });
                 
-                alert('Ocorrência finalizada!');
+                alert(esAlerta ? 'Alerta finalizado!' : 'Ocorrência finalizada!');
                 fecharModal('modalFinalizacao');
-                fecharModal('modalOcorrencia');
-                carregarMonitoramento();
-            } catch(e) { alert('Erro ao finalizar'); }
+                fecharModal(esAlerta ? 'modalAlerta' : 'modalOcorrencia');
+                
+                if(esAlerta) {
+                    carregarAlertas();
+                    idAlertaAberto = null;
+                } else {
+                    carregarMonitoramento();
+                    idOcorrenciaAberta = null;
+                }
+            } catch(e) {
+                console.error('Erro ao finalizar:', e);
+                alert('Erro ao finalizar: ' + e.message);
+            }
         }
 
         // Abrir seleção de frota em modal
@@ -2062,7 +2589,8 @@ async function aplicarPui() {
                 const ocoAtual = ocoDados[0];
                 
                 let viaturas = ocoAtual.viaturas_empenhadas || [];
-                const novaViatura = { prefixo: prefixo, funcao: tipo, status_deslocamento: 'DESPACHADA', hora_status: new Date().toISOString() };
+                const agora = new Date().toISOString();
+                const novaViatura = { prefixo: prefixo, funcao: tipo, status_deslocamento: 'DESPACHADA', hora_status: agora };
                 
                 // Se é PRINCIPAL e já existe um, converte o antigo para APOIO
                 if(tipo === 'PRINCIPAL' && viaturas.length > 0) {
@@ -2074,7 +2602,8 @@ async function aplicarPui() {
                 
                 await api('tb_triagem', `id=eq.${idOco}`, 'PATCH', {
                     viaturas_empenhadas: viaturas,
-                    status: tipo === 'PRINCIPAL' ? 'EM_ANDAMENTO' : ocoAtual.status
+                    status: tipo === 'PRINCIPAL' ? 'EM_ANDAMENTO' : ocoAtual.status,
+                    hora_despacho: agora
                 });
                 
                 // Marcar viatura como em uso (padronizado para 'Despachada')
@@ -2111,12 +2640,14 @@ async function aplicarPui() {
                 }
                 
                 // 3. Adicionar nova viatura ao array
-                viaturas.push({ prefixo: prefixo, funcao: funcao, status_deslocamento: 'DESPACHADA', hora_status: new Date().toISOString() });
+                const agora = new Date().toISOString();
+                viaturas.push({ prefixo: prefixo, funcao: funcao, status_deslocamento: 'DESPACHADA', hora_status: agora });
                 
-                // 4. Atualizar tb_triagem com viaturas_empenhadas e status
+                // 4. Atualizar tb_triagem com viaturas_empenhadas, status e hora_despacho
                 await api('tb_triagem', `id=eq.${idOcorrencia}`, 'PATCH', {
                     viaturas_empenhadas: viaturas,
-                    status: 'EM_ANDAMENTO'
+                    status: 'EM_ANDAMENTO',
+                    hora_despacho: agora
                 });
                 
                 // 5. Atualizar status da viatura para 'Despachada'
@@ -2218,20 +2749,66 @@ async function aplicarPui() {
         }
 
         async function atualizarStatusTatico(idOcorrencia, indexVtr, novoStatus) {
+            if(!idOcorrencia) {
+                alert('ID de ocorrência inválido');
+                console.error('ID inválido:', idOcorrencia);
+                return;
+            }
+            
             try {
+                console.log('Atualizando status tático:', idOcorrencia, indexVtr, novoStatus);
+                
+                idOcorrencia = String(idOcorrencia).trim();
+                
                 const ocoDados = await api('tb_triagem', `id=eq.${idOcorrencia}&select=*`);
-                if(!ocoDados.length) return;
+                if(!ocoDados || !ocoDados.length) {
+                    alert('Ocorrência não encontrada');
+                    console.error('Ocorrência não encontrada:', idOcorrencia);
+                    return;
+                }
+                
                 const ocoAtual = ocoDados[0];
                 let viaturas = ocoAtual.viaturas_empenhadas || [];
-                if(!viaturas[indexVtr]) return;
                 
+                if(!viaturas[indexVtr]) {
+                    alert('Viatura não encontrada');
+                    console.error('Viatura não encontrada no índice:', indexVtr);
+                    return;
+                }
+                
+                // Atualizar status da viatura
                 viaturas[indexVtr].status_deslocamento = novoStatus;
-                viaturas[indexVtr].hora_status = new Date().toISOString();
                 
-                await api('tb_triagem', `id=eq.${idOcorrencia}`, 'PATCH', { viaturas_empenhadas: viaturas });
-                carregarMonitoramento();
-                abrirModalOcorrencia(idOcorrencia);
-            } catch(e) { console.error('Erro status tático:', e); }
+                // Preparar payload com viaturas e timestamp na ocorrência
+                const payload = { viaturas_empenhadas: viaturas };
+                const agora = new Date().toISOString();
+                
+                // Adicionar timestamp no objeto da viatura E na ocorrência (para timer tático)
+                if (novoStatus === 'NO LOCAL') {
+                    viaturas[indexVtr].hora_chegada = agora;
+                    payload.hora_local = agora; // Atualizar ocorrência para timer mostrar "L"
+                    console.log('Status atualizado para NO LOCAL (L):', viaturas[indexVtr]);
+                } else if (novoStatus === 'SAIU') {
+                    viaturas[indexVtr].hora_saida_local = agora;
+                    payload.hora_saida = agora; // Atualizar ocorrência para timer mostrar "S"
+                    console.log('Status atualizado para SAIU (S):', viaturas[indexVtr]);
+                }
+                
+                payload.viaturas_empenhadas = viaturas;
+                console.log('Payload enviado:', payload);
+                
+                const result = await api('tb_triagem', `id=eq.${idOcorrencia}`, 'PATCH', payload);
+                console.log('Resposta da API:', result);
+                
+                // Recarregar dados
+                await carregarMonitoramento();
+                await abrirModalOcorrencia(idOcorrencia);
+                
+            } catch(e) { 
+                console.error('Erro ao atualizar status tático:', e);
+                console.error('Detalhes:', e.message);
+                alert('Erro ao atualizar status: ' + e.message);
+            }
         }
 
         async function adicionarApoio() {
@@ -2451,7 +3028,10 @@ async function compartilharWhatsApp(id) {
         const relatoSujo = d[0].resumo_texto || 'Sem relato';
         const relatoLimpo = relatoSujo.replace(/\n\s*\n/g, '\n');
         
-        const txt = `🚨 *OCORRÊNCIA:* ${i.natureza}\n📍 *LOCAL:* ${i.endereco.logradouro}, ${i.endereco.numero} - ${i.endereco.bairro}, ${i.endereco.cidade}\n📌 *REFERÊNCIA:* ${i.endereco.referencia || 'Sem ponto de referência'}\n👤 *SOLICITANTE:* ${i.solicitante.nome} - ${i.solicitante.telefone}\n📝 *RELATO:* ${relatoLimpo}`;
+        // Esta é a linha mágica que o Copilot apagou
+        const tags = i.classificacoes && i.classificacoes.length > 0 ? `\n\n⚠️ *CLASSIFICAÇÃO:* ${i.classificacoes.join(' | ')}` : '';
+        
+        const txt = `🚨 *OCORRÊNCIA:* ${i.natureza}\n📍 *LOCAL:* ${i.endereco.logradouro}, ${i.endereco.numero} - ${i.endereco.bairro}, ${i.endereco.cidade}\n📌 *REFERÊNCIA:* ${i.endereco.referencia || 'Sem ponto de referência'}\n👤 *SOLICITANTE:* ${i.solicitante.nome} - ${i.solicitante.telefone}\n📝 *RELATO:* ${relatoLimpo}${tags}`;
         
         await navigator.clipboard.writeText(txt);
         window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
@@ -2462,24 +3042,59 @@ async function compartilharWhatsApp(id) {
 
 async function editarEndereco() {
     try {
-        const d = await api('tb_triagem', `id=eq.${idOcorrenciaAberta}&select=*`); const e = d[0].dados_preenchidos.endereco;
+        // Detectar qual ID está ativo (Alerta ou Ocorrência)
+        const id = idAlertaAberto || idOcorrenciaAberta;
+        if(!id) return alert('Nenhum registro aberto para editar.');
+        
+        const tabela = 'tb_triagem'; // Será 'tb_alertas' ou 'tb_ocorrencias_ativas' quando separadas
+        const d = await api(tabela, `id=eq.${id}&select=*`);
+        const e = d[0].dados_preenchidos.endereco;
+        
         document.getElementById('ed_cep').value = e.cep || ''; document.getElementById('ed_cidade').value = e.cidade || '';
         document.getElementById('ed_log').value = e.logradouro || ''; document.getElementById('ed_num').value = e.numero || '';
         document.getElementById('ed_bairro').value = e.bairro || ''; document.getElementById('ed_ref').value = e.referencia || '';
         document.getElementById('modalEditarEndereco').style.display = 'flex';
-    } catch(e) {}
+    } catch(e) {
+        console.error('Erro ao abrir edição de endereço:', e);
+        alert('Erro ao carregar endereço: ' + e.message);
+    }
 }
 
 async function salvarEdicaoEndereco() {
     try {
-        const d = await api('tb_triagem', `id=eq.${idOcorrenciaAberta}&select=*`); const info = d[0].dados_preenchidos;
-        info.endereco.cep = document.getElementById('ed_cep').value; info.endereco.cidade = document.getElementById('ed_cidade').value.toUpperCase();
-        info.endereco.logradouro = document.getElementById('ed_log').value.toUpperCase(); info.endereco.numero = document.getElementById('ed_num').value.toUpperCase();
-        info.endereco.bairro = document.getElementById('ed_bairro').value.toUpperCase(); info.endereco.referencia = document.getElementById('ed_ref').value.toUpperCase();
+        // Detectar qual ID está ativo e qual modal reabrir
+        const id = idAlertaAberto || idOcorrenciaAberta;
+        const esAlerta = !!idAlertaAberto;
+        if(!id) return alert('Nenhum registro aberto para editar.');
+        
+        const tabela = 'tb_triagem'; // Será 'tb_alertas' ou 'tb_ocorrencias_ativas' quando separadas
+        const d = await api(tabela, `id=eq.${id}&select=*`);
+        const info = d[0].dados_preenchidos;
+        
+        info.endereco.cep = document.getElementById('ed_cep').value;
+        info.endereco.cidade = document.getElementById('ed_cidade').value.toUpperCase();
+        info.endereco.logradouro = document.getElementById('ed_log').value.toUpperCase();
+        info.endereco.numero = document.getElementById('ed_num').value.toUpperCase();
+        info.endereco.bairro = document.getElementById('ed_bairro').value.toUpperCase();
+        info.endereco.referencia = document.getElementById('ed_ref').value.toUpperCase();
         info.endereco.formatado = `${info.endereco.logradouro}, ${info.endereco.numero} - ${info.endereco.bairro}, ${info.endereco.cidade}`;
-        await api('tb_triagem', `id=eq.${idOcorrenciaAberta}`, 'PATCH', { dados_preenchidos: info });
-        fecharModal('modalEditarEndereco'); carregarMonitoramento(); abrirModalOcorrencia(idOcorrenciaAberta);
-    } catch(e) { alert('Erro ao salvar endereço'); }
+        
+        await api(tabela, `id=eq.${id}`, 'PATCH', { dados_preenchidos: info });
+        
+        fecharModal('modalEditarEndereco');
+        
+        // Recarregar e reabrirmodal correto
+        if(esAlerta) {
+            carregarAlertas();
+            abrirModalAlerta(id);
+        } else {
+            carregarMonitoramento();
+            abrirModalOcorrencia(id);
+        }
+    } catch(e) {
+        console.error('Erro ao salvar endereço:', e);
+        alert('Erro ao salvar endereço: ' + e.message);
+    }
 }
 
     </script>
