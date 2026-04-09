@@ -1044,6 +1044,41 @@ async function aplicarPui() {
             return `${dataHoraFmt} (${duracaoFmt})`;
         }
 
+        function obterHoraCriacao(oc) {
+            // Retorna apenas data/hora de criação sem duração
+            if (!oc.criado_em) return '--/-- --:--';
+            const dataHora = new Date(oc.criado_em);
+            const dia = String(dataHora.getDate()).padStart(2, '0');
+            const mes = String(dataHora.getMonth() + 1).padStart(2, '0');
+            const hora = String(dataHora.getHours()).padStart(2, '0');
+            const min = String(dataHora.getMinutes()).padStart(2, '0');
+            return `${dia}/${mes} ${hora}:${min}`;
+        }
+
+        function obterDuracaoUltimaAtualizacao(oc) {
+            // Retorna a duração desde a ÚLTIMA atualização de status
+            // Hierarquia: hora_saida > hora_local > hora_despacho > criado_em
+            let baseTimeStr = oc.criado_em;
+            
+            if (oc.hora_saida) baseTimeStr = oc.hora_saida;
+            else if (oc.hora_local) baseTimeStr = oc.hora_local;
+            else if (oc.hora_despacho) baseTimeStr = oc.hora_despacho;
+            
+            if (!baseTimeStr) return '(00m)';
+            
+            const baseTime = new Date(baseTimeStr);
+            const agora = new Date();
+            const diffMs = agora - baseTime;
+            const diffMinutes = Math.floor(diffMs / 60000);
+            
+            if (diffMinutes >= 60) {
+                const h = Math.floor(diffMinutes / 60);
+                const m = diffMinutes % 60;
+                return `(${h}h ${m}m)`;
+            }
+            return `(${diffMinutes >= 0 ? diffMinutes : 0}m)`;
+        }
+
         function navegar(tela) {
             ['atendimento', 'triagem', 'monitoramento', 'frota', 'alertas', 'admin'].forEach(t => {
                 const el = document.getElementById('view-'+t);
@@ -1930,11 +1965,11 @@ async function aplicarPui() {
                         
                         // Card Mobile (só principal)
                         const card = `<div class="card-mobile" style="border-left-color:var(--success)" onclick="abrirModalOcorrencia('${d.id}')" ${atributoBusca}>
-                            <div style="display:flex;justify-content:space-between;font-weight:bold;font-size:13px;margin-bottom:5px;"><span>${info.natureza}</span><span>${calcularTimerTatico(d)}</span></div>
+                            <div style="display:flex;justify-content:space-between;font-weight:bold;font-size:13px;margin-bottom:5px;"><span>${info.natureza}</span><span>${obterHoraCriacao(d)}</span></div>
                             <div style="font-size:11px;color:#aaa;margin-bottom:5px;">${info.endereco.formatado}</div>
                             <div style="display:flex;gap:5px; flex-wrap:wrap;">
                                 <span class="card-tag" style="background:var(--success);color:black">🚔 ${prefixoPrincipal}</span>
-                                <span class="card-tag" style="background:var(--bg-hover);color:var(--info)">⏱ ${timerTxt} ${statusTatico}</span>
+                                <span class="card-tag" style="background:var(--bg-hover);color:var(--info)">⏱ ${obterDuracaoUltimaAtualizacao(d)} ${statusTatico}</span>
                                 ${viaturas.filter(v=>v.funcao==='APOIO').length > 0 ? `<span class="card-tag" style="background:#ff9500;color:black">+${viaturas.filter(v=>v.funcao==='APOIO').length} APOIO</span>` : ''}
                             </div>
                         </div>`;
