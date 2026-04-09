@@ -3028,15 +3028,21 @@ async function compartilharWhatsApp(id) {
         const relatoSujo = d[0].resumo_texto || 'Sem relato';
         const relatoLimpo = relatoSujo.replace(/\n\s*\n/g, '\n');
         
-        // Esta é a linha mágica que o Copilot apagou
         const tags = i.classificacoes && i.classificacoes.length > 0 ? `\n\n⚠️ *CLASSIFICAÇÃO:* ${i.classificacoes.join(' | ')}` : '';
         
-        const txt = `🚨 *OCORRÊNCIA:* ${i.natureza}\n📍 *LOCAL:* ${i.endereco.logradouro}, ${i.endereco.numero} - ${i.endereco.bairro}, ${i.endereco.cidade}\n📌 *REFERÊNCIA:* ${i.endereco.referencia || 'Sem ponto de referência'}\n👤 *SOLICITANTE:* ${i.solicitante.nome} - ${i.solicitante.telefone}\n📝 *RELATO:* ${relatoLimpo}${tags}`;
+        // Formata o endereço por extenso para leitura
+        const enderecoFormatado = `${i.endereco.logradouro}, ${i.endereco.numero} - ${i.endereco.bairro}, ${i.endereco.cidade}`;
+        
+        // Gera o link oficial de busca do Google Maps baseado no endereço
+        const linkMapa = `https://maps.google.com/?q=${encodeURIComponent(enderecoFormatado)}`;
+        
+        // Constrói o texto separando o LOCAL e o MAPA em linhas diferentes
+        const txt = `🚨 *OCORRÊNCIA:* ${i.natureza}\n📍 *LOCAL:* ${enderecoFormatado}\n🗺️ *MAPA:* ${linkMapa}\n📌 *REFERÊNCIA:* ${i.endereco.referencia || 'Sem ponto de referência'}\n👤 *SOLICITANTE:* ${i.solicitante.nome} - ${i.solicitante.telefone}\n📝 *RELATO:* ${relatoLimpo}${tags}`;
         
         await navigator.clipboard.writeText(txt);
         window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
     } catch(e) { 
-        alert('Erro no WPP'); 
+        alert('Erro ao partilhar no WhatsApp.'); 
     }
 }
 
